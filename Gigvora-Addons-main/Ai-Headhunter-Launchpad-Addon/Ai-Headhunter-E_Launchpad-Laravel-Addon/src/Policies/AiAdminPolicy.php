@@ -10,6 +10,6 @@ class AiAdminPolicy
 {
     public function manage(User $user): bool
     {
-        return $user->can('manage_talent_ai');
+        return $user->user_role === 'admin';
     }
 }

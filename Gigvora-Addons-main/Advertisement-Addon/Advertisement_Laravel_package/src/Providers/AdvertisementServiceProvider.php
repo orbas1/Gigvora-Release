@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Advertisement\Models\Campaign;
 use Advertisement\Policies\CampaignPolicy;
+use App\Models\User;
 
 class AdvertisementServiceProvider extends ServiceProvider
 {
@@ -19,13 +20,20 @@ class AdvertisementServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/advertisement.php' => config_path('advertisement.php'),
         ], 'advertisement-config');
 
+        Gate::policy(Campaign::class, CampaignPolicy::class);
+        Gate::define('manage_advertisement', static function (?User $user): bool {
+            return $user?->user_role === 'admin';
+        });
+
+        if (!config('advertisement.enabled')) {
+            return;
+        }
+
         $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
         $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
 
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'advertisement');
-
-        Gate::policy(Campaign::class, CampaignPolicy::class);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([

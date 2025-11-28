@@ -4,8 +4,19 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Gigvora-Addons-main/Advertisement-Addon/Advertisement_Laravel_package"
+        },
+        {
+            "type": "path",
+            "url": "../Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-Laravel-Addon"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.0",
+        "advertisement/package": "*@dev",
         "anandsiddharth/laravel-paytm-wallet": "^2.0",
         "firebase/php-jwt": "^6.4",
         "flutterwavedev/flutterwave-v3": "^1.0",
@@ -21,7 +32,8 @@
         "php-flasher/flasher-laravel": "^1.7",
         "razorpay/razorpay": "^2.8",
         "stripe/stripe-php": "^10.11",
-        "yajra/laravel-datatables-oracle": "^10.3"
+        "yajra/laravel-datatables-oracle": "^10.3",
+        "gigvora/talent-ai": "*@dev"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.0",
