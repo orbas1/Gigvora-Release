@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Ads Admin Dashboard')
+@section('title', 'Gigvora Ads Admin')
 
 @section('breadcrumbs')
 <nav aria-label="breadcrumb">
@@ -12,6 +12,7 @@
 @endsection
 
 @section('content')
+<div class="container py-4">
 <div class="row g-3 mb-3">
     @foreach([
         ['label' => 'Total Ad Revenue', 'id' => 'admin-revenue'],
@@ -85,8 +86,9 @@
         </table>
     </div>
 </div>
+</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/advertisement/admin.js') }}"></script>
+<script src="{{ mix('js/advertisement/admin.js') }}" defer></script>
 @endpush

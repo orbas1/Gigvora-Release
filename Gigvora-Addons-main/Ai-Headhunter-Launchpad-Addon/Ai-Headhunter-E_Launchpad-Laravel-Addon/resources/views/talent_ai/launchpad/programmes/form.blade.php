@@ -3,7 +3,7 @@
 @section('title', ($programme->exists ?? false) ? 'Edit programme' : 'Create programme')
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @section('content')

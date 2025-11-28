@@ -3,7 +3,7 @@
 ## Web
 - `GET /addons/advertisement/dashboard` → `view('advertisement::dashboard')`
   - Shows the Gigvora Ads Manager dashboard; requires `web` + `auth` middleware and `advertisement.enabled` flag.
-  - UI assets: `@vite(['resources/js/advertisement/dashboard.js'])` with shared Gigvora layout (`layouts.app`).
+  - UI assets: `mix('js/advertisement/dashboard.js')` with shared Gigvora layout (`layouts.app`).
 
 ## API (all behind `api` + `auth:sanctum` and `advertisement.enabled`)
 - `GET /api/advertisement/advertisers` → `AdvertiserController@index`

@@ -1,7 +1,7 @@
 # Talent & AI Backend Functions & Endpoints
 
 ## Web (`web` + `auth` middleware, gated by `gigvora_talent_ai.enabled` and module toggles)
-UI assets are delivered via Vite from `resources/js/addons/talent_ai/*` and `resources/css/addons/talent_ai/talent_ai.css` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles.
+UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/addons/talent_ai/talent_ai.css` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles.
 
 ### Primary screens
 - `GET /addons/talent-ai/headhunters/dashboard` → `view('talent_ai::headhunters.dashboard')` (name: `addons.talent_ai.headhunters.dashboard`)

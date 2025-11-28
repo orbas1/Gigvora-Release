@@ -3,7 +3,7 @@
 @section('title', 'Gigvora Ads Manager')
 
 @push('scripts')
-    @vite('resources/js/advertisement/dashboard.js')
+    <script src="{{ mix('js/advertisement/dashboard.js') }}" defer></script>
 @endpush
 
 @section('content')

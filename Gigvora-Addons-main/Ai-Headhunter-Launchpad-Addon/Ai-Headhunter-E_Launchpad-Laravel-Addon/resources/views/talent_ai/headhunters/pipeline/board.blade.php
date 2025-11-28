@@ -3,11 +3,11 @@
 @section('title', 'Pipeline Board')
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @push('scripts')
-    @vite('resources/js/addons/talent_ai/pipeline_board.js')
+    <script src="{{ mix('js/addons/talent_ai/pipeline_board.js') }}" defer></script>
 @endpush
 
 @section('content')

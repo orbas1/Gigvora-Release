@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ads Dashboard')
+@section('title', 'Gigvora Ads Dashboard')
 
 @section('breadcrumbs')
 <nav aria-label="breadcrumb">
@@ -12,6 +12,7 @@
 @endsection
 
 @section('content')
+<div class="container py-4">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h3 mb-1">Ads Performance</h1>
@@ -113,8 +114,9 @@
         </table>
     </div>
 </div>
+</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/advertisement/dashboard.js') }}"></script>
+<script src="{{ mix('js/advertisement/dashboard.js') }}" defer></script>
 @endpush

@@ -3,7 +3,7 @@
 @section('title', __('talent_ai::addons_talent_ai.menu.headhunter_management'))
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @section('content')
