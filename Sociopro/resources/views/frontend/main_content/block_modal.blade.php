@@ -23,7 +23,7 @@
         <ul>
             <li>{{get_phrase("See your posts on your timeline")}}</li>
         </ul>
-        <p>{{get_phrase('If you just want to limit what you share with')}} {{$post->getUser->name}} {{get_phrase('or see less of him on Sociopro, you can take a break from him instead.')}}</p>
+        <p>{{get_phrase('If you just want to limit what you share with')}} {{$post->getUser->name}} {{get_phrase('or see less of him on Gigvora, you can take a break from him instead.')}}</p>
        <div class="modal-footer mt-2">
           <button type="submit" class="btn common_btn ">{{get_phrase('Confirm')}}</button>
        </div>

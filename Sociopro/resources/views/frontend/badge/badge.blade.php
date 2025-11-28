@@ -12,7 +12,7 @@
                         @endphp
                         <div class="batch">
                             <div class="demo-badge">
-                                <h4>{{get_phrase('Build trust with Sociopro Verified')}}</h4>
+                                <h4>{{get_phrase('Build trust with Gigvora Verified')}}</h4>
                                 <div class="badge-image">
                                     <img src="{{ get_user_image(auth()->user()->id,'optimized') }}" alt="">
                                     <div class="badge_info d-flex justify-content-center mt-2">
