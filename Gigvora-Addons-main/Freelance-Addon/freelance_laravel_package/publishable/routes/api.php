@@ -35,89 +35,89 @@ use App\Http\Controllers\Api\SendMessageController;
 |
 */
 
-Route::post('login',        [AuthController::class, 'login']);
-Route::post('register',     [AuthController::class, 'register']);
-Route::post('forget-password', [AuthController::class, 'resetEmailPassword']);
+Route::prefix(config('freelance.api.prefix', 'api'))
+    ->middleware(config('freelance.api.middleware', ['api']))
+    ->group(function () {
+        // Auth endpoints are provided by the host app; avoid duplicating login/register here.
 
- // Taxonomies
-Route::get('taxonomies',    [TaxonomyController::class, 'getTaxonomies']);
+        // Taxonomies
+        Route::get('taxonomies',    [TaxonomyController::class, 'getTaxonomies']);
 
-Route::get('tags',                  [TaxonomyController::class, 'getTags']);
-Route::get('gig_delivery_time',     [TaxonomyController::class, 'getGigDeliveryTime']);
-Route::get('project_durations',     [TaxonomyController::class, 'getProjectDuration']);
-Route::get('project-location',      [TaxonomyController::class, 'getProjectLocation']);
-Route::get('countries',             [TaxonomyController::class, 'getCountries']);
-Route::get('country-states/{country_id}', [TaxonomyController::class, 'getAllCountryState']);
+        Route::get('tags',                  [TaxonomyController::class, 'getTags']);
+        Route::get('gig_delivery_time',     [TaxonomyController::class, 'getGigDeliveryTime']);
+        Route::get('project_durations',     [TaxonomyController::class, 'getProjectDuration']);
+        Route::get('project-location',      [TaxonomyController::class, 'getProjectLocation']);
+        Route::get('countries',             [TaxonomyController::class, 'getCountries']);
+        Route::get('country-states/{country_id}', [TaxonomyController::class, 'getAllCountryState']);
 
-  // Search items
-Route::get('projects',          [ProjectController::class, 'index']);
-Route::get('gigs',              [GigController::class, 'index']);
-Route::get('sellers',           [ SellerController::class, 'index']);
-Route::get('recent-projects',   [ProjectController::class, 'recentProjects']);
+        // Search items
+        Route::get('projects',          [ProjectController::class, 'index']);
+        Route::get('gigs',              [GigController::class, 'index']);
+        Route::get('sellers',           [ SellerController::class, 'index']);
+        Route::get('recent-projects',   [ProjectController::class, 'recentProjects']);
 
- //
-Route::get('project/{id}', [ProjectController::class, 'getProjectDetail']);
-Route::get('gig/{id}',       [ GigController::class, 'gigDetail']);
-Route::get('seller/{id}',    [ SellerController::class, 'sellerDetail']);
+        Route::get('project/{id}', [ProjectController::class, 'getProjectDetail']);
+        Route::get('gig/{id}',       [ GigController::class, 'gigDetail']);
+        Route::get('seller/{id}',    [ SellerController::class, 'sellerDetail']);
 
-Route::get('popular-gigs',  [GigController::class, 'popularGigs']);
-Route::get('top-sellers',   [SellerController::class, 'topSellers']);
+        Route::get('popular-gigs',  [GigController::class, 'popularGigs']);
+        Route::get('top-sellers',   [SellerController::class, 'topSellers']);
 
- Route::middleware('auth:sanctum')->group(function () {
-    Route::get('resend-email',  [AuthController::class, 'resendEmail']);
-    Route::post('logout',       [AuthController::class, 'logout']);
-});
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('resend-email',  [AuthController::class, 'resendEmail']);
+            Route::post('logout',       [AuthController::class, 'logout']);
+        });
 
-Route::middleware('auth:sanctum', 'verified')->group(function () {
+        Route::middleware('auth:sanctum', 'verified')->group(function () {
 
-    Route::middleware(['role:buyer|seller|buyer,api'])->group(function () {
+            Route::middleware(['role:buyer|seller|buyer,api'])->group(function () {
 
 
-        // Detail pages
-        Route::get('user', [ ProfileSettingsController::class, 'useDetail']);
-        Route::post('switch-profile',  [ ProfileSettingsController::class, 'switchProfile']);
-        Route::post('change-password', [ ProfileSettingsController::class, 'changePassword']);
+                // Detail pages
+                Route::get('user', [ ProfileSettingsController::class, 'useDetail']);
+                Route::post('switch-profile',  [ ProfileSettingsController::class, 'switchProfile']);
+                Route::post('change-password', [ ProfileSettingsController::class, 'changePassword']);
 
-        Route::post('favourite-item',  [ GeneralController::class, 'setFavItem']);
-        Route::get('saved-items',      [ GeneralController::class, 'getSavedItem']);
-    });
+                Route::post('favourite-item',  [ GeneralController::class, 'setFavItem']);
+                Route::get('saved-items',      [ GeneralController::class, 'getSavedItem']);
+            });
 
-    Route::middleware(['role:buyer|seller,api'])->group(function () {
-        Route::get('portfolios',        [ SellerController::class, 'getPortfolios']);
-        Route::put('portfolio/{id}',    [ SellerController::class, 'updatePortfolio']);
-        Route::post('portfolio',        [ SellerController::class, 'addPortfolio']);
-        Route::delete('portfolio/{id}', [ SellerController::class, 'deletePortfolio']);
-    });
+            Route::middleware(['role:buyer|seller,api'])->group(function () {
+                Route::get('portfolios',        [ SellerController::class, 'getPortfolios']);
+                Route::put('portfolio/{id}',    [ SellerController::class, 'updatePortfolio']);
+                Route::post('portfolio',        [ SellerController::class, 'addPortfolio']);
+                Route::delete('portfolio/{id}', [ SellerController::class, 'deletePortfolio']);
+            });
 
-    Route::post('reset-password',       [AuthController::class, 'resetPassword']);
-    Route::get('account-stats',         [AccountController::class, 'getAccountStats']);
-    Route::get('payout-history',        [AccountController::class, 'getPayoutHistory']);
-    Route::post('setup-payout-method',  [AccountController::class, 'setPayoutMethod']);
-    Route::get('payout-method',         [AccountController::class, 'getPayoutMethod']);
-    Route::post('withdraw-amount',      [AccountController::class, 'withdrawAmount']);
-    Route::get('settings',              [OptionBuilderController::class, 'getOpSettings']);
+            Route::post('reset-password',       [AuthController::class, 'resetPassword']);
+            Route::get('account-stats',         [AccountController::class, 'getAccountStats']);
+            Route::get('payout-history',        [AccountController::class, 'getPayoutHistory']);
+            Route::post('setup-payout-method',  [AccountController::class, 'setPayoutMethod']);
+            Route::get('payout-method',         [AccountController::class, 'getPayoutMethod']);
+            Route::post('withdraw-amount',      [AccountController::class, 'withdrawAmount']);
+            Route::get('settings',              [OptionBuilderController::class, 'getOpSettings']);
 
-    Route::get('educations',                [EducationController::class, 'getEducations']);
-    Route::post('education',                [EducationController::class, 'addEducation']);
-    Route::post('update-education/{id}',    [EducationController::class, 'updateEducation']);
-    Route::delete('delete-education/{id}',  [EducationController::class, 'deleteEducation']);
+            Route::get('educations',                [EducationController::class, 'getEducations']);
+            Route::post('education',                [EducationController::class, 'addEducation']);
+            Route::post('update-education/{id}',    [EducationController::class, 'updateEducation']);
+            Route::delete('delete-education/{id}',  [EducationController::class, 'deleteEducation']);
 
-    // Account settings
-    Route::post('update-privacy-info',  [ ProfileSettingsController::class, 'updatePrivacyInfo']);
-    Route::post('deactivate-account',   [ ProfileSettingsController::class, 'deactivateAccount']);
+            // Account settings
+            Route::post('update-privacy-info',  [ ProfileSettingsController::class, 'updatePrivacyInfo']);
+            Route::post('deactivate-account',   [ ProfileSettingsController::class, 'deactivateAccount']);
 
-    Route::post('update-profile-info',  [ ProfileSettingsController::class, 'updateProfileInfo']);
-    Route::post('update-profile-photo', [ ProfileSettingsController::class, 'updateProfilePhoto']);
+            Route::post('update-profile-info',  [ ProfileSettingsController::class, 'updateProfileInfo']);
+            Route::post('update-profile-photo', [ ProfileSettingsController::class, 'updateProfilePhoto']);
 
-    Route::put('identity-information',  [ ProfileSettingsController::class, 'uploadIdentityInfo']);
-    Route::get('identity-information',  [ ProfileSettingsController::class, 'getIdentityInfo']);
+            Route::put('identity-information',  [ ProfileSettingsController::class, 'uploadIdentityInfo']);
+            Route::get('identity-information',  [ ProfileSettingsController::class, 'getIdentityInfo']);
 
-    Route::get('billing-information',   [ ProfileSettingsController::class, 'getBillingInfo']);
-    Route::post('billing-information',  [ ProfileSettingsController::class, 'updateBillingInfo']);
+            Route::get('billing-information',   [ ProfileSettingsController::class, 'getBillingInfo']);
+            Route::post('billing-information',  [ ProfileSettingsController::class, 'updateBillingInfo']);
 
-        Route::get('disputes', [ DisputeController::class, 'getDisputes']);
-        Route::get('invoices', [ TransactionController::class, 'getInvoices']);
-        Route::get('dispute/{id}/stages', [DisputeStageController::class, 'stages']);
+            Route::get('disputes', [ DisputeController::class, 'getDisputes']);
+            Route::get('invoices', [ TransactionController::class, 'getInvoices']);
+            Route::get('dispute/{id}/stages', [DisputeStageController::class, 'stages']);
         Route::post('dispute/{id}/advance', [DisputeStageController::class, 'advance']);
 
         Route::get('project/{slug}/board', [ProjectManagementController::class, 'board']);
@@ -180,7 +180,9 @@ Route::middleware('auth:sanctum', 'verified')->group(function () {
             Route::delete('admin/profile/review/{id}', [ProfileEnrichmentController::class, 'adminDeleteReview']);
         });
     });
-Route::fallback(function () {
-    return response()->message(message: __('messages.api_url_not_found'), status_code: Response::HTTP_NOT_FOUND);
+
+    Route::fallback(function () {
+        return response()->message(message: __('messages.api_url_not_found'), status_code: Response::HTTP_NOT_FOUND);
+    });
 });
 

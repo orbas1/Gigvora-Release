@@ -55,11 +55,12 @@ return [
     ],
 
     'api' => [
-        'middleware' => ['api'],
-        'prefix' => 'api',
+        'middleware' => array_filter(explode(',', env('FREELANCE_API_MIDDLEWARE', 'api'))),
+        'prefix' => env('FREELANCE_API_PREFIX', 'api'),
     ],
 
     'web' => [
-        'middleware' => ['web'],
+        'middleware' => array_filter(explode(',', env('FREELANCE_WEB_MIDDLEWARE', 'web'))),
+        'prefix' => env('FREELANCE_WEB_PREFIX', ''),
     ],
 ];
