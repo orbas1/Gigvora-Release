@@ -49,3 +49,4 @@
 - Policies mapped for `Advertisement\Models\Campaign` via `CampaignPolicy`.
 - `manage_advertisement` gate restricts administrative actions to Gigvora admins (`user_role === 'admin'`).
 - Visibility hooks: `advertisement.enabled` toggles the Ads Manager navigation entry and related menu children (Campaigns, Creatives, Reports, Keyword Planner, Forecast, Admin).
+- UI components for placements are reusable via `advertisement::components.ad_feed_card`, `advertisement::components.ad_banner`, and `advertisement::components.ad_search_result`, each carrying Gigvora-branded classes for feed, banner, and search slots.
