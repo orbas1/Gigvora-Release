@@ -3,6 +3,12 @@
 ## Overview
 This package delivers a full-featured Jobs & ATS module for a LinkedIn-style platform, providing job search, employer posting, ATS pipeline management, interview scheduling, CV/cover-letter handling, and subscription tracking. The Laravel package exposes REST + Blade experiences, and the Flutter addon surfaces mobile-ready screens backed by the same APIs.
 
+Routing and middleware are aligned with the host Gigvora/Sociopro stack by default:
+
+- Web experiences live under `/jobs` using the `jobs.middleware.web` stack (defaults: `web`, `auth`, `verified`). Protected web-only actions (apply, save, company create) inherit `jobs.middleware.web_protected`.
+- API experiences live under `/api/jobs/**` using the `jobs.middleware.api` stack (defaults: `api`, `auth:sanctum`), with sensitive actions wrapped by `jobs.middleware.api_protected`.
+- Prefixes can be adjusted via `jobs.prefixes.web` and `jobs.prefixes.api` to match host routing while keeping mobile clients consistent.
+
 ## Architecture & Modules
 - **Laravel**
   - Controllers in `src/Http/Controllers` cover jobs, applications, ATS, screening, interviews, subscriptions, CVs, and cover letters.
@@ -25,11 +31,11 @@ This package delivers a full-featured Jobs & ATS module for a LinkedIn-style pla
 - **Jobs**
   - `GET /jobs` → `JobController@index` (HTML or JSON with filters: `search`, `location`, `employment_type`, `workplace_type`, `featured`, `posted`, `per_page`).
   - `GET /jobs/{job}` → `JobController@show` (HTML detail or JSON with company, applications, screening questions).
-  - `GET /jobs/{job}/apply` → `JobController@apply` renders multi-step apply wizard.
+  - `GET /jobs/{job}/apply` → `JobController@apply` renders multi-step apply wizard (protected by `jobs.middleware.web_protected`).
   - `POST /jobs/{job}/apply` → `ApplicationController@storeForJob` (web form submission).
   - `POST/DELETE /jobs/{job}/save` + `GET /jobs/saved` → toggle and list bookmarks.
   - `GET /jobs/{job}/similar` → similar roles (company/location based).
-  - `POST /api/jobs` `PUT /api/jobs/{job}` `DELETE /api/jobs/{job}` → create/update/close jobs (analytics: `job_posted`, `job_updated`, `job_closed`).
+  - `POST /api/jobs` `PUT /api/jobs/{job}` `DELETE /api/jobs/{job}` → create/update/close jobs (analytics: `job_posted`, `job_updated`, `job_closed`) behind `jobs.middleware.api`.
 - **Applications & ATS**
   - `GET /api/applications` (filters: `company_id`, `candidate_id`, `status`, `per_page`).
   - `POST /api/applications` and `POST /api/jobs/{job}/applications` create applications (auto `applied_at`, default status, optional screening answers) firing `job_applied` and `screening_questions_answered`.
@@ -98,6 +104,8 @@ This package delivers a full-featured Jobs & ATS module for a LinkedIn-style pla
 
 ## Configuration & Environment
 - Publish config: `php artisan vendor:publish --tag=jobs-config` to adjust roles/features/posting limits.
+- Configure middleware stacks and prefixes in `config/jobs.php` (`jobs.middleware.*`, `jobs.prefixes.*`) to mirror the host web/API guards (e.g., `auth`, `verified`, `auth:sanctum`).
+- Align default pagination, application limits, and status enums through `config('jobs.defaults.*')` to match platform expectations.
 - Views/lang: `php artisan vendor:publish --tag=jobs-views` / `jobs-lang` if overriding UI text.
 - Ensure API + web middleware stacks include `auth` + `web` with CSRF for POST job/apply/save routes.
 - Set `JobsAddonConfig.baseUrl` and optional `authToken` (Bearer) in Flutter host app; headers auto-attached.
@@ -106,7 +114,7 @@ This package delivers a full-featured Jobs & ATS module for a LinkedIn-style pla
 1. **Laravel Package**
    - Install dependencies and run migrations.
    - Register `Jobs\JobsServiceProvider` (auto-discovery) and publish config/views as needed.
-   - Add web routes namespace `/jobs` to navigation; ensure auth middleware wraps apply/save/post routes.
+   - Add web routes namespace `/jobs` to navigation; ensure auth middleware wraps apply/save/post routes using `jobs.middleware.web_protected`.
    - Wire feed/search integrations using `JobFeedTransformer` and `JobSearchService`.
    - Attach analytics listener to `Jobs\Events\AnalyticsEvent` to forward events.
 2. **Flutter Addon**

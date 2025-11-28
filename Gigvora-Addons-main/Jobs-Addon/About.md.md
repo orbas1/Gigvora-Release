@@ -5,7 +5,7 @@ _UI, Views & Screens Specification (Laravel + Flutter)_
 
 Build a complete **Jobs & ATS** experience for:
 
-1. **Laravel web app** (Blade views + JS), and  
+1. **Laravel web app** (Blade views + JS), and
 2. **Flutter mobile addon** (`jobs_flutter_addon`),
 
 covering:
@@ -18,6 +18,8 @@ covering:
 - Screening questions
 - Interview scheduling & calendar
 - Job posting plans / subscriptions
+
+Everything must stay **fully aligned with the Sociopro/Gigvora host platform**: reuse shared layouts/navigation, respect the platform auth stack (web + `auth`/`verified`, API + `auth:sanctum`), and keep route prefixes under `/jobs` and `/api/jobs` so web, API, and Flutter all share the same entry points without breaking existing behaviour.
 
 This plugs into an existing **social media / LinkedIn-style platform** and must feel fully integrated.
 
