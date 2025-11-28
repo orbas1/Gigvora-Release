@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/live_mobile_theme.dart';
+
 class WebinarLiveScreen extends StatelessWidget {
   const WebinarLiveScreen({super.key, required this.title});
 
@@ -43,11 +45,15 @@ class WebinarLiveScreen extends StatelessWidget {
   }
 
   Widget _videoContainer() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
-      child: const Center(
-        child: Text('Video Player', style: TextStyle(color: Colors.white)),
+      decoration: BoxDecoration(
+        color: colorScheme.inverseSurface,
+        borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius),
+      ),
+      child: Center(
+        child: Text('Video Player', style: TextStyle(color: colorScheme.onInverseSurface)),
       ),
     );
   }

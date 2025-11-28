@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/wnip_api_client.dart';
 import '../../models/networking_session.dart';
 import '../../models/networking_participant.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class NetworkingSessionPage extends StatefulWidget {
   final WnipApiClient apiClient;
@@ -124,7 +125,7 @@ class _NetworkingSessionPageState extends State<NetworkingSessionPage> {
                 if (error != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
-                    child: Text(error!, style: const TextStyle(color: Colors.red)),
+                    child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ),
               ],
             ),

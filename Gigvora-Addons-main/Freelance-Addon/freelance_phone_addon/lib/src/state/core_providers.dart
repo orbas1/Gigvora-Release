@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 import '../api/freelance_api_client.dart';
 import '../repositories/freelance_repository.dart';
 
-final baseUrlProvider = Provider<String>((ref) => 'https://BASE_URL.com/api/');
-final apiPrefixProvider = Provider<String>((ref) => 'freelance/');
+final baseUrlProvider = Provider<String>((ref) => '');
+final apiPrefixProvider = Provider<String>((ref) => 'api/freelance');
+final requestTimeoutProvider = Provider<Duration>((ref) => const Duration(seconds: 20));
 
 final tokenProviderOverride = Provider<String Function()>((ref) => () => '');
 
@@ -19,6 +20,7 @@ final apiClientProvider = Provider<FreelanceApiClient>((ref) {
     httpClient: ref.watch(httpClientProvider),
     tokenProvider: tokenProvider,
     apiPrefix: ref.watch(apiPrefixProvider),
+    requestTimeout: ref.watch(requestTimeoutProvider),
   );
 });
 

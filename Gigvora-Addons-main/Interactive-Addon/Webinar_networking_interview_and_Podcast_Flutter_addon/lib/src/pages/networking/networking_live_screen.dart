@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../theme/live_mobile_theme.dart';
+
 class NetworkingLiveScreen extends StatefulWidget {
   const NetworkingLiveScreen({super.key});
 
@@ -55,7 +57,9 @@ class _NetworkingLiveScreenState extends State<NetworkingLiveScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: LiveMobileTheme.surfaceVariant(context),
+                  borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
                 Text('Jamie Doe', style: TextStyle(fontWeight: FontWeight.bold)),
                 Text('Role: Growth Lead'),

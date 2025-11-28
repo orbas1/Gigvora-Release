@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'routes' => [
+        'web' => [
+            'prefix' => env('LIVE_WEB_PREFIX', 'events'),
+            'middleware' => ['web', 'auth', 'verified', 'locale'],
+        ],
+        'api' => [
+            'prefix' => env('LIVE_API_PREFIX', 'api/live'),
+            'middleware' => ['api', 'auth:sanctum', 'verified'],
+        ],
+    ],
+
     'features' => [
         'webinars' => true,
         'networking' => true,

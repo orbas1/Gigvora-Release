@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/gig.dart';
+import '../theme/mobile_theme.dart';
 
 class GigCard extends StatelessWidget {
   const GigCard({
@@ -17,12 +18,13 @@ class GigCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final image = gig.attachments.files.isNotEmpty ? gig.attachments.files.first.filePath : null;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: FreelanceMobileTheme.cardShape(),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(FreelanceMobileTheme.cardRadius),
         onTap: onTap,
         child: Row(
           children: [
@@ -31,19 +33,19 @@ class GigCard extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
+                  topLeft: Radius.circular(FreelanceMobileTheme.cardRadius),
+                  bottomLeft: Radius.circular(FreelanceMobileTheme.cardRadius),
                 ),
                 image: image != null
                     ? DecorationImage(image: NetworkImage(image), fit: BoxFit.cover)
                     : null,
-                color: Colors.grey.shade200,
+                color: FreelanceMobileTheme.surfaceVariant(context),
               ),
               child: Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: gig.isFavourite
-                      ? const Icon(Icons.favorite, color: Colors.red)
+                      ? Icon(Icons.favorite, color: colorScheme.error)
                       : const Icon(Icons.favorite_border),
                   onPressed: onFavourite,
                 ),
@@ -84,13 +86,16 @@ class GigCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.star, size: 16, color: Colors.orange.shade600),
+                        Icon(Icons.star, size: 16, color: FreelanceMobileTheme.success(context)),
                         const SizedBox(width: 4),
                         Text('${gig.rating?.toStringAsFixed(1) ?? '0.0'} (${gig.reviews ?? 0} reviews)'),
                         const Spacer(),
                         Text(
                           '\$${gig.price.toStringAsFixed(0)}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/wnip_api_client.dart';
 import '../../models/podcast_episode.dart';
 import '../../models/podcast_series.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class PodcastSeriesPage extends StatefulWidget {
   final WnipApiClient apiClient;
@@ -92,13 +93,13 @@ class _PodcastSeriesPageState extends State<PodcastSeriesPage> {
                                 icon: const Icon(Icons.publish),
                                 onPressed: working ? null : () => _publishEpisode(episode),
                               )
-                            : const Icon(Icons.check, color: Colors.green),
+                            : Icon(Icons.check, color: Theme.of(context).colorScheme.secondary),
                       ),
                     )),
                 if (error != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
-                    child: Text(error!, style: const TextStyle(color: Colors.red)),
+                    child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ),
               ],
             ),

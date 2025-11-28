@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../repositories/freelance_repository.dart';
+import '../ui/theme/mobile_theme.dart';
 
 class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
@@ -30,7 +31,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               children: List.generate(5, (i) {
                 final idx = i + 1;
                 return IconButton(
-                  icon: Icon(idx <= rating ? Icons.star : Icons.star_border, color: Colors.amber),
+                  icon: Icon(idx <= rating ? Icons.star : Icons.star_border,
+                      color: FreelanceMobileTheme.success(context)),
                   onPressed: () => setState(() => rating = idx),
                 );
               }),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/live_mobile_theme.dart';
+
 class PodcastLiveRecordingScreen extends StatefulWidget {
   const PodcastLiveRecordingScreen({super.key});
 
@@ -21,8 +23,13 @@ class _PodcastLiveRecordingScreenState extends State<PodcastLiveRecordingScreen>
           children: [
             Container(
               height: 200,
-              decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
-              child: const Center(child: Icon(Icons.mic, color: Colors.white, size: 48)),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.inverseSurface,
+                borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius),
+              ),
+              child: Center(
+                  child: Icon(Icons.mic,
+                      color: Theme.of(context).colorScheme.onInverseSurface, size: 48)),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

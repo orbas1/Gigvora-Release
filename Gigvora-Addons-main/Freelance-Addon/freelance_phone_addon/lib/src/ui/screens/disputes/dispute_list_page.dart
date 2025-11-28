@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../state/dispute_provider.dart';
 import '../../../state/dispute_stage_provider.dart';
 import '../../../models/dispute_stage.dart';
+import '../../theme/mobile_theme.dart';
 
 class DisputeListPage extends ConsumerWidget {
   const DisputeListPage({super.key});
@@ -32,8 +33,10 @@ class DisputeListPage extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final dispute = disputes[index];
                   return ListTile(
-                    tileColor: Colors.grey.shade100,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    tileColor: FreelanceMobileTheme.surfaceVariant(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(FreelanceMobileTheme.cardRadius),
+                    ),
                     title: Text(dispute.subject),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +91,8 @@ class _EmptyDisputes extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.report_gmailerrorred_outlined, size: 56, color: Colors.grey.shade500),
+            Icon(Icons.report_gmailerrorred_outlined,
+                size: 56, color: FreelanceMobileTheme.emphasisIcon(context)),
             const SizedBox(height: 12),
             const Text('No disputes filed yet.'),
           ],

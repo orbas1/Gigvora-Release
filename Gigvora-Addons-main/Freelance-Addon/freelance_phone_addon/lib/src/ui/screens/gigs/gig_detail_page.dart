@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/gig.dart';
 import '../../../state/core_providers.dart';
 import '../../../state/gig_provider.dart';
+import '../../theme/mobile_theme.dart';
 
 class GigDetailPage extends ConsumerWidget {
   const GigDetailPage({super.key, required this.gigId});
@@ -68,7 +69,7 @@ class _GigDetailView extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.star, color: Colors.orange.shade600),
+              Icon(Icons.star, color: FreelanceMobileTheme.success(context)),
               const SizedBox(width: 4),
               Text('${gig.rating ?? 0} (${gig.reviews ?? 0} reviews)'),
             ],

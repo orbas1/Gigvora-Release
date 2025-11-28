@@ -13,6 +13,7 @@ This package delivers a full events and media stack for webinars, networking ses
   - Services: `webinar_service.dart`, `networking_service.dart`, `podcast_service.dart`, `interview_service.dart` backed by `wnip_api_client.dart`.
   - State: `webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart` manage loading/error/empty states.
   - UI: Screens under `lib/src/pages/**` for listings, details, waiting rooms, and live shells, navigated via `menu.dart`.
+  - API client alignment: `WnipApiClient` now accepts an `apiPrefix` (default `/api/live`) so mobile calls stay in lockstep with the Laravel routes and host auth/token handling.
 
 Core flow bullets:
 - Webinars: list → detail → register → waiting room → live shell → replay.
@@ -23,12 +24,12 @@ Core flow bullets:
 ## Functions & Features (Laravel)
 ### Webinars
 - **Routes**
-  - `GET /events/webinars` → `WebinarPageController@index` (filters: `q`, `upcoming`, `past`, `paid`).
+  - `GET /events/webinars` → `WebinarPageController@index` (filters: `q`, `upcoming`, `past`, `paid`) with the host `web, auth, verified, locale` stack configurable via `webinar_networking_interview_podcast.routes.web`.
   - `GET /events/webinars/{webinar}` → `WebinarPageController@show` (details + recordings + registration state).
   - `POST /events/webinars/{webinar}/register` → `WebinarPageController@register` (auth, optional `ticket_id`).
   - `GET /events/webinars/{webinar}/waiting-room` → `WebinarPageController@waitingRoom` (countdown + announcement).
   - `GET /events/webinars/{webinar}/live` → `WebinarPageController@live` (host/attendee shell).
-  - API: CRUD + register + toggle live via `WebinarController` under `/api/wnip/webinars*` (Sanctum auth).
+  - API: CRUD + register + toggle live via `WebinarController` under `/api/live/webinars*` (configurable prefix, Sanctum + verified).
 - **Data**: Eager-load host/registrations, enforce policies, analytics events `webinar_created`, `webinar_started/ended`, `webinar_registered`.
 
 ### Networking Sessions
@@ -38,23 +39,23 @@ Core flow bullets:
   - `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
   - `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
   - `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
-  - API: CRUD/register/rotate at `/api/wnip/networking*` via `NetworkingController`.
+  - API: CRUD/register/rotate at `/api/live/networking*` (configurable) via `NetworkingController`.
 - **Data**: Tracks `networking_session_created`, `networking_session_joined`, `networking_rotation_completed` analytics.
 
 ### Podcasts
 - **Routes**
   - `GET /events/podcasts` → `PodcastPageController@index` (catalogue with latest episodes per series).
   - `GET /events/podcasts/{series}` → `PodcastPageController@show` (episode list + playback links).
-  - API: series CRUD + episodes create/publish under `/api/wnip/podcast-series*` and `/api/wnip/podcasts`.
+  - API: series CRUD + episodes create/publish under `/api/live/podcast-series*` and `/api/live/podcasts` (configurable prefix).
 - **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`.
 
 ### Interviews
 - **Routes**
-  - `GET /events/interviews` → `InterviewPageController@index` (schedule list with search).
+  - `GET /events/interviews` → `InterviewPageController@index` (schedule list with search, typically linked from Jobs/HR areas rather than main nav).
   - `GET /events/interviews/{interview}` → `InterviewPageController@show` (slots + scores + waiting link).
   - `GET /events/interviews/{interview}/waiting-room` → `InterviewPageController@waitingRoom` (countdown to start).
   - `POST /events/interviews/{interview}/slots/{slot}/score` → `InterviewPageController@score` (auth, criteria + scores arrays).
-  - API: CRUD + slot add + score at `/api/wnip/interviews*` via `InterviewController`.
+  - API: CRUD + slot add + score at `/api/live/interviews*` via `InterviewController` (configurable prefix).
 - **Data**: Analytics events `interview_scheduled`, `interview_joined`, `interview_scored`.
 
 ### Feed & Search Helpers
@@ -68,11 +69,11 @@ Core flow bullets:
   - Podcasts: `podcast_catalogue_screen.dart`, `podcast_series_detail_screen.dart`, `podcast_episode_player_screen.dart`, `podcast_live_recording_screen.dart`.
   - Interviews: `interview_schedule_screen.dart`, `interview_detail_screen.dart`, `interview_waiting_room_screen.dart`, `interviewer_panel_screen.dart`, `interview_live_screen.dart`.
 - **Services/State**
-  - `wnip_api_client.dart` consumes Laravel endpoints with auth headers and structured error handling.
+  - `wnip_api_client.dart` consumes Laravel endpoints with auth headers, structured error handling, and a configurable `apiPrefix` (default `api/live`) plus 20s timeout to match host HTTP patterns.
   - Service wrappers (`webinar_service.dart`, `networking_service.dart`, `podcast_service.dart`, `interview_service.dart`) provide typed methods that populate view states.
   - States (`webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart`) expose loading/error/empty/data patterns for the screens.
 - **Navigation**
-  - `menu.dart` registers `/live/...` routes. Waiting room routes now accept maps containing `title`, `startsAt` (DateTime), optional `message`, and `isLive` to render real-time countdowns.
+  - `menu.dart` registers `/live/...` routes. Waiting room routes now accept maps containing `title`, `startsAt` (DateTime), optional `message`, and `isLive` to render real-time countdowns. Use `buildLiveEventsMenu()` for the main Live & Events tab and place `buildCandidateInterviewMenu()`/`buildEmployerInterviewMenu()` items inside Jobs/HR areas instead of the primary nav.
 
 ## Integration Guide – Feed & Search
 - **Feed**: Use `FeedTransformer` to convert models to `FeedItem` arrays. Example:
@@ -108,10 +109,11 @@ Core flow bullets:
   1. Install via Composer and register the service provider if not auto-discovered.
   2. Run `php artisan migrate` (or publish migrations if preferred).
   3. Publish config/views/lang as needed.
-  4. Mount routes: the package registers `/events/*` (web) and `/api/wnip/*` (API). Protect with `auth` middleware in your app layout.
-  5. Add menu links to `/events/webinars`, `/events/networking`, `/events/podcasts`, `/events/interviews`.
-- **Flutter addon**
-  1. Add dependency and import `webinar_networking_interview_podcast_flutter_addon.dart`.
-  2. Instantiate `WnipApiClient(baseUrl: '<api-base>', tokenProvider: ...)` and pass to `buildAddonRoutes` + `buildMenuItems`.
-  3. Register the provided routes inside your host router; ensure waiting room routes receive `title`, `startsAt`, and optional `message/isLive` maps.
-  4. Hook your analytics provider into registration and playback screens using the navigation callbacks described above.
+  4. Mount routes: the package registers `/events/*` (web) and `/api/live/*` (API) by default; override via `LIVE_WEB_PREFIX`/`LIVE_API_PREFIX` + `webinar_networking_interview_podcast.routes.*` config if your host uses different shells.
+  5. Add menu links to `/events/webinars`, `/events/networking`, `/events/podcasts`, and surface `/events/interviews` inside Jobs/HR/candidate dashboards instead of the main nav.
+  - **Flutter addon**
+    1. Add dependency and import `webinar_networking_interview_podcast_flutter_addon.dart`.
+    2. Instantiate `LiveAddonIntegration.createClient(baseUrl: '<api-base>', tokenProvider: ..., apiPrefix: 'api/live')` (or new `WnipApiClient`) and pass to `LiveAddonIntegration.routes(...)` when registering routes.
+    3. Wire navigation with `buildLiveEventsMenu()` in the main drawer/tab and drop `buildCandidateInterviewMenu()` or `buildEmployerInterviewMenu()` into Jobs/HR sections so interviews stay contextual.
+    4. Register the provided routes inside your host router; ensure waiting room routes receive `title`, `startsAt`, and optional `message/isLive` maps.
+    5. Hook your analytics provider into registration and playback screens using the navigation callbacks described above.

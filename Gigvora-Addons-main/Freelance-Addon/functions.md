@@ -73,7 +73,7 @@ The freelance package layers a complete marketplace experience on top of a socia
   - `/freelance/dispute` → `DisputeDetailScreen` (stage timeline + messages view).
   - `/freelance/review` → `ReviewScreen` (profile review submission via repository `submitProfileReview`).
 - **State & Services**
-  - `FreelanceApiClient` normalises base URL/token, applies the `apiPrefix` (default `freelance/` to hit `/api/freelance/*`), enforces a 20s timeout, and decodes Laravel API shapes.
+  - `FreelanceApiClient` normalises base URL/token, applies the `apiPrefix` (default `api/freelance` to hit `/api/freelance/*`), enforces a 20s timeout, and decodes Laravel API shapes.
   - `FreelanceRepository` wraps API for gigs/projects/disputes/escrow/tags/portfolios/education/certifications/reviews/recommendations and bid/dispute actions.
   - Providers: `gigsProvider`, `projectsProvider`, `disputesProvider`, `disputeStagesProvider`, `escrowProvider`, `tagActionsProvider`, `dashboardSnapshotProvider`.
   - UI widgets: `GigCard`, `ProjectCard`, `MetricGrid`, `MilestoneList`, etc.
@@ -115,7 +115,7 @@ The freelance package layers a complete marketplace experience on top of a socia
    - Wire navigation links to `/dashboard`, `/gigs-listing`, `/projects`, `/create-project`, `/create-gig`, `/dispute-list`, `/gig-activity/{slug}`.
 2. **Flutter add-on**
    - Add dependency in host `pubspec.yaml` pointing to `freelance_phone_addon`.
-   - Wrap app with `ProviderScope`; override `baseUrlProvider` and `tokenProviderOverride` to point at your Laravel `/api/` base and auth token getter.
-   - Register routes from `buildRoutes()` and expose menu items (`freelancerMenu`, `clientMenu`, `globalMenu`).
+   - Wrap app with `ProviderScope`; override `baseUrlProvider`, `apiPrefixProvider`, `requestTimeoutProvider`, and `tokenProviderOverride` (or use `FreelanceAddonIntegration.providerOverrides`) to point at your Laravel API base and auth token getter.
+   - Register routes from `buildRoutes()` (or `FreelanceAddonIntegration.routes()`) and expose menu items via `FreelanceAddonIntegration.navigationItems` to mirror Gigvora’s role-aware nav.
    - Add analytics hooks around repository calls for the events listed above.
    - Use UI screens from `lib/src/ui/screens` for gigs/projects/disputes/escrow; dashboards and proposal/review flows are wired to live API data via Riverpod providers.

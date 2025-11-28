@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/recording.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class WebinarRecordingPlayerScreen extends StatefulWidget {
   const WebinarRecordingPlayerScreen({super.key, required this.recording});
@@ -17,6 +18,7 @@ class _WebinarRecordingPlayerScreenState extends State<WebinarRecordingPlayerScr
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(widget.recording.title ?? 'Recording')),
       body: Padding(
@@ -26,8 +28,13 @@ class _WebinarRecordingPlayerScreenState extends State<WebinarRecordingPlayerScr
           children: [
             Container(
               height: 200,
-              decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
-              child: const Center(child: Icon(Icons.play_circle_outline, color: Colors.white, size: 48)),
+              decoration: BoxDecoration(
+                color: colorScheme.inverseSurface,
+                borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius),
+              ),
+              child: Center(
+                child: Icon(Icons.play_circle_outline, color: colorScheme.onInverseSurface, size: 48),
+              ),
             ),
             const SizedBox(height: 16),
             Slider(

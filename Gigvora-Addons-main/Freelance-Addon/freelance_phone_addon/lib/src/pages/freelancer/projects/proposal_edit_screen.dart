@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/project.dart';
 import '../../../repositories/freelance_repository.dart';
+import '../../ui/theme/mobile_theme.dart';
 
 class ProposalEditScreen extends ConsumerStatefulWidget {
   const ProposalEditScreen({super.key, this.project});
@@ -52,7 +53,10 @@ class _ProposalEditScreenState extends ConsumerState<ProposalEditScreen> {
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(
+                color: FreelanceMobileTheme.surfaceVariant(context),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Commission: \$${commission.toStringAsFixed(2)}'),
                 Text('Net earning: \$${net.toStringAsFixed(2)}'),

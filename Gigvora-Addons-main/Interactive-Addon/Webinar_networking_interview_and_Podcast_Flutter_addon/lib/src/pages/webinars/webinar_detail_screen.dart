@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../services/webinar_service.dart';
 import '../../state/webinar_state.dart';
 import '../../widgets/live_cards.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class WebinarDetailScreen extends StatefulWidget {
   const WebinarDetailScreen({super.key, required this.service, required this.webinarId});
@@ -49,7 +50,10 @@ class _WebinarDetailScreenState extends State<WebinarDetailScreen> {
                       Text(webinar.title, style: Theme.of(context).textTheme.headlineSmall),
                       const SizedBox(height: 4),
                       Text('${webinar.startsAt} • ${(webinar.endsAt.difference(webinar.startsAt).inMinutes)} mins',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700])),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: LiveMobileTheme.mutedText(context))),
                       const SizedBox(height: 16),
                       Text(webinar.description ?? 'No description', style: Theme.of(context).textTheme.bodyLarge),
                       const SizedBox(height: 16),

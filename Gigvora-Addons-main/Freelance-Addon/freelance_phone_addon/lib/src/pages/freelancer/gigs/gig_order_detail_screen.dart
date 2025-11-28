@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/milestone_list.dart';
 import '../../../models/milestone.dart';
+import '../../ui/theme/mobile_theme.dart';
 
 class GigOrderDetailScreen extends StatelessWidget {
   const GigOrderDetailScreen({super.key});
@@ -19,7 +20,8 @@ class GigOrderDetailScreen extends StatelessWidget {
           const ListTile(title: Text('Logo design for Alice'), subtitle: Text('Due in 5 days')),
           const Divider(),
           const Text('Requirements'),
-          const Text('Provide two logo options and source files.', style: TextStyle(color: Colors.black54)),
+          Text('Provide two logo options and source files.',
+              style: TextStyle(color: FreelanceMobileTheme.mutedText(context))),
           const SizedBox(height: 12),
           MilestoneList(milestones: milestones, onAction: (m, action) {}),
           const SizedBox(height: 12),

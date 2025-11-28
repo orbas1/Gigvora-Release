@@ -66,7 +66,10 @@ class _WebinarsHomeScreenState extends State<WebinarsHomeScreen> with SingleTick
         actions: [
           TextButton(
             onPressed: () {},
-            child: const Text('Host Webinar', style: TextStyle(color: Colors.white)),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            ),
+            child: const Text('Host Webinar'),
           )
         ],
       ),
