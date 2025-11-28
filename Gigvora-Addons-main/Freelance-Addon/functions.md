@@ -4,10 +4,10 @@
 The freelance package layers a complete marketplace experience on top of a social/LinkedIn-style host. The Laravel module exposes gigs, projects, contracts, escrow, disputes, reviews, and onboarding flows, while the Flutter add-on provides mobile pages that consume the same authenticated API. Both sides share users and permissions from the host platform so freelancers and clients can switch roles without duplicating accounts.
 
 ### Alignment with Sociopro/Gigvora host
-- **Route shape**: API endpoints are grouped under the configurable `freelance.api.prefix` (default `api`); set `FREELANCE_API_PREFIX=api/freelance` to isolate the namespace while preserving Sanctum + `verified` + `role` middleware from the route file. Web middleware can be aligned with `FREELANCE_WEB_MIDDLEWARE` and optional `FREELANCE_WEB_PREFIX` for Blade/Llivewire pages.
+- **Route shape**: API endpoints are grouped under the configurable `freelance.api.prefix` (default `api`); set `FREELANCE_API_PREFIX=api/freelance` to isolate the namespace while preserving Sanctum + `verified` + `role` middleware from the route file. Web middleware can be aligned with `FREELANCE_WEB_MIDDLEWARE` and optional `FREELANCE_WEB_PREFIX` for Blade/Llivewire pages. The Flutter client mirrors this through `apiPrefixProvider` (default `freelance/`) so mobile calls hit the same `/api/freelance/*` paths without custom URL concatenation.
 - **Middleware**: The API group uses `freelance.api.middleware` (default `api`) and nests Sanctum + role middleware for authenticated flows, matching the Sociopro Gigvora guard pattern.
 - **Policies/roles**: Controllers assume host roles `buyer`, `seller`, and `admin`; navigation/menu exposure in both web and Flutter should respect these roles when wiring links.
-- **Navigation hooks**: Web menus live in `resources/views/components/navigation/freelance-menu.blade.php` (Gigvora layout-friendly with responsive BEM styling). Flutter exposes `buildFreelanceMenu(isFreelancer: bool, isClient: bool, includeGlobal: bool)` to merge items into the host drawer/tab structure.
+- **Navigation hooks**: Web menus live in `resources/views/components/navigation/freelance-menu.blade.php` (Gigvora layout-friendly with responsive BEM styling). Flutter exposes `buildFreelanceMenu(isFreelancer: bool, isClient: bool, includeGlobal: bool)` to merge items into the host drawer/tab structure, and all published web pages should extend `resources/views/layouts/freelance.blade.php` to inherit the host shell and navigation.
 - **Auth source of truth**: Login, registration, and password reset flows remain in the core Gigvora app; the freelance add-on consumes the shared session/token instead of publishing duplicate endpoints.
 
 ## Architecture & Modules
@@ -73,7 +73,7 @@ The freelance package layers a complete marketplace experience on top of a socia
   - `/freelance/dispute` → `DisputeDetailScreen` (stage timeline + messages view).
   - `/freelance/review` → `ReviewScreen` (profile review submission via repository `submitProfileReview`).
 - **State & Services**
-  - `FreelanceApiClient` normalises base URL/token, enforces 20s timeout, and decodes Laravel API shapes.
+  - `FreelanceApiClient` normalises base URL/token, applies the `apiPrefix` (default `freelance/` to hit `/api/freelance/*`), enforces a 20s timeout, and decodes Laravel API shapes.
   - `FreelanceRepository` wraps API for gigs/projects/disputes/escrow/tags/portfolios/education/certifications/reviews/recommendations and bid/dispute actions.
   - Providers: `gigsProvider`, `projectsProvider`, `disputesProvider`, `disputeStagesProvider`, `escrowProvider`, `tagActionsProvider`, `dashboardSnapshotProvider`.
   - UI widgets: `GigCard`, `ProjectCard`, `MetricGrid`, `MilestoneList`, etc.

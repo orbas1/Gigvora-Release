@@ -1,8 +1,7 @@
-@extends('layouts.app', ['include_menu' => true])
-@section('content')
-    <main class="tk-scetiondb">
-        @include('components.navigation.freelance-menu')
-        <section class="tk-giglist-section">
+@extends('layouts.freelance')
+
+@section('freelance-content')
+        <section class="tk-giglist-section" aria-label="{{ __('Freelance gig list') }}">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -114,8 +113,7 @@
                 </div>
             </div>
         </section>
-    </main>
-@endsection('content')
+@endsection
 
 @push('styles')
     @vite([

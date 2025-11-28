@@ -1,8 +1,7 @@
-@extends('layouts.app',['include_menu' => true])
-@section('content')
-<main class="tk-scetiondb">
-    @include('components.navigation.freelance-menu')
-    <section class="tk-searchproject-section tk-main-bg">
+@extends('layouts.freelance')
+
+@section('freelance-content')
+    <section class="tk-searchproject-section tk-main-bg" aria-label="{{ __('Freelance project search') }}">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -207,8 +206,7 @@
             </div>
         </div>
     </section>
-</main>
-@endsection('content')
+@endsection
 
 @push('styles')
     @vite([

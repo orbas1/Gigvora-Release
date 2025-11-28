@@ -31,6 +31,13 @@ This will sit **inside a social/LinkedIn-style platform**, sharing users but add
 - **Menu integration**: use `resources/views/components/navigation/freelance-menu.blade.php` for web (Gigvora tokens + BEM classes) and `buildFreelanceMenu` in the Flutter add-on to merge items into existing drawers/tabs depending on the current role.
 - **Authentication**: rely on the host Gigvora login/registration/reset flows only—no additional login UI or API endpoints should be enabled inside the freelance add-on.
 
+### Layout & navigation glue (web + mobile)
+
+- Web views should extend the shared `layouts.freelance` wrapper (which itself extends `layouts.app`) so the host header/footer are preserved, the freelance navigation component is injected once, and the `freelance-shell` grid provides consistent spacing.
+- The `freelance-menu` Blade component now pulls its role gates from `config('freelance.default_roles')` and only renders when the authenticated user has the matching role; unauthenticated visitors see a one-line reminder that Gigvora single sign-on applies.
+- Styling for the menu is centralized in `resources/css/freelance/navigation.css` (BEM classes, Gigvora tokens) and loaded via Vite through the layout/component.
+- Flutter should keep using the host’s navigation container; call `buildFreelanceMenu` to fetch role-filtered items and inject them into the existing drawer/tab model rather than spawning a new stack.
+
 > ⚠️ Do **not** add or touch binary files (images, fonts, compiled JS/CSS bundles, `.exe`, `.dll`, `.so`, `.apk`, `.ipa`, etc.). Only templates, Dart/JS/TS, CSS/SCSS and configuration.
 
 ---

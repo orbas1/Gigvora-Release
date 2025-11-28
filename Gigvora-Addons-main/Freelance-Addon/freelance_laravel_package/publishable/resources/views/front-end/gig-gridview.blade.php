@@ -1,12 +1,11 @@
-@extends('layouts.app', ['include_menu' => true])
-@section('content')
-<main class="tk-scetiondb">
-        @include('components.navigation.freelance-menu')
-        <section>
+@extends('layouts.freelance')
+
+@section('freelance-content')
+        <section aria-label="{{ __('Freelance gig search') }}">
                 <div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<form class="tk-formsearch tk-formsearchvtwo">
+                        <div class="row">
+                                <div class="col-lg-12">
+                                        <form class="tk-formsearch tk-formsearchvtwo">
 						<fieldset>
 							<div class="tk-taskform">
 								<div class="tk-inputicon">
@@ -93,11 +92,10 @@
 				</div>
 			</div>
 
-			<livewire:gig.search-gigs :view_type="$view" :selected_category="$selected_category"/> 
-		</div>
-	</section>
-</main>
-@endsection('content')
+                        <livewire:gig.search-gigs :view_type="$view" :selected_category="$selected_category"/>
+                </div>
+        </section>
+@endsection
 
 @push('styles')
     @vite([
