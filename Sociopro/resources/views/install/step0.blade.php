@@ -9,10 +9,9 @@
     			<!-- panel body -->
     			<div class="panel-body ins-four">
             <p class="ins-four">
-              {{ __('Welcome to Sociopro social platform Installation. You will need to know the following items before proceeding.') }}
+              {{ __('Welcome to Gigvora social platform Installation. You will need to know the following items before proceeding.') }}
             </p>
             <ol>
-              <li>{{ __('Codecanyon purchase code') }}</li>
               <li>{{ __('Database Name') }}</li>
               <li>{{ __('Database Username') }}</li>
               <li>{{ __('Database Password') }}</li>

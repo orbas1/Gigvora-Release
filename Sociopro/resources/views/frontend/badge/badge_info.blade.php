@@ -11,7 +11,7 @@
                            @endphp
                            <div class="batch E_new_batch">
                             <h4>{{get_phrase('Confirm and pay')}}</h4>
-                            <p>{{get_phrase('You are subscribing to Meta Verified on Sociopro.')}}</p>
+                            <p>{{get_phrase('You are subscribing to Meta Verified on Gigvora.')}}</p>
                                <div class="demo-badge E_badge">
                                    <div class="badge-image  d-flex">
                                        <img src="{{ get_user_image(auth()->user()->id,'optimized') }}" alt="">
@@ -23,7 +23,7 @@
                                                     <path d="M7.5 11.83L10.6629 14.9929L17 8.66705" stroke="white" stroke-width="1.67647" stroke-linecap="round" stroke-linejoin="round"/>
                                                   </svg></p>
                                             </div>
-                                            <p class="socio-text">{{get_phrase('Sociopro')}}</p>
+                                            <p class="socio-text">{{get_phrase('Gigvora')}}</p>
                                        </div>
                                    </div>
                                    <h4>{{get_phrase("You'll be billed")}} {{currency(get_settings('badge_price'))}} {{get_phrase('per month.')}}</h4>

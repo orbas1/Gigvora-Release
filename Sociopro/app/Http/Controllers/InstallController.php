@@ -43,65 +43,25 @@ class InstallController extends Controller
     }
 
     function step2($param1 = '') {
-        if ($param1 == 'error') {
-            $error = 'Purchase Code Verification Failed';
-        } else {
-            $error = "";
-        }
+        $error = "";
         return view('install.step2', ['error' => $error]);
     }
 
     public function validatePurchaseCode(Request $request) 
     {
         $data = $request->all();
-        $purchase_code = $data['purchase_code'];
-        $validation_response = true;//$this->api_request($purchase_code);
-        if ($validation_response == true) {
-          // keeping the purchase code in users session
-          session(['purchase_code' => $purchase_code]);
-          session(['purchase_code_verified' => 1]);
-          //move to step 3
-          return redirect()->route('step3');
-        } else {
-          //remain on step 2 and show error
-          session(['purchase_code_verified' => 0]);
-          return redirect()->route('step0', ['error' => 'error']);
-        }
+        $purchase_code = $data['purchase_code'] ?? 'not_required';
+        // purchase code validation has been intentionally skipped for Gigvora deployments
+        session(['purchase_code' => $purchase_code]);
+        session(['purchase_code_verified' => 1]);
+        //move to step 3
+        return redirect()->route('step3');
     }
 
     public function api_request($code = '')
     {
-        $product_code = $code;
-        $personal_token = "FkA9UyDiQT0YiKwYLK3ghyFNRVV9SeUn";
-        $url = "https://api.envato.com/v3/market/author/sale?code=" . $product_code;
-        $curl = curl_init($url);
-    
-        //setting the header for the rest of the api
-        $bearer   = 'bearer ' . $personal_token;
-        $header   = array();
-        $header[] = 'Content-length: 0';
-        $header[] = 'Content-type: application/json; charset=utf-8';
-        $header[] = 'Authorization: ' . $bearer;
-    
-        $verify_url = 'https://api.envato.com/v1/market/private/user/verify-purchase:' . $product_code . '.json';
-        $ch_verify = curl_init($verify_url . '?code=' . $product_code);
-    
-        curl_setopt($ch_verify, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch_verify, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch_verify, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch_verify, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch_verify, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-    
-        $cinit_verify_data = curl_exec($ch_verify);
-        curl_close($ch_verify);
-    
-        $response = json_decode($cinit_verify_data, true);
-    
-        if (count($response['verify-purchase']) > 0) {
-          return true;
-        } else {
-          return false;
-        }
+        // Envato purchase code validation has been removed for Gigvora deployments
+        return true;
     }
 
     public function step3(Request $request) {
@@ -135,14 +95,8 @@ class InstallController extends Controller
     }
 
     public function check_purchase_code_verification() {
-        if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {
-            //return 'running_locally';
-        } else {
-            if (session('purchase_code_verified'))
-                return redirect()->route('step2');
-            else if (session('purchase_code_verified') == 0)
-                return redirect()->route('step2');
-        }
+        // Purchase code verification is no longer required for installation
+        return;
     }
 
     public function check_database_connection($hostname, $username, $password, $dbname) {

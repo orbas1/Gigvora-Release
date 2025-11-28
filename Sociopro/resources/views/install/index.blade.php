@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="description" content="Creativeitem Software Installation" />
 	<meta name="author" content="Creativeitem" />
-	<title>{{ __('Installation').' | '.__('Sociopro') }}</title>
+        <title>{{ __('Installation').' | '.__('Gigvora') }}</title>
 	
 	<!-- CSRF Token for ajax for submission -->
     <meta name="csrf_token" content="{{ csrf_token() }}" />
