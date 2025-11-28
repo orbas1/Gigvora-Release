@@ -118,6 +118,11 @@ UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/ad
 - `GET /api/addons/talent-ai/volunteering/applications/{application}` → `VolunteeringApplicationController@show` (`api.addons.talent_ai.volunteering.applications.show`)
   - Shows a single volunteering application with opportunity context.
 
+## Mobile Screens & Flows
+- `GigvoraAddonNavigation.routes` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) publishes named routes for Headhunters, Launchpad, AI Workspace, and Volunteering to the Flutter shell.
+- `GigvoraAddonProviders.talentAi` registers ChangeNotifier providers for `HeadhunterState`, `LaunchpadState`, `AiWorkspaceState`, and `VolunteeringState`, each backed by `/api/addons/talent-ai/*` endpoints and the shared token provider.
+- Mobile navigation labels mirror web: **Talent & AI** > **Headhunters**, **Experience Launchpad**, **AI Workspace**, **Volunteering**, with Material icons matching the Laravel menu and feature flag visibility tied to `gigvora_talent_ai.enabled` + per-module toggles.
+
 ### AI Workspace (`modules.ai_workspace.enabled`)
 - `POST /api/addons/talent-ai/ai/cv-writer` → `ToolController@cvWriter` (`api.addons.talent_ai.ai.cv_writer`)
   - Generates CV content.

@@ -26,3 +26,9 @@ Policies and the `manage_talent_ai` gate enforce Gigvora admin-only access to ad
   - `/addons/talent-ai/ai-workspace` → AI tools and usage (JS mix entrypoint: `js/addons/talent_ai/ai_workspace.js`).
   - `/addons/talent-ai/volunteering/*` → Volunteering opportunities and filters (JS mix entrypoint: `js/addons/talent_ai/volunteering_filters.js`).
 - **Styling:** The shared stylesheet `css/addons/talent_ai/talent_ai.css` (served via Mix) keeps cards, pipelines, and AI tiles visually aligned with Gigvora branding.
+
+## Mobile Integration
+- **Dependencies:** `talent_ai_flutter_addon` added as a local dependency in the Flutter shell (`../Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-flutter_addon`).
+- **API base:** Targets the same Gigvora host endpoints under `/api/addons/talent-ai/*` with the mobile auth token injected via the shared provider.
+- **Navigation:** Mobile routes include `/talent-ai/headhunters`, `/talent-ai/headhunters/mandates/:id`, `/talent-ai/launchpad`, `/talent-ai/launchpad/:id`, `/talent-ai/launchpad/applications/:id`, `/talent-ai/ai-workspace`, `/talent-ai/volunteering`, `/talent-ai/volunteering/:id` surfaced beneath the **Talent & AI** menu. Icons mirror the web set (work_outline, school_outlined, smart_toy_outlined, volunteer_activism_outlined).
+- **Providers:** `GigvoraAddonProviders.talentAi` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) attaches ChangeNotifier providers for Headhunter, Launchpad, AI Workspace, and Volunteering states so screens render live data and analytics.

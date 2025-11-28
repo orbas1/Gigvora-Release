@@ -17,3 +17,9 @@ The addon is designed to interoperate with the Gigvora core feed, search, gigs, 
 - **Navigation placement:** Add a top-level **Ads Manager** entry in the Gigvora navigation with children for Campaigns, Creatives, Reports, Keyword Planner, Forecast, and Admin (visiblity controlled by `advertisement.enabled` and `manage_advertisement`).
 - **Icons & styling:** Use the host icon set (e.g., Font Awesome) and Gigvora button/card classes; the dashboard view now pulls its scripts through Laravel Mix (`mix('js/advertisement/dashboard.js')`) to stay on-brand with the host build pipeline. Mix entrypoints include `resources/js/advertisement/dashboard.js`, with matching placeholders ready for campaigns, creatives, reports, keyword planner, forecast, and admin screens.
 - **Shared components:** Reusable ad placements live under `advertisement::components.*` (feed card, banner, search result) and now ship with Gigvora-scoped utility classes (`gigvora-ad*`) plus ARIA labels so host surfaces can include them without bespoke styling or accessibility regressions.
+
+## Mobile Integration
+- **Add-on dependency:** `advertisement_flutter_addon` added via path dependency in the Sociopro/Gigvora Flutter shell (`../Gigvora-Addons-main/Advertisement-Addon/Advertisement_Flutter_addon`).
+- **API base:** Points to the same Gigvora Laravel host at `/api/advertisement/*` with bearer token injection via the shell’s auth repository.
+- **Navigation:** Mobile routes mirror web: `/ads/home`, `/ads/campaigns`, `/ads/campaigns/:id`, `/ads/campaigns/create`, `/ads/creatives`, `/ads/keyword-planner`, `/ads/forecast`, `/ads/reports`, surfaced under the **Ads Manager** menu with matching icons.
+- **Providers:** `GigvoraAddonProviders.ads` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) wires the Campaign, Creative, Analytics, Forecast, Keyword Planner, and Affiliate blocs so screens render live data.

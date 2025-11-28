@@ -1,0 +1,23 @@
+name: gigvora_mobile_shell
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.3
+  provider: ^6.0.5
+  advertisement_flutter_addon:
+    path: ../../Gigvora-Addons-main/Advertisement-Addon/Advertisement_Flutter_addon
+  talent_ai_flutter_addon:
+    path: ../../Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-flutter_addon
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true

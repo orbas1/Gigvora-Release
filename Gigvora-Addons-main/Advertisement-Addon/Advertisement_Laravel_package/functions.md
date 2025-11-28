@@ -50,3 +50,8 @@
 - `manage_advertisement` gate restricts administrative actions to Gigvora admins (`user_role === 'admin'`).
 - Visibility hooks: `advertisement.enabled` toggles the Ads Manager navigation entry and related menu children (Campaigns, Creatives, Reports, Keyword Planner, Forecast, Admin).
 - UI components for placements are reusable via `advertisement::components.ad_feed_card`, `advertisement::components.ad_banner`, and `advertisement::components.ad_search_result`, each carrying Gigvora-branded classes for feed, banner, and search slots.
+
+## Mobile Screens & Flows
+- `GigvoraAddonNavigation.routes` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) publishes the advertisement routes for the phone app: `/ads/home`, `/ads/campaigns`, `/ads/campaigns/:id`, `/ads/campaigns/create`, `/ads/creatives`, `/ads/keyword-planner`, `/ads/forecast`, `/ads/reports`.
+- `GigvoraAddonProviders.ads` registers the Campaign, Creative, Analytics, Forecast, Keyword Planner, and Affiliate blocs so the Flutter screens hydrate from `/api/advertisement/*` using the shared bearer token provider.
+- Menu labels **Ads Manager**, **Campaigns**, **Ads Reports** reuse Material icons that mirror the web sidebar for brand consistency.
