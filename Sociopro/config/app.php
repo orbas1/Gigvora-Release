@@ -188,6 +188,8 @@ return [
         /*
          * Package Service Providers...
          */
+        Advertisement\Providers\AdvertisementServiceProvider::class,
+        Gigvora\TalentAi\Providers\TalentAiServiceProvider::class,
 
         /*
          * Application Service Providers...

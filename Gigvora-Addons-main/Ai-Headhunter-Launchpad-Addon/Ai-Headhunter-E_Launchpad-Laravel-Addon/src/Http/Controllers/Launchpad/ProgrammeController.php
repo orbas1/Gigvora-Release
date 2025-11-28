@@ -9,6 +9,7 @@ use Gigvora\TalentAi\Domain\Launchpad\Services\LaunchpadProgrammeService;
 use Gigvora\TalentAi\Http\Requests\Launchpad\ProgrammeRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class ProgrammeController extends Controller
@@ -17,6 +18,41 @@ class ProgrammeController extends Controller
 
     public function __construct(private LaunchpadProgrammeService $service)
     {
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.launchpad.enabled'), 403);
+
+        $programmes = LaunchpadProgramme::query()
+            ->with('tasks')
+            ->when(!$request->user()->can('manage_launchpad_programmes'), fn ($query) => $query->where('status', 'published'))
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($programmes);
+    }
+
+    public function show(LaunchpadProgramme $programme): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.launchpad.enabled'), 403);
+
+        if (($programme->status?->value ?? null) !== 'published') {
+            $this->authorize('view', $programme);
+        }
+
+        return response()->json(['programme' => $programme->load('tasks')]);
+    }
+
+    public function tasks(LaunchpadProgramme $programme): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.launchpad.enabled'), 403);
+
+        if (($programme->status?->value ?? null) !== 'published') {
+            $this->authorize('view', $programme);
+        }
+
+        return response()->json(['tasks' => $programme->tasks()->orderBy('order')->get()]);
     }
 
     public function store(ProgrammeRequest $request): JsonResponse

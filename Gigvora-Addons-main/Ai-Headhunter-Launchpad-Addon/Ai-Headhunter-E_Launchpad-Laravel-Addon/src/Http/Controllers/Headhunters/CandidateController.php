@@ -10,6 +10,7 @@ use Gigvora\TalentAi\Domain\Headhunters\Services\HeadhunterService;
 use Gigvora\TalentAi\Http\Requests\Headhunters\CandidateRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class CandidateController extends Controller
@@ -18,6 +19,26 @@ class CandidateController extends Controller
 
     public function __construct(private HeadhunterService $service)
     {
+    }
+
+    public function show(HeadhunterCandidate $candidate): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
+        $this->authorize('view', $candidate);
+
+        return response()->json(['candidate' => $candidate->load('profile')]);
+    }
+
+    public function notes(Request $request, HeadhunterCandidate $candidate): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
+        $this->authorize('update', $candidate);
+
+        $request->validate(['notes' => 'required|string']);
+
+        $candidate->pipelineItems()->update(['notes' => $request->input('notes')]);
+
+        return response()->json(['candidate' => $candidate->load('pipelineItems')]);
     }
 
     public function store(CandidateRequest $request, HeadhunterProfile $profile): JsonResponse

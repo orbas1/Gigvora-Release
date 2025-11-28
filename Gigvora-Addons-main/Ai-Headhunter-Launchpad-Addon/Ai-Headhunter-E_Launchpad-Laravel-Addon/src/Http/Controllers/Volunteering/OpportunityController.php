@@ -9,6 +9,7 @@ use Gigvora\TalentAi\Domain\Volunteering\Services\VolunteeringService;
 use Gigvora\TalentAi\Http\Requests\Volunteering\OpportunityRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class OpportunityController extends Controller
@@ -17,6 +18,29 @@ class OpportunityController extends Controller
 
     public function __construct(private VolunteeringService $service)
     {
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $this->ensureEnabled();
+
+        $opportunities = VolunteeringOpportunity::query()
+            ->when(!$request->user()->can('manage_volunteering_opportunities'), fn ($query) => $query->where('status', 'published'))
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($opportunities);
+    }
+
+    public function show(VolunteeringOpportunity $opportunity): JsonResponse
+    {
+        $this->ensureEnabled();
+
+        if (($opportunity->status?->value ?? null) !== 'published') {
+            $this->authorize('view', $opportunity);
+        }
+
+        return response()->json(['opportunity' => $opportunity]);
     }
 
     protected function ensureEnabled(): void
