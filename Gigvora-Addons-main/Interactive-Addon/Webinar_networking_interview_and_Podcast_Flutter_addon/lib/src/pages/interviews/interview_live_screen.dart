@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/live_mobile_theme.dart';
+
 class InterviewLiveScreen extends StatelessWidget {
   const InterviewLiveScreen({super.key});
 
@@ -14,9 +16,13 @@ class InterviewLiveScreen extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
-                child: const Center(
-                  child: Text('Video call view', style: TextStyle(color: Colors.white)),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                  borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius),
+                ),
+                child: Center(
+                  child: Text('Video call view',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface)),
                 ),
               ),
             ),

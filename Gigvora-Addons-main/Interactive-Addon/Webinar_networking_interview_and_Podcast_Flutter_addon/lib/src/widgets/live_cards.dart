@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/live_mobile_theme.dart';
+
 class LiveEventCard extends StatelessWidget {
   const LiveEventCard({
     super.key,
@@ -36,9 +38,17 @@ class LiveEventCard extends StatelessWidget {
                   children: [
                     Text(title, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700])),
+                    Text(subtitle,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: LiveMobileTheme.mutedText(context))),
                     const SizedBox(height: 8),
-                    Text(meta, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                    Text(meta,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: LiveMobileTheme.metaText(context))),
                   ],
                 ),
               ),
@@ -61,8 +71,8 @@ class InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color ?? Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: color ?? Theme.of(context).colorScheme.primary.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius),
       ),
       child: Text(label, style: Theme.of(context).textTheme.labelMedium),
     );

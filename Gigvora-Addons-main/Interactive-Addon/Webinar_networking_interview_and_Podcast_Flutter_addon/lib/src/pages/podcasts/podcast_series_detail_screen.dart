@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/podcast_episode.dart';
 import '../../services/podcast_service.dart';
 import '../../state/podcast_state.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class PodcastSeriesDetailScreen extends StatefulWidget {
   const PodcastSeriesDetailScreen({super.key, required this.service, required this.seriesId});
@@ -44,7 +45,11 @@ class _PodcastSeriesDetailScreenState extends State<PodcastSeriesDetailScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(
                   children: [
-                    Container(width: 100, height: 100, color: Colors.grey.shade300),
+                    Container(
+                      width: 100,
+                      height: 100,
+                      color: LiveMobileTheme.surfaceVariant(context),
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

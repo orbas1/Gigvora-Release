@@ -4,6 +4,7 @@ import '../../api/wnip_api_client.dart';
 import '../../models/interview.dart';
 import '../../models/interview_score.dart';
 import '../../models/interview_slot.dart';
+import '../../theme/live_mobile_theme.dart';
 import 'score_form_page.dart';
 
 class InterviewPage extends StatefulWidget {
@@ -120,11 +121,11 @@ class _InterviewPageState extends State<InterviewPage> {
                       trailing: Text(score.scores.join(', ')),
                     ),
                   ),
-                  if (error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Text(error!, style: const TextStyle(color: Colors.red)),
-                    ),
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  ),
                 ],
               ),
             ),

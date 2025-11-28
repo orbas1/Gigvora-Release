@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/wnip_api_client.dart';
 import '../../models/webinar.dart';
 import '../../models/webinar_registration.dart';
+import '../../theme/live_mobile_theme.dart';
 
 class WebinarDetailPage extends StatefulWidget {
   final WnipApiClient apiClient;
@@ -150,7 +151,7 @@ class _WebinarDetailPageState extends State<WebinarDetailPage> {
                 if (error != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
-                    child: Text(error!, style: const TextStyle(color: Colors.red)),
+                    child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ),
               ],
             ),

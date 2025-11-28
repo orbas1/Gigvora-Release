@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../state/escrow_provider.dart';
+import '../../theme/mobile_theme.dart';
 
 class EscrowStatusPage extends ConsumerWidget {
   const EscrowStatusPage({super.key});
@@ -56,7 +57,8 @@ class _EmptyEscrow extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.lock_outline, size: 56, color: Colors.grey.shade500),
+            Icon(Icons.lock_outline,
+                size: 56, color: FreelanceMobileTheme.emphasisIcon(context)),
             const SizedBox(height: 12),
             const Text('No escrow has been opened yet.'),
           ],

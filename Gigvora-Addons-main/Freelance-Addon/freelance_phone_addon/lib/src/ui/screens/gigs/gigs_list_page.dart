@@ -7,6 +7,7 @@ import '../../../state/gig_provider.dart';
 import '../../widgets/gig_card.dart';
 import 'gig_detail_page.dart';
 import 'gig_filter_sheet.dart';
+import '../../theme/mobile_theme.dart';
 
 class GigsListPage extends ConsumerWidget {
   const GigsListPage({super.key});
@@ -33,7 +34,7 @@ class GigsListPage extends ConsumerWidget {
           child: paged.items.isEmpty
               ? const _EmptyState()
               : ListView.separated(
-                  padding: const EdgeInsets.all(12),
+                  padding: FreelanceMobileTheme.screenPadding,
                   itemBuilder: (context, index) => GigCard(
                     gig: paged.items[index],
                     onTap: () => _openGig(context, paged.items[index]),
@@ -94,7 +95,8 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.work_outline, size: 56, color: Colors.grey.shade500),
+            Icon(Icons.work_outline,
+                size: 56, color: FreelanceMobileTheme.emphasisIcon(context)),
             const SizedBox(height: 12),
             const Text('No gigs found. Try adjusting the filters or check back later.'),
           ],

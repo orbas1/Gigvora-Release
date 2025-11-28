@@ -5,6 +5,7 @@ import '../../../state/core_providers.dart';
 import '../../../state/project_provider.dart';
 import '../../widgets/project_card.dart';
 import 'project_detail_page.dart';
+import '../../theme/mobile_theme.dart';
 
 class ProjectListPage extends ConsumerWidget {
   const ProjectListPage({super.key});
@@ -31,7 +32,7 @@ class ProjectListPage extends ConsumerWidget {
           child: paged.items.isEmpty
               ? const _EmptyProjectState()
               : ListView.separated(
-                  padding: const EdgeInsets.all(12),
+                  padding: FreelanceMobileTheme.screenPadding,
                   itemBuilder: (context, index) => ProjectCard(
                     project: paged.items[index],
                     onTap: () => _openProject(context, paged.items[index].slug),
@@ -90,7 +91,8 @@ class _EmptyProjectState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cases_outlined, size: 56, color: Colors.grey.shade500),
+            Icon(Icons.cases_outlined,
+                size: 56, color: FreelanceMobileTheme.emphasisIcon(context)),
             const SizedBox(height: 12),
             const Text('No projects available right now.'),
           ],
