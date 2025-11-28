@@ -2,7 +2,8 @@
 
 ## Web
 - `GET /addons/advertisement/dashboard` → `view('advertisement::dashboard')`
-  - Shows the advertiser dashboard surfaced in Sociopro; requires `web` + `auth` middleware and `advertisement.enabled` flag.
+  - Shows the Gigvora Ads Manager dashboard; requires `web` + `auth` middleware and `advertisement.enabled` flag.
+  - UI assets: `@vite(['resources/js/advertisement/dashboard.js'])` with shared Gigvora layout (`layouts.app`).
 
 ## API (all behind `api` + `auth:sanctum` and `advertisement.enabled`)
 - `GET /api/advertisement/advertisers` → `AdvertiserController@index`
@@ -46,4 +47,5 @@
 
 ## Permissions & Policies
 - Policies mapped for `Advertisement\Models\Campaign` via `CampaignPolicy`.
-- `manage_advertisement` gate restricts administrative actions to Sociopro admins (`user_role === 'admin'`).
+- `manage_advertisement` gate restricts administrative actions to Gigvora admins (`user_role === 'admin'`).
+- Visibility hooks: `advertisement.enabled` toggles the Ads Manager navigation entry and related menu children (Campaigns, Creatives, Reports, Keyword Planner, Forecast, Admin).

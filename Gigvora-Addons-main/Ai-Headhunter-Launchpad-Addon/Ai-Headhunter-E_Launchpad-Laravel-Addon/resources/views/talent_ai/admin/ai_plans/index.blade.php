@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', __('talent_ai::addons_talent_ai.menu.plans'))
 
@@ -7,11 +7,16 @@
 @endpush
 
 @push('scripts')
-    @vite('resources/js/addons/talent_ai/talent_ai.js')
+    @vite('resources/js/addons/talent_ai/admin_settings.js')
 @endpush
 
 @section('content')
-<div class="talent-ai-page">
+<div class="container py-4">
+    <div class="talent-ai-card mb-3">
+        <ul class="nav nav-pills flex-column flex-lg-row gap-2">
+            @include('talent_ai::admin.partials.menu')
+        </ul>
+    </div>
     <div class="talent-ai-header">
         <div>
             <h1 class="h4 mb-1">AI Subscription Plans</h1>

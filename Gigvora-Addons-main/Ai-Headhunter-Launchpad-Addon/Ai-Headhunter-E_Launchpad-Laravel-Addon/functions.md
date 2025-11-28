@@ -1,6 +1,18 @@
 # Talent & AI Backend Functions & Endpoints
 
 ## Web (`web` + `auth` middleware, gated by `gigvora_talent_ai.enabled` and module toggles)
+UI assets are delivered via Vite from `resources/js/addons/talent_ai/*` and `resources/css/addons/talent_ai/talent_ai.css` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles.
+
+### Primary screens
+- `GET /addons/talent-ai/headhunters/dashboard` → `view('talent_ai::headhunters.dashboard')` (name: `addons.talent_ai.headhunters.dashboard`)
+  - Presents mandate and candidate summaries with pipeline drag-and-drop hooks (`pipeline_board.js`).
+- `GET /addons/talent-ai/launchpad/programmes` → `view('talent_ai::launchpad.programmes.index')` (name: `addons.talent_ai.launchpad.programmes.index`)
+  - Lists Experience Launchpad programmes with pagination and progress context (`launchpad_progress.js`).
+- `GET /addons/talent-ai/ai-workspace` → `view('talent_ai::ai_workspace.index')` (name: `addons.talent_ai.ai_workspace.index`)
+  - Surfaces AI tool tiles wired to API endpoints (`ai_workspace.js`).
+- `GET /addons/talent-ai/volunteering/opportunities` → `view('talent_ai::volunteering.opportunities.index')` (name: `addons.talent_ai.volunteering.opportunities.index`)
+  - Provides volunteering discovery with client-side filters (`volunteering_filters.js`).
+
 ### Headhunters (`modules.headhunters.enabled`)
 - `POST /addons/talent-ai/headhunter/profile` → `HeadhunterProfileController@store` (`addons.talent_ai.headhunter.profile.store`)
   - Creates a headhunter profile for the authenticated user.
@@ -140,5 +152,13 @@
 
 ## Permissions & Policies
 - Policies mapped for headhunter, launchpad, and volunteering domain models ensure per-resource authorization.
-- `manage_talent_ai` gate restricts admin routes to Sociopro admins (`user_role === 'admin'`).
+- `manage_talent_ai` gate restricts admin routes to Gigvora admins (`user_role === 'admin'`).
 - All routes enforce authentication through Laravel `auth` or `auth:sanctum` middleware.
+- Navigation visibility: the **Talent & AI** menu plus its sub-links (Headhunters, Experience Launchpad, AI Workspace, Volunteering) are shown only when `gigvora_talent_ai.enabled` and the relevant `modules.*.enabled` flags are true; admin entries remain hidden without the `manage_talent_ai` ability.
+
+## UI Function Mapping (Web)
+- Headhunter pipeline drag-and-drop and card hydration: `resources/js/addons/talent_ai/pipeline_board.js` (paired with Blade pipeline components extending `layouts.app`).
+- Launchpad progress steppers and programme cards: `resources/js/addons/talent_ai/launchpad_progress.js`.
+- AI workspace tool tiles and BYOK interactions: `resources/js/addons/talent_ai/ai_workspace.js`.
+- Volunteering filters and card interactions: `resources/js/addons/talent_ai/volunteering_filters.js`.
+- Admin settings, plan management, and guardrail toggles: `resources/js/addons/talent_ai/admin_settings.js`.

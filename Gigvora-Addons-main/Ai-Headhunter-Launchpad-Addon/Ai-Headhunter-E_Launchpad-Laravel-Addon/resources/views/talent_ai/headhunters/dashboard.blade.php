@@ -7,14 +7,15 @@
 @endpush
 
 @push('scripts')
-    @vite('resources/js/addons/talent_ai/talent_ai.js')
+    @vite('resources/js/addons/talent_ai/pipeline_board.js')
 @endpush
 
 @section('content')
-<div class="talent-ai-page">
-    <div class="talent-ai-header">
-        <div>
-            <h1 class="h4 mb-1">@lang('talent_ai::addons_talent_ai.headhunters.dashboard_title')</h1>
+<div class="container py-4">
+    <div class="talent-ai-page">
+        <div class="talent-ai-header">
+            <div>
+                <h1 class="h4 mb-1">@lang('talent_ai::addons_talent_ai.headhunters.dashboard_title')</h1>
             <p class="text-muted mb-0">Track mandates, candidates, and AI intel in one place.</p>
         </div>
         <div class="d-flex gap-2">
@@ -105,6 +106,7 @@
                 @endforeach
             </div>
         @endif
+        </div>
     </div>
 </div>
 @endsection

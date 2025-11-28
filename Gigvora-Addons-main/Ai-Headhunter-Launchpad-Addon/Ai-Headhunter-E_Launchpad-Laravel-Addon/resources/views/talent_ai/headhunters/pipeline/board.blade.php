@@ -7,14 +7,15 @@
 @endpush
 
 @push('scripts')
-    @vite('resources/js/addons/talent_ai/talent_ai.js')
+    @vite('resources/js/addons/talent_ai/pipeline_board.js')
 @endpush
 
 @section('content')
-<div class="talent-ai-page">
-    <div class="talent-ai-header">
-        <div>
-            <h1 class="h4 mb-1">Pipeline: {{ $mandate->title ?? '' }}</h1>
+<div class="container py-4">
+    <div class="talent-ai-page">
+        <div class="talent-ai-header">
+            <div>
+                <h1 class="h4 mb-1">Pipeline: {{ $mandate->title ?? '' }}</h1>
             <p class="text-muted mb-0">Drag candidates between stages and keep notes synced.</p>
         </div>
         <a href="{{ url()->previous() }}" class="btn btn-light">@lang('talent_ai::addons_talent_ai.common.back')</a>
@@ -52,5 +53,6 @@
             </div>
         @endforeach
     </div>
+</div>
 </div>
 @endsection
