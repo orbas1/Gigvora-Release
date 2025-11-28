@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Gigvora\TalentAi\Http\Controllers\Admin\AdminController;
 use Gigvora\TalentAi\Http\Controllers\AiWorkspace\ByokController;
+use Gigvora\TalentAi\Http\Controllers\AiWorkspace\StatusController;
 use Gigvora\TalentAi\Http\Controllers\AiWorkspace\ToolController;
 use Gigvora\TalentAi\Http\Controllers\Headhunters\CandidateController;
 use Gigvora\TalentAi\Http\Controllers\Headhunters\HeadhunterProfileController;
@@ -74,6 +75,34 @@ Route::group([
         return;
     }
 
+    if (config('gigvora_talent_ai.modules.headhunters.enabled')) {
+        Route::get('headhunters/profile', [HeadhunterProfileController::class, 'show'])->name('headhunters.profile.show');
+        Route::get('headhunters/mandates', [MandateController::class, 'index'])->name('headhunters.mandates.index');
+        Route::get('headhunters/mandates/{mandate}', [MandateController::class, 'show'])->name('headhunters.mandates.show');
+        Route::get('headhunters/mandates/{mandate}/pipeline', [PipelineController::class, 'index'])->name('headhunters.pipeline.index');
+        Route::post('headhunters/mandates/{mandate}/pipeline/{pipelineItem}', [PipelineController::class, 'move'])->name('headhunters.pipeline.move');
+        Route::get('headhunters/candidates/{candidate}', [CandidateController::class, 'show'])->name('headhunters.candidates.show');
+        Route::post('headhunters/candidates/{candidate}/notes', [CandidateController::class, 'notes'])->name('headhunters.candidates.notes');
+        Route::get('headhunters/candidates/{candidate}/interviews', [HeadhunterInterviewController::class, 'index'])->name('headhunters.candidates.interviews.index');
+    }
+
+    if (config('gigvora_talent_ai.modules.launchpad.enabled')) {
+        Route::get('launchpad/programmes', [ProgrammeController::class, 'index'])->name('launchpad.programmes.index');
+        Route::get('launchpad/programmes/{programme}', [ProgrammeController::class, 'show'])->name('launchpad.programmes.show');
+        Route::get('launchpad/programmes/{programme}/tasks', [ProgrammeController::class, 'tasks'])->name('launchpad.programmes.tasks');
+        Route::post('launchpad/programmes/{programme}/applications', [LaunchpadApplicationController::class, 'store'])->name('launchpad.applications.store');
+        Route::get('launchpad/applications/{application}', [LaunchpadApplicationController::class, 'show'])->name('launchpad.applications.show');
+        Route::post('launchpad/applications/{application}/tasks/{task}', [LaunchpadApplicationController::class, 'updateTask'])->name('launchpad.applications.tasks.update');
+    }
+
+    if (config('gigvora_talent_ai.modules.volunteering.enabled')) {
+        Route::get('volunteering/opportunities', [OpportunityController::class, 'index'])->name('volunteering.opportunities.index');
+        Route::get('volunteering/opportunities/{opportunity}', [OpportunityController::class, 'show'])->name('volunteering.opportunities.show');
+        Route::post('volunteering/opportunities/{opportunity}/applications', [VolunteeringApplicationController::class, 'store'])->name('volunteering.applications.store');
+        Route::get('volunteering/applications', [VolunteeringApplicationController::class, 'index'])->name('volunteering.applications.index');
+        Route::get('volunteering/applications/{application}', [VolunteeringApplicationController::class, 'show'])->name('volunteering.applications.show');
+    }
+
     if (config('gigvora_talent_ai.modules.ai_workspace.enabled')) {
         Route::post('ai/cv-writer', [ToolController::class, 'cvWriter'])->name('ai.cv_writer');
         Route::post('ai/outreach', [ToolController::class, 'outreach'])->name('ai.outreach');
@@ -87,5 +116,10 @@ Route::group([
 
         Route::post('ai/byok', [ByokController::class, 'store'])->name('ai.byok.store');
         Route::delete('ai/byok/{credential}', [ByokController::class, 'destroy'])->name('ai.byok.destroy');
+
+        Route::get('ai-workspace/sessions', [StatusController::class, 'sessions'])->name('ai.sessions');
+        Route::get('ai-workspace/usage', [StatusController::class, 'usage'])->name('ai.usage');
+        Route::get('ai-workspace/plans', [StatusController::class, 'plans'])->name('ai.plans');
+        Route::get('ai-workspace/subscription', [StatusController::class, 'subscription'])->name('ai.subscription');
     }
 });

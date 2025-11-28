@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gigvora\TalentAi\Domain\Launchpad\Models;
 
+use Gigvora\TalentAi\Domain\Launchpad\Models\LaunchpadApplicationTaskProgress;
 use Gigvora\TalentAi\Domain\Shared\Enums\LaunchpadApplicationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,5 +44,10 @@ class LaunchpadApplication extends Model
     public function interviews(): HasMany
     {
         return $this->hasMany(LaunchpadInterview::class, 'launchpad_application_id');
+    }
+
+    public function taskProgress(): HasMany
+    {
+        return $this->hasMany(LaunchpadApplicationTaskProgress::class, 'launchpad_application_id');
     }
 }

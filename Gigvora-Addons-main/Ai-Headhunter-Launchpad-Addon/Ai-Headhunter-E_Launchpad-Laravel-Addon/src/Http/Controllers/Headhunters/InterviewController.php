@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gigvora\TalentAi\Http\Controllers\Headhunters;
 
 use Gigvora\TalentAi\Domain\Headhunters\Models\HeadhunterInterview;
+use Gigvora\TalentAi\Domain\Headhunters\Models\HeadhunterCandidate;
 use Gigvora\TalentAi\Domain\Headhunters\Models\HeadhunterPipelineItem;
 use Gigvora\TalentAi\Domain\Headhunters\Services\HeadhunterInterviewService;
 use Gigvora\TalentAi\Http\Requests\Headhunters\InterviewRequest;
@@ -18,6 +19,16 @@ class InterviewController extends Controller
 
     public function __construct(private HeadhunterInterviewService $service)
     {
+    }
+
+    public function index(HeadhunterCandidate $candidate): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
+        $this->authorize('view', $candidate);
+
+        $interviews = $candidate->pipelineItems()->with('interviews')->get()->pluck('interviews')->flatten();
+
+        return response()->json(['interviews' => $interviews]);
     }
 
     public function store(InterviewRequest $request, HeadhunterPipelineItem $pipelineItem): JsonResponse

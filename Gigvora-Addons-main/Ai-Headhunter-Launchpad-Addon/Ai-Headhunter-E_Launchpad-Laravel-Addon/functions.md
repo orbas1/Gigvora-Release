@@ -61,7 +61,52 @@
 - `POST /addons/talent-ai/admin/plans` → `AdminController@storePlan` (`addons.talent_ai.admin.plans.store`)
   - Creates or updates AI workspace plans.
 
-## API (`api` + `auth:sanctum`, `gigvora_talent_ai.enabled`, `modules.ai_workspace.enabled`)
+## API (`api` + `auth:sanctum`, `gigvora_talent_ai.enabled`)
+### Headhunters (`modules.headhunters.enabled`)
+- `GET /api/addons/talent-ai/headhunters/profile` → `HeadhunterProfileController@show` (`api.addons.talent_ai.headhunters.profile.show`)
+  - Returns the authenticated headhunter profile with mandate and candidate counts.
+- `GET /api/addons/talent-ai/headhunters/mandates` → `MandateController@index` (`api.addons.talent_ai.headhunters.mandates.index`)
+  - Paginates mandates owned by the authenticated headhunter, with pipeline counts.
+- `GET /api/addons/talent-ai/headhunters/mandates/{mandate}` → `MandateController@show` (`api.addons.talent_ai.headhunters.mandates.show`)
+  - Shows mandate detail and pipeline items.
+- `GET /api/addons/talent-ai/headhunters/mandates/{mandate}/pipeline` → `PipelineController@index` (`api.addons.talent_ai.headhunters.pipeline.index`)
+  - Lists pipeline items for a mandate.
+- `POST /api/addons/talent-ai/headhunters/mandates/{mandate}/pipeline/{pipelineItem}` → `PipelineController@move` (`api.addons.talent_ai.headhunters.pipeline.move`)
+  - Moves a pipeline item between stages.
+- `GET /api/addons/talent-ai/headhunters/candidates/{candidate}` → `CandidateController@show` (`api.addons.talent_ai.headhunters.candidates.show`)
+  - Returns candidate detail for the headhunter.
+- `POST /api/addons/talent-ai/headhunters/candidates/{candidate}/notes` → `CandidateController@notes` (`api.addons.talent_ai.headhunters.candidates.notes`)
+  - Updates pipeline notes for the candidate across associated mandates.
+- `GET /api/addons/talent-ai/headhunters/candidates/{candidate}/interviews` → `HeadhunterInterviewController@index` (`api.addons.talent_ai.headhunters.candidates.interviews.index`)
+  - Lists interviews scheduled for the candidate’s pipeline items.
+
+### Launchpad (`modules.launchpad.enabled`)
+- `GET /api/addons/talent-ai/launchpad/programmes` → `ProgrammeController@index` (`api.addons.talent_ai.launchpad.programmes.index`)
+  - Paginates published programmes (or all for managers/creators) with tasks.
+- `GET /api/addons/talent-ai/launchpad/programmes/{programme}` → `ProgrammeController@show` (`api.addons.talent_ai.launchpad.programmes.show`)
+  - Shows a programme and its tasks.
+- `GET /api/addons/talent-ai/launchpad/programmes/{programme}/tasks` → `ProgrammeController@tasks` (`api.addons.talent_ai.launchpad.programmes.tasks`)
+  - Lists programme tasks in order.
+- `POST /api/addons/talent-ai/launchpad/programmes/{programme}/applications` → `LaunchpadApplicationController@store` (`api.addons.talent_ai.launchpad.applications.store`)
+  - Submits an application to a programme.
+- `GET /api/addons/talent-ai/launchpad/applications/{application}` → `LaunchpadApplicationController@show` (`api.addons.talent_ai.launchpad.applications.show`)
+  - Returns an application with programme tasks, interviews, and task progress.
+- `POST /api/addons/talent-ai/launchpad/applications/{application}/tasks/{task}` → `LaunchpadApplicationController@updateTask` (`api.addons.talent_ai.launchpad.applications.tasks.update`)
+  - Marks or clears task completion for an application.
+
+### Volunteering (`modules.volunteering.enabled`)
+- `GET /api/addons/talent-ai/volunteering/opportunities` → `OpportunityController@index` (`api.addons.talent_ai.volunteering.opportunities.index`)
+  - Paginates published volunteering opportunities (or all for managers/creators).
+- `GET /api/addons/talent-ai/volunteering/opportunities/{opportunity}` → `OpportunityController@show` (`api.addons.talent_ai.volunteering.opportunities.show`)
+  - Shows opportunity details.
+- `POST /api/addons/talent-ai/volunteering/opportunities/{opportunity}/applications` → `VolunteeringApplicationController@store` (`api.addons.talent_ai.volunteering.applications.store`)
+  - Submits an application to an opportunity.
+- `GET /api/addons/talent-ai/volunteering/applications` → `VolunteeringApplicationController@index` (`api.addons.talent_ai.volunteering.applications.index`)
+  - Lists volunteering applications for the authenticated user.
+- `GET /api/addons/talent-ai/volunteering/applications/{application}` → `VolunteeringApplicationController@show` (`api.addons.talent_ai.volunteering.applications.show`)
+  - Shows a single volunteering application with opportunity context.
+
+### AI Workspace (`modules.ai_workspace.enabled`)
 - `POST /api/addons/talent-ai/ai/cv-writer` → `ToolController@cvWriter` (`api.addons.talent_ai.ai.cv_writer`)
   - Generates CV content.
 - `POST /api/addons/talent-ai/ai/outreach` → `ToolController@outreach` (`api.addons.talent_ai.ai.outreach`)
@@ -84,6 +129,14 @@
   - Stores BYOK credentials when enabled.
 - `DELETE /api/addons/talent-ai/ai/byok/{credential}` → `ByokController@destroy` (`api.addons.talent_ai.ai.byok.destroy`)
   - Removes BYOK credential.
+- `GET /api/addons/talent-ai/ai-workspace/sessions` → `StatusController@sessions` (`api.addons.talent_ai.ai.sessions`)
+  - Returns recent AI sessions for the current user.
+- `GET /api/addons/talent-ai/ai-workspace/usage` → `StatusController@usage` (`api.addons.talent_ai.ai.usage`)
+  - Returns recent usage aggregates for metering/limits.
+- `GET /api/addons/talent-ai/ai-workspace/plans` → `StatusController@plans` (`api.addons.talent_ai.ai.plans`)
+  - Lists available AI subscription plans.
+- `GET /api/addons/talent-ai/ai-workspace/subscription` → `StatusController@subscription` (`api.addons.talent_ai.ai.subscription`)
+  - Returns the authenticated user’s active AI subscription (if any).
 
 ## Permissions & Policies
 - Policies mapped for headhunter, launchpad, and volunteering domain models ensure per-resource authorization.

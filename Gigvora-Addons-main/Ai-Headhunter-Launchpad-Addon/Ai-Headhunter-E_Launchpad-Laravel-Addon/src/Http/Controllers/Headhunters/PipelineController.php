@@ -21,6 +21,16 @@ class PipelineController extends Controller
     {
     }
 
+    public function index(HeadhunterMandate $mandate): JsonResponse
+    {
+        abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
+        $this->authorize('view', $mandate);
+
+        $items = $mandate->pipelineItems()->with('candidate')->get();
+
+        return response()->json(['items' => $items]);
+    }
+
     public function store(PipelineMoveRequest $request, HeadhunterMandate $mandate): JsonResponse
     {
         abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
@@ -35,6 +45,10 @@ class PipelineController extends Controller
     {
         abort_unless(config('gigvora_talent_ai.enabled') && config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
         $this->authorize('update', $pipelineItem);
+
+        if ($request->route('mandate') instanceof HeadhunterMandate && $pipelineItem->mandate?->isNot($request->route('mandate'))) {
+            abort(404);
+        }
 
         $item = $this->service->moveStage($pipelineItem, HeadhunterPipelineStage::from($request->input('stage')), $request->input('notes'));
 

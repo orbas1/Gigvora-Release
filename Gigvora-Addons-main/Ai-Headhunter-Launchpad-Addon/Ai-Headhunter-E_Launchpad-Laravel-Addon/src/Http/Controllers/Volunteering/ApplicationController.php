@@ -11,6 +11,7 @@ use Gigvora\TalentAi\Domain\Volunteering\Services\VolunteeringService;
 use Gigvora\TalentAi\Http\Requests\Volunteering\ApplicationRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class ApplicationController extends Controller
@@ -19,6 +20,27 @@ class ApplicationController extends Controller
 
     public function __construct(private VolunteeringService $service)
     {
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $this->ensureEnabled();
+
+        $applications = VolunteeringApplication::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['opportunity'])
+            ->latest()
+            ->get();
+
+        return response()->json(['applications' => $applications]);
+    }
+
+    public function show(VolunteeringApplication $application): JsonResponse
+    {
+        $this->ensureEnabled();
+        $this->authorize('view', $application);
+
+        return response()->json(['application' => $application->load('opportunity')]);
     }
 
     protected function ensureEnabled(): void
