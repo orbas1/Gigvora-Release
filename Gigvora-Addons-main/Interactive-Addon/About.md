@@ -21,6 +21,8 @@ This must work for:
 - **Attendees** (discover, register, join, replay)
 - **Admins** (moderate and configure)
 
+> Gigvora alignment: all web routes run under the `events` prefix with the host `web + auth + verified + locale` middleware stack (configurable via `LIVE_WEB_PREFIX`), API routes are mounted under `/api/live` (configurable via `LIVE_API_PREFIX`) with Sanctum + verified guards, and navigation surfaces Webinars, Networking, and Podcasts as top-level “Live & Events” entries while Interviews stay contextual inside Jobs/HR areas. Mobile clients should point to the same `/api/live` prefix and reuse the platform auth token provider—no separate login flows.
+
 > ⚠️ Do **not** add or touch any binary files (images, fonts, compiled bundles, `.exe`, `.dll`, `.so`, `.apk`, `.ipa`, etc.). Only templates, Dart/JS/TS, and CSS/SCSS.
 
 ---

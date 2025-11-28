@@ -5,6 +5,7 @@ import '../api/freelance_api_client.dart';
 import '../repositories/freelance_repository.dart';
 
 final baseUrlProvider = Provider<String>((ref) => 'https://BASE_URL.com/api/');
+final apiPrefixProvider = Provider<String>((ref) => 'freelance/');
 
 final tokenProviderOverride = Provider<String Function()>((ref) => () => '');
 
@@ -17,6 +18,7 @@ final apiClientProvider = Provider<FreelanceApiClient>((ref) {
     baseUrl: baseUrl,
     httpClient: ref.watch(httpClientProvider),
     tokenProvider: tokenProvider,
+    apiPrefix: ref.watch(apiPrefixProvider),
   );
 });
 

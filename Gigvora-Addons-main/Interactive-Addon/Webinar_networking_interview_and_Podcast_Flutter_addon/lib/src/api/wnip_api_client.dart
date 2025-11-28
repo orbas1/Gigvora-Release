@@ -19,18 +19,38 @@ class WnipApiClient {
   final String baseUrl;
   final http.Client _httpClient;
   final FutureOr<String?> Function()? tokenProvider;
+  final String apiPrefix;
 
   WnipApiClient({
     required this.baseUrl,
     http.Client? httpClient,
     this.tokenProvider,
+    this.apiPrefix = '/api/live',
   }) : _httpClient = httpClient ?? http.Client();
 
   Uri _buildUri(String path, [Map<String, String>? queryParameters]) {
-    final normalized = path.startsWith('http')
-        ? Uri.parse(path)
-        : Uri.parse(baseUrl).resolve(path);
+    final normalizedPath = _prefixedPath(path);
+    final normalized = normalizedPath.startsWith('http')
+        ? Uri.parse(normalizedPath)
+        : Uri.parse(baseUrl).resolve(normalizedPath);
     return normalized.replace(queryParameters: queryParameters);
+  }
+
+  String _prefixedPath(String path) {
+    if (path.startsWith('http')) {
+      return path;
+    }
+
+    final sanitizedPrefix = apiPrefix.endsWith('/')
+        ? apiPrefix.substring(0, apiPrefix.length - 1)
+        : apiPrefix;
+    final trimmedPath = path.startsWith('/') ? path.substring(1) : path;
+
+    final normalizedPrefix = sanitizedPrefix.startsWith('/')
+        ? sanitizedPrefix
+        : '/$sanitizedPrefix';
+
+    return '$normalizedPrefix/$trimmedPath';
   }
 
   Future<Map<String, String>> _headers() async {
@@ -55,7 +75,7 @@ class WnipApiClient {
   }
 
   Future<PaginatedResponse<Webinar>> fetchWebinars({bool upcoming = false, int page = 1}) async {
-    final uri = _buildUri('/wnip/webinars', {
+    final uri = _buildUri('webinars', {
       if (upcoming) 'upcoming': '1',
       'page': page.toString(),
     });
@@ -65,34 +85,34 @@ class WnipApiClient {
   }
 
   Future<Webinar> fetchWebinarDetails(int id) async {
-    final uri = _buildUri('/wnip/webinars/' + id.toString());
+    final uri = _buildUri('webinars/' + id.toString());
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Webinar.fromJson(body);
   }
 
   Future<Webinar> createWebinar(WebinarPayload payload) async {
-    final uri = _buildUri('/wnip/webinars');
+    final uri = _buildUri('webinars');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Webinar.fromJson(body);
   }
 
   Future<Webinar> updateWebinar(int id, WebinarUpdatePayload payload) async {
-    final uri = _buildUri('/wnip/webinars/' + id.toString());
+    final uri = _buildUri('webinars/' + id.toString());
     final response = await _httpClient.put(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Webinar.fromJson(body);
   }
 
   Future<void> deleteWebinar(int id) async {
-    final uri = _buildUri('/wnip/webinars/' + id.toString());
+    final uri = _buildUri('webinars/' + id.toString());
     final response = await _httpClient.delete(uri, headers: await _headers());
     await _handleResponse(response);
   }
 
   Future<WebinarRegistration> registerForWebinar(int id, {int? ticketId}) async {
-    final uri = _buildUri('/wnip/webinars/' + id.toString() + '/register');
+    final uri = _buildUri('webinars/' + id.toString() + '/register');
     final response = await _httpClient.post(
       uri,
       headers: await _headers(),
@@ -103,14 +123,14 @@ class WnipApiClient {
   }
 
   Future<Webinar> toggleWebinarLive(int id) async {
-    final uri = _buildUri('/wnip/webinars/' + id.toString() + '/toggle-live');
+    final uri = _buildUri('webinars/' + id.toString() + '/toggle-live');
     final response = await _httpClient.post(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Webinar.fromJson(body);
   }
 
   Future<PaginatedResponse<NetworkingSession>> fetchNetworkingSessions({int page = 1}) async {
-    final uri = _buildUri('/wnip/networking', {'page': page.toString()});
+    final uri = _buildUri('networking', {'page': page.toString()});
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PaginatedResponse.fromJson(
@@ -120,41 +140,41 @@ class WnipApiClient {
   }
 
   Future<NetworkingSession> fetchNetworkingSession(int id) async {
-    final uri = _buildUri('/wnip/networking/' + id.toString());
+    final uri = _buildUri('networking/' + id.toString());
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return NetworkingSession.fromJson(body);
   }
 
   Future<NetworkingSession> createNetworkingSession(NetworkingSessionPayload payload) async {
-    final uri = _buildUri('/wnip/networking');
+    final uri = _buildUri('networking');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return NetworkingSession.fromJson(body);
   }
 
   Future<NetworkingSession> updateNetworkingSession(int id, NetworkingSessionUpdatePayload payload) async {
-    final uri = _buildUri('/wnip/networking/' + id.toString());
+    final uri = _buildUri('networking/' + id.toString());
     final response = await _httpClient.put(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return NetworkingSession.fromJson(body);
   }
 
   Future<NetworkingParticipant> registerForNetworking(int id) async {
-    final uri = _buildUri('/wnip/networking/' + id.toString() + '/register');
+    final uri = _buildUri('networking/' + id.toString() + '/register');
     final response = await _httpClient.post(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return NetworkingParticipant.fromJson(body);
   }
 
   Future<void> rotateNetworking(int id) async {
-    final uri = _buildUri('/wnip/networking/' + id.toString() + '/rotate');
+    final uri = _buildUri('networking/' + id.toString() + '/rotate');
     final response = await _httpClient.post(uri, headers: await _headers());
     await _handleResponse(response);
   }
 
   Future<PaginatedResponse<PodcastSeries>> fetchPodcastSeries({int page = 1}) async {
-    final uri = _buildUri('/wnip/podcasts', {'page': page.toString()});
+    final uri = _buildUri('podcasts', {'page': page.toString()});
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PaginatedResponse.fromJson(
@@ -164,28 +184,28 @@ class WnipApiClient {
   }
 
   Future<PodcastSeries> fetchPodcastSeriesDetails(int id) async {
-    final uri = _buildUri('/wnip/podcast-series/' + id.toString());
+    final uri = _buildUri('podcast-series/' + id.toString());
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PodcastSeries.fromJson(body);
   }
 
   Future<PodcastSeries> createPodcastSeries(PodcastSeriesPayload payload) async {
-    final uri = _buildUri('/wnip/podcast-series');
+    final uri = _buildUri('podcast-series');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PodcastSeries.fromJson(body);
   }
 
   Future<PodcastSeries> updatePodcastSeries(int id, PodcastSeriesUpdatePayload payload) async {
-    final uri = _buildUri('/wnip/podcast-series/' + id.toString());
+    final uri = _buildUri('podcast-series/' + id.toString());
     final response = await _httpClient.put(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PodcastSeries.fromJson(body);
   }
 
   Future<PodcastEpisode> createPodcastEpisode(int seriesId, PodcastEpisodePayload payload) async {
-    final uri = _buildUri('/wnip/podcast-series/' + seriesId.toString() + '/episodes');
+    final uri = _buildUri('podcast-series/' + seriesId.toString() + '/episodes');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PodcastEpisode.fromJson(body);
@@ -193,7 +213,7 @@ class WnipApiClient {
 
   Future<PodcastEpisode> publishPodcastEpisode(int seriesId, int episodeId) async {
     final uri = _buildUri(
-      '/wnip/podcast-series/' + seriesId.toString() + '/episodes/' + episodeId.toString() + '/publish',
+      'podcast-series/' + seriesId.toString() + '/episodes/' + episodeId.toString() + '/publish',
     );
     final response = await _httpClient.post(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
@@ -201,7 +221,7 @@ class WnipApiClient {
   }
 
   Future<PaginatedResponse<Interview>> fetchInterviews({int page = 1}) async {
-    final uri = _buildUri('/wnip/interviews', {'page': page.toString()});
+    final uri = _buildUri('interviews', {'page': page.toString()});
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return PaginatedResponse.fromJson(
@@ -211,28 +231,28 @@ class WnipApiClient {
   }
 
   Future<Interview> fetchInterviewDetails(int id) async {
-    final uri = _buildUri('/wnip/interviews/' + id.toString());
+    final uri = _buildUri('interviews/' + id.toString());
     final response = await _httpClient.get(uri, headers: await _headers());
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Interview.fromJson(body);
   }
 
   Future<Interview> createInterview(InterviewPayload payload) async {
-    final uri = _buildUri('/wnip/interviews');
+    final uri = _buildUri('interviews');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Interview.fromJson(body);
   }
 
   Future<Interview> updateInterview(int id, InterviewUpdatePayload payload) async {
-    final uri = _buildUri('/wnip/interviews/' + id.toString());
+    final uri = _buildUri('interviews/' + id.toString());
     final response = await _httpClient.put(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return Interview.fromJson(body);
   }
 
   Future<InterviewSlot> addInterviewSlot(int interviewId, InterviewSlotPayload payload) async {
-    final uri = _buildUri('/wnip/interviews/' + interviewId.toString() + '/slots');
+    final uri = _buildUri('interviews/' + interviewId.toString() + '/slots');
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return InterviewSlot.fromJson(body);
@@ -244,7 +264,7 @@ class WnipApiClient {
     InterviewScorePayload payload,
   ) async {
     final uri = _buildUri(
-      '/wnip/interviews/' + interviewId.toString() + '/slots/' + slotId.toString() + '/score',
+      'interviews/' + interviewId.toString() + '/slots/' + slotId.toString() + '/score',
     );
     final response = await _httpClient.post(uri, headers: await _headers(), body: jsonEncode(payload.toJson()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
