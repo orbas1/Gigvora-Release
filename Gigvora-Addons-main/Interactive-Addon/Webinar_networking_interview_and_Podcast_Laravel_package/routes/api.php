@@ -6,7 +6,10 @@ use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\NetworkingController
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\PodcastController;
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\WebinarController;
 
-Route::group(['prefix' => 'wnip', 'middleware' => ['api', 'auth:sanctum']], function () {
+Route::group([
+    'prefix' => config('webinar_networking_interview_podcast.routes.api.prefix', 'api/live'),
+    'middleware' => config('webinar_networking_interview_podcast.routes.api.middleware', ['api', 'auth:sanctum']),
+], function () {
     Route::get('/webinars', [WebinarController::class, 'index']);
     Route::post('/webinars', [WebinarController::class, 'store']);
     Route::get('/webinars/{webinar}', [WebinarController::class, 'show']);

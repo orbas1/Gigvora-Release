@@ -26,18 +26,30 @@ class FreelanceApiClient {
     required this.baseUrl,
     required this.httpClient,
     required this.tokenProvider,
+    this.apiPrefix = 'api/freelance',
     this.requestTimeout = const Duration(seconds: 20),
   });
 
   final String baseUrl;
   final http.Client httpClient;
   final String Function() tokenProvider;
+  final String apiPrefix;
   final Duration requestTimeout;
 
   Uri _uri(String path, [Map<String, dynamic>? query]) {
     final base = Uri.parse(baseUrl);
-    final normalizedPath = base.path.endsWith('/') ? base.path : '${base.path}/';
-    return base.replace(path: '$normalizedPath$path', queryParameters: query);
+    final normalizedPath = base.path.isEmpty
+        ? ''
+        : (base.path.endsWith('/') ? base.path : '${base.path}/');
+    final normalizedPrefix = apiPrefix.isNotEmpty
+        ? (apiPrefix.endsWith('/') ? apiPrefix : '$apiPrefix/')
+        : '';
+    final composedPath = '$normalizedPath$normalizedPrefix$path';
+
+    return base.replace(
+      path: composedPath,
+      queryParameters: query,
+    );
   }
 
   Map<String, String> _headers() {

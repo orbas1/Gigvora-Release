@@ -32,26 +32,43 @@ class MenuItem {
   const MenuItem({required this.title, required this.route, required this.icon});
 }
 
-List<MenuItem> buildMenuItems() {
-  return const [
-    MenuItem(title: 'Webinars', route: '/live/webinars', icon: Icons.videocam_outlined),
-    MenuItem(title: 'Networking', route: '/live/networking', icon: Icons.people_outline),
-    MenuItem(title: 'Podcasts', route: '/live/podcasts', icon: Icons.podcasts),
-    MenuItem(title: 'Interviews', route: '/live/interviews', icon: Icons.event_note_outlined),
-  ];
+const _webinarMenu = MenuItem(title: 'Webinars', route: '/live/webinars', icon: Icons.videocam_outlined);
+const _networkingMenu = MenuItem(title: 'Networking', route: '/live/networking', icon: Icons.people_outline);
+const _podcastMenu = MenuItem(title: 'Podcasts', route: '/live/podcasts', icon: Icons.podcasts);
+const _interviewMenu = MenuItem(title: 'Interviews', route: '/live/interviews', icon: Icons.event_note_outlined);
+
+List<MenuItem> buildMenuItems({bool includeInterviewsInMainNav = false}) {
+  final items = <MenuItem>[_webinarMenu, _networkingMenu, _podcastMenu];
+  if (includeInterviewsInMainNav) {
+    items.add(_interviewMenu);
+  }
+  return items;
 }
 
-Map<String, WidgetBuilder> buildAddonRoutes(WnipApiClient apiClient) {
-  final webinarService = WebinarService(apiClient);
-  final networkingService = NetworkingService(apiClient);
-  final podcastService = PodcastService(apiClient);
-  final interviewService = InterviewService(apiClient);
+List<MenuItem> buildLiveEventsMenu() => const [_webinarMenu, _networkingMenu, _podcastMenu];
+
+List<MenuItem> buildCandidateInterviewMenu() => const [_interviewMenu];
+
+List<MenuItem> buildEmployerInterviewMenu() => const [
+      MenuItem(title: 'Interview Panel', route: '/live/interviews', icon: Icons.event_available_outlined),
+    ];
+
+Map<String, WidgetBuilder> buildAddonRoutes(
+    {WnipApiClient? apiClient,
+    WebinarService? webinarService,
+    NetworkingService? networkingService,
+    PodcastService? podcastService,
+    InterviewService? interviewService}) {
+  final webinarSvc = webinarService ?? WebinarService(apiClient!);
+  final networkingSvc = networkingService ?? NetworkingService(apiClient!);
+  final podcastSvc = podcastService ?? PodcastService(apiClient!);
+  final interviewSvc = interviewService ?? InterviewService(apiClient!);
 
   return {
-    '/live/webinars': (_) => WebinarsHomeScreen(service: webinarService),
+    '/live/webinars': (_) => WebinarsHomeScreen(service: webinarSvc),
     '/live/webinars/:id': (context) {
       final id = ModalRoute.of(context)?.settings.arguments as int? ?? 0;
-      return WebinarDetailScreen(service: webinarService, webinarId: id);
+      return WebinarDetailScreen(service: webinarSvc, webinarId: id);
     },
     '/live/webinars/waiting/:id': (context) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -67,10 +84,10 @@ Map<String, WidgetBuilder> buildAddonRoutes(WnipApiClient apiClient) {
       final recording = ModalRoute.of(context)?.settings.arguments as dynamic;
       return WebinarRecordingPlayerScreen(recording: recording);
     },
-    '/live/networking': (_) => NetworkingHomeScreen(service: networkingService),
+    '/live/networking': (_) => NetworkingHomeScreen(service: networkingSvc),
     '/live/networking/:id': (context) {
       final id = ModalRoute.of(context)?.settings.arguments as int? ?? 0;
-      return NetworkingSessionDetailScreen(service: networkingService, sessionId: id);
+      return NetworkingSessionDetailScreen(service: networkingSvc, sessionId: id);
     },
     '/live/networking/waiting/:id': (context) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -81,20 +98,20 @@ Map<String, WidgetBuilder> buildAddonRoutes(WnipApiClient apiClient) {
       );
     },
     '/live/networking/live': (_) => const NetworkingLiveScreen(),
-    '/live/podcasts': (_) => PodcastCatalogueScreen(service: podcastService),
+    '/live/podcasts': (_) => PodcastCatalogueScreen(service: podcastSvc),
     '/live/podcasts/series/:id': (context) {
       final id = ModalRoute.of(context)?.settings.arguments as int? ?? 0;
-      return PodcastSeriesDetailScreen(service: podcastService, seriesId: id);
+      return PodcastSeriesDetailScreen(service: podcastSvc, seriesId: id);
     },
     '/live/podcasts/episode/:id': (context) {
       final episode = ModalRoute.of(context)?.settings.arguments as dynamic;
       return PodcastEpisodePlayerScreen(episode: episode);
     },
     '/live/podcasts/live': (_) => const PodcastLiveRecordingScreen(),
-    '/live/interviews': (_) => InterviewScheduleScreen(service: interviewService),
+    '/live/interviews': (_) => InterviewScheduleScreen(service: interviewSvc),
     '/live/interviews/:id': (context) {
       final id = ModalRoute.of(context)?.settings.arguments as int? ?? 0;
-      return InterviewDetailScreen(service: interviewService, interviewId: id);
+      return InterviewDetailScreen(service: interviewSvc, interviewId: id);
     },
     '/live/interviews/waiting/:id': (context) {
       final title = ModalRoute.of(context)?.settings.arguments as String? ?? 'Interview';
@@ -105,7 +122,7 @@ Map<String, WidgetBuilder> buildAddonRoutes(WnipApiClient apiClient) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       final interviewId = args?['interviewId'] as int? ?? 0;
       final slotId = args?['slotId'] as int? ?? 0;
-      return InterviewerPanelScreen(service: interviewService, interviewId: interviewId, slotId: slotId);
+      return InterviewerPanelScreen(service: interviewSvc, interviewId: interviewId, slotId: slotId);
     },
   };
 }
