@@ -84,5 +84,5 @@
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/advertisement/admin.js') }}"></script>
+<script type="module" src="{{ mix('js/advertisement/admin.js') }}"></script>
 @endpush

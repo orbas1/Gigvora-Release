@@ -106,5 +106,5 @@
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/advertisement/creatives.js') }}"></script>
+<script type="module" src="{{ mix('js/advertisement/creatives.js') }}"></script>
 @endpush

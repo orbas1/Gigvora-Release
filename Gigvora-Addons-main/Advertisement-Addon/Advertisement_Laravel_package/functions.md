@@ -4,6 +4,7 @@
 - `GET /addons/advertisement/dashboard` → `view('advertisement::dashboard')`
   - Shows the Gigvora Ads Manager dashboard; requires `web` + `auth` middleware and `advertisement.enabled` flag.
   - UI assets: `mix('js/advertisement/dashboard.js')` with shared Gigvora layout (`layouts.app`).
+  - Layout now exposes `<meta name="gigvora-ads-api-base" content="/api/advertisement">` plus `@stack('styles')/@stack('scripts')` so all Ads pages consume the same API host and Mix bundles.
 
 ## API (all behind `api` + `auth:sanctum` and `advertisement.enabled`)
 - `GET /api/advertisement/advertisers` → `AdvertiserController@index`

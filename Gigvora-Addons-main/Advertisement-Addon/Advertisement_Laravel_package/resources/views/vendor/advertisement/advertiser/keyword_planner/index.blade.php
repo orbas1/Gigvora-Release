@@ -64,5 +64,5 @@
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/advertisement/keyword_planner.js') }}"></script>
+<script type="module" src="{{ mix('js/advertisement/keyword_planner.js') }}"></script>
 @endpush
