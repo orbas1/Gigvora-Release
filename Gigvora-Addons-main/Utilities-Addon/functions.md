@@ -1,172 +1,55 @@
-# Technical Map
+# Functions & Integration Guide – Utilities Addon (Gigvora/Sociopro)
 
-This document lists the Laravel backend surface and Flutter addon pieces for the Professional Network Utilities, Security & Analytics addon. Use it as a quick index when enabling features or integrating with Sociopro hosts.
+The Utilities addon is a shared support layer for the Gigvora/Sociopro platform. It provides notifications, bookmarks/saved items, calendar events, reminders, and quick tools that can be surfaced across Jobs, Freelance, Interactive, and core social modules. All routes and components reuse the host middleware, layouts, and authentication.
 
-## 1. Laravel (Backend)
+## Routing & Middleware Alignment
+- **Web**: Prefixed by `/{config('pro_network_utilities_security_analytics.utilities.prefixes.web')}` (default `/utilities`) with middleware stack from `config('pro_network_utilities_security_analytics.utilities.middleware.web')` (`web`, `auth`, `verified`, `locale`).
+- **API**: Prefixed by `/{config('pro_network_utilities_security_analytics.utilities.prefixes.api')}` (default `/api/utilities`) with middleware from `config('pro_network_utilities_security_analytics.utilities.middleware.api')` (`api`, `auth:sanctum`, `locale`).
+- **Guards & limits**: Feature toggles live in `config/pro_network_utilities_security_analytics.php` under `features.utilities_*`; rate/quantity limits live under `utilities.limits` and retention under `utilities.retention`.
 
-### Connections / My Network
-- **Domain Service:** `ProNetwork\Services\ConnectionService` – summaries, first/second/third degree, mutual connections.
-- **Controllers:** `ConnectionsController@index|list|mutual`.
-- **Routes:**
-  - Web: `/pro-network/my-network`, `/pro-network/my-network/connections`, `/pro-network/my-network/mutual/{user}`.
-  - API: `/api/pro-network/connections`, `/api/pro-network/connections/mutual/{user}`.
-- **Views:** `pro_network::my_network.index`, `pro_network::my_network.connections`, `pro_network::my_network.mutual`.
-- **Config flags:** `features.connections_graph`.
+## Laravel Surface
+- **Controllers**
+  - `NotificationCenterController@index|paginate|markRead|markAllRead|clear` – user-scoped notifications.
+  - `BookmarkController@toggle|list|destroy` – saved/bookmarked resources (jobs, posts, events, companies, freelancers, content IDs via morph map).
+  - `CalendarController@index|store|update|destroy` – personal calendar entries and synced interview reminders.
+  - `ReminderController@index|store|update|destroy|snooze` – lightweight reminders tied to user or resource type.
+  - `UtilityToolsController@index|downloadCsv|exportToken|metrics` – quick tools, CSV exports, API tokens (admin-only when `can:manageUtilities`).
+- **Routes**
+  - Web: `/utilities/notifications`, `/utilities/notifications/read-all`, `/utilities/saved`, `/utilities/calendar`, `/utilities/reminders`, `/utilities/tools`.
+  - API: `/api/utilities/notifications`, `/api/utilities/notifications/read`, `/api/utilities/bookmarks`, `/api/utilities/calendar`, `/api/utilities/reminders`, `/api/utilities/tools/*`.
+- **Policies & permissions**
+  - Users can only view/update their own notifications, bookmarks, reminders, calendar entries, and tokens.
+  - Admin-only quick tools and platform metrics via `can:manageUtilities` or `role:platform_admin`.
+- **Events & jobs**
+  - Emit `utilities.notification.created`, `utilities.notification.read`, `utilities.bookmark.toggled`, `utilities.reminder.created`, `utilities.reminder.due`.
+  - Queue workers send digest emails/in-app notifications using host channels; cleanup jobs trim old notifications/activity per retention config.
 
-### Recommendations
-- **Domain Service:** `RecommendationService` – people/companies/groups/content suggestions.
-- **Controller:** `RecommendationsController@people|companies|groups|content`.
-- **Routes:** API `/api/pro-network/recommendations/*` guarded by `pro-network.feature:recommendations`.
-- **Config flag:** `features.recommendations`.
+## Flutter Addon Surface
+- **Models**: `NotificationItem`, `Bookmark`, `Reminder`, `CalendarEvent`, `QuickTool` under `flutter_addon/lib/models`.
+- **Services**: `NotificationApi`, `BookmarkApi`, `ReminderApi`, `CalendarApi`, `UtilitiesToolsApi` under `flutter_addon/lib/services` using shared HTTP client/auth.
+- **State**: ChangeNotifiers in `flutter_addon/lib/state/utilities_state.dart` expose loading/error/data for notifications, bookmarks, reminders, and calendar.
+- **UI**: Widgets in `flutter_addon/lib/ui/utilities` – notification list + bell dropdown, bookmark toggle button, reminder cards, mini-calendar, quick actions panel. Navigation hooks live in `flutter_addon/lib/menu.dart` and `menu/routes.dart` to surface Notifications page, Saved items, and My Schedule.
 
-### Professional Profiles & Company Pages
-- **Domain Service:** `ProfileEnhancementService` for professional profiles; `AccountTypeService` for account tiers; `Company` logic via `CompanyProfileController`.
-- **Controllers:** `ProfessionalProfileController@show|edit|update`, `CompanyProfileController@show|update`.
-- **Routes:**
-  - Web: `/pro-network/profile/professional`, `/pro-network/profile/professional/{user}`, `/pro-network/profile/professional/edit`, `/pro-network/company/{company}`.
-  - API: `/api/pro-network/profile/professional` (GET/POST), `/api/pro-network/company/{company}` (GET/POST, update guarded by policy).
-- **Views:** `pro_network::profile.show`, `pro_network::profile.edit`, `pro_network::company.show`.
-- **Models:** `ProfessionalProfile`, `ProfileSkill`, `ProfileCertification`, `ProfileEducationHistory`, `ProfileWorkHistory`, `ProfileInterest`, `ProfileBackgroundCheck`, `ProfileOpportunity`, `ProfileReference`, `CompanyProfile`, `CompanyEmployee`, `UserAccountType`, `UserFeatureFlag`.
-- **Config flag:** `features.profile_professional_upgrades`, `features.account_types`.
+## API Endpoints (JSON)
+- `GET /api/utilities/notifications` – list notifications (filters: `unread`, `type`, `page`).
+- `POST /api/utilities/notifications/read` – mark one or many as read; `POST /api/utilities/notifications/read-all` marks all.
+- `DELETE /api/utilities/notifications` – clear user notifications (retention-friendly).
+- `GET /api/utilities/bookmarks` – list saved items (filters: `type`, `resource_id`).
+- `POST /api/utilities/bookmarks` – body `{type, resource_id}` to save/unsave (idempotent toggle) respecting `utilities.limits.saved_items`.
+- `GET /api/utilities/calendar` – list calendar events (supports `range[start,end]`).
+- `POST /api/utilities/calendar` – create event `{title, starts_at, ends_at, location?, notes?}`; `PUT /api/utilities/calendar/{event}` updates; `DELETE` removes.
+- `GET /api/utilities/reminders` – list reminders; supports `status` filter (`pending`, `snoozed`, `sent`).
+- `POST /api/utilities/reminders` – create reminder `{message, due_at, resource_type?, resource_id?}`; `PUT /api/utilities/reminders/{reminder}` updates; `DELETE` removes; `POST /api/utilities/reminders/{reminder}/snooze` defers.
+- `GET /api/utilities/tools` – list quick tools available to user; `GET /api/utilities/tools/metrics` (admin), `POST /api/utilities/tools/export` (CSV export), `POST /api/utilities/tools/token` (generate API token – admin only).
 
-### Marketplace Escrow & Disputes
-- **Domain Service:** `MarketplaceEscrowDomain` – escrow lifecycle, milestones, refunds, dispute hooks.
-- **Controllers:** `MarketplaceEscrowController@open|release|refund|showByOrder`, `MarketplaceDisputeController@create|store|show|reply|resolve`.
-- **Routes:**
-  - Web: `/pro-network/marketplace/orders/{order}/escrow`, `/pro-network/marketplace/orders/{order}/disputes/create`, `/pro-network/marketplace/disputes/{dispute}`.
-  - API: `/api/pro-network/marketplace/orders/{order}/escrow/open`, `/api/pro-network/marketplace/escrow/{escrow}/release`, `/api/pro-network/escrow/{escrow}/refund`, `/api/pro-network/marketplace/orders/{order}/disputes`, `/api/pro-network/marketplace/disputes/{dispute}`, `/api/pro-network/marketplace/disputes/{dispute}/reply`, `/api/pro-network/marketplace/disputes/{dispute}/resolve`.
-- **Views:** `pro_network::escrow.show`, `pro_network::disputes.create`, `pro_network::disputes.show`.
-- **Models:** `MarketplaceEscrow`, `MarketplaceMilestone`, `MarketplaceTransaction`, `MarketplaceDispute`, `MarketplaceDisputeMessage`.
-- **Config flag:** `features.marketplace_escrow`.
+## Cross-Module Hooks
+- **Jobs**: job cards can call bookmark toggle endpoints; interview schedules can push `CalendarController` entries and reminders.
+- **Freelance/Interactive**: saved gigs/posts reuse bookmarks; live/meeting reminders reuse reminders endpoints.
+- **Notifications**: host modules push notifications via `NotificationCenterController` or events; mobile/web bell dropdown consumes the same API.
 
-### Stories & Live Enhancements
-- **Domain Services:** `StoryEnhancementService` (stories), `LiveStreamingWrapper` (participants/donations).
-- **Controllers:** `StoryEnhancementController@store|viewers|viewer|creator`.
-- **Routes:** Web `/pro-network/stories/viewer`, `/pro-network/stories/creator`; API `/api/pro-network/stories` (POST), `/api/pro-network/stories/{story}/viewers` (GET).
-- **Views:** `pro_network::stories.viewer`, `pro_network::stories.creator`.
-- **Models:** `StoryMetadata`, `LiveSession`, `LiveSessionParticipant`, `LiveSessionDonation` (participant/donation data referenced in wrapper), `StoryMusicTrack` via music library.
-- **Config flags:** `features.stories_wrapper`, `features.live_streaming_enhanced`, `features.music_library`.
-
-### Post Enhancements (Polls, Threads, Reshare, Celebrate)
-- **Domain Service:** `PostEnhancementService` – polls, threads, reshares, celebrate.
-- **Controller:** `PostEnhancementController@createPoll|storePoll|votePoll|createThread|storeThread|reshare|createCelebrate|storeCelebrate`.
-- **Routes:**
-  - Web creators under `/pro-network/posts/polls/create`, `/pro-network/posts/threads/create`, `/pro-network/posts/celebrate/create`.
-  - API `/api/pro-network/posts/polls`, `/api/pro-network/posts/polls/{poll}/vote`, `/api/pro-network/posts/threads`, `/api/pro-network/posts/reshare`, `/api/pro-network/posts/celebrate`.
-- **Views:** `pro_network::posts.polls.create`, `pro_network::posts.threads.create`, `pro_network::posts.celebrate.create`.
-- **Models:** `PostEnhancement` (poll/thread metadata), `Hashtag`, `HashtagAssignment` for tagging.
-- **Config flag:** `features.post_enhancements`.
-
-### Reactions, Dislikes & Scores
-- **Domain Service:** `ReactionsService` – reactions/dislikes, scoring.
-- **Controller:** `ReactionsController@react|unreact|dislike|undislike|profileScore`.
-- **Routes:** API `/api/pro-network/reactions` (POST/DELETE), `/api/pro-network/reactions/dislike` (POST/DELETE), `/api/pro-network/profiles/{user}/reaction-score`.
-- **Models:** `Reaction`, `ReactionAggregate`, `ProfileReactionScore`.
-- **Config flag:** `features.reactions_dislikes_scores`.
-
-### Hashtags & Search SEO
-- **Domain Service:** `HashtagService`, `SearchTagsDomain`, `SearchUpgradeService` for richer search and tagging.
-- **Controller:** `HashtagController@index|search|show`.
-- **Routes:** Web `/pro-network/hashtags/{hashtag}`; API `/api/pro-network/hashtags` (GET), `/api/pro-network/hashtags/search` (POST).
-- **Views:** `pro_network::hashtags.show`.
-- **Models:** `Hashtag`, `HashtagAssignment`.
-- **Config flags:** `features.hashtags`, `features.search_upgrade`.
-
-### Music Library
-- **Domain Service:** `MusicLibraryService` – royalty-free track metadata.
-- **Controller:** `MusicLibraryController@index|search`.
-- **Routes:** API `/api/pro-network/music-library` (GET/POST search).
-- **Models:** `MusicTrack`.
-- **Config flag:** `features.music_library`.
-
-### Recommendations, Notifications, Invites
-- **Domain Services:** `RecommendationService`, `NotificationsWrapper`, `InviteContributorsService`.
-- **Controllers/Routes:** Recommendations covered above; invites and notifications are surfaced via services for host wiring.
-- **Config flags:** `features.recommendations`, `features.notifications_wrapper`, `features.invite_contributors`.
-
-### Analytics Hub
-- **Domain Service:** `AnalyticsService` – `metrics(array $filters)` and `series(array $filters)` plus tracking hooks.
-- **Controller:** `AnalyticsController@overview|metrics|series`.
-- **Routes:** Web `/pro-network/analytics`; API `/api/pro-network/analytics/metrics`, `/api/pro-network/analytics/series` (both `can:viewAnalytics`).
-- **Views:** `pro_network::analytics.overview`.
-- **Models:** `AnalyticsMetric`, `AnalyticsEvent`.
-- **Config flag:** `features.analytics_hub`; driver config under `analytics.*`.
-
-### Security & Moderation
-- **Domain Services:** `SecurityEventService`, `ModerationService`, `BadWord`/`BadWordRule` utilities, `FileScan` hooks, `StorageService` encryption.
-- **Controller:** `SecurityModerationController@securityLog|moderationQueue|events|queue|moderate`.
-- **Routes:** Web `/pro-network/security/log` (`can:viewSecurity`), `/pro-network/moderation` (`can:moderate`); API `/api/pro-network/security/events`, `/api/pro-network/moderation/queue`, `/api/pro-network/moderation/action` with matching gates.
-- **Views:** `pro_network::security.log`, `pro_network::moderation.queue`.
-- **Models:** `SecurityEvent`, `ModerationQueue`, `BadWord`, `BadWordRule`, `FileScan`.
-- **Config flags:** `features.security_hardening`, `features.moderation_tools`, `features.bad_word_checker`, `features.file_scan`, `security.*`.
-
-### Storage & Encryption
-- **Domain Service:** `StorageService` – maps disks, presigned URLs, optional encryption.
-- **Models:** `BaseModel` provides encrypted casting for sensitive columns when enabled.
-- **Config flags:** `features.storage_backends`, `features.db_encryption`, `storage.*`.
-
-### Account Types & Feature Flags
-- **Domain Service:** `AccountTypeService`.
-- **Controllers/Routes:** Integrated within profile/company flows.
-- **Models:** `AccountType`, `UserAccountType`, `UserFeatureFlag`.
-- **Config flag:** `features.account_types`.
-
-### Chat Enhancements
-- **Domain Service:** `ChatEnhancementService` – conversation listing, clearing, message requests, settings.
-- **Controller:** `ChatEnhancementController@listConversations|showConversation|deleteConversation|clearConversation|updateSettings|messageRequests|acceptRequest|declineRequest`.
-- **Routes:** API `/api/pro-network/chat/*` guarded by `pro-network.feature:chat_enhancements`.
-- **Models:** `NetworkMetric` (presence/status metrics leveraged in chat), conversation data handled via Sociopro core identifiers.
-- **Config flag:** `features.chat_enhancements`.
-
-### Newsletter & Invite to Contribute
-- **Domain Service:** `NewsletterService` (subscribe/unsubscribe/admin listing); `InviteContributorsService` (invites).
-- **Controller:** `NewsletterController@manage|adminIndex|subscribe|unsubscribe`.
-- **Routes:** Web `/pro-network/newsletters/manage`; admin newsletters under `/pro-network/analytics` group; API `/api/pro-network/newsletters/subscribe`, `/api/pro-network/newsletters/unsubscribe`.
-- **Views:** `pro_network::newsletters.manage`, `pro_network::newsletters.admin.index`.
-- **Models:** `NewsletterSubscription`, `InviteContribution`.
-- **Config flag:** `features.newsletters`, `features.invite_contributors`.
-
-### Age Verification / KYC
-- **Domain Service:** `AgeVerificationService` – status and start placeholders.
-- **Controller:** `AgeVerificationController@status|start|callback`.
-- **Routes:** Web `/pro-network/age-verification/callback`; API `/api/pro-network/age-verification/status`, `/api/pro-network/age-verification/start`.
-- **Models:** `AgeVerification`, `AgeVerificationLog`.
-- **Config flags:** `features.age_verification`, `age_verification.*`, `kyc.*`.
-
-### Multi-language Wrapper
-- **Domain Service:** `MultiLanguageService` for translating new feature surfaces.
-- **Config flag:** `features.multi_language_wrapper`.
-
-### Service Provider & Middleware
-- **Provider:** `ProNetworkUtilitiesSecurityAnalyticsServiceProvider` merges config, loads migrations/routes/views/translations, registers policies, binds services, and registers `EnsureFeatureEnabled` middleware alias `pro-network.feature`.
-- **Policies:** `MarketplaceEscrowPolicy`, `MarketplaceDisputePolicy`, `CompanyProfilePolicy` plus gates for analytics/security/moderation.
-
-## 2. Flutter Addon
-
-### Models
-Located under `flutter_addon/lib/models/*` covering networking, profiles, companies, escrows/disputes, stories/live, posts (polls/threads/reshare/celebrate), reactions, recommendations, analytics metrics/series, security/age verification, newsletters, chat.
-
-### API Clients
-Under `flutter_addon/lib/services`:
-- `ApiClient` (base), `ConnectionsApi`, `ProfileApi`, `CompanyApi`, `MarketplaceEscrowApi`, `StoriesApi`, `PostsApi`, `ChatApi`, `AnalyticsApi`, `SecurityApi`, `NewsletterApi`, `AgeVerificationApi`, `RecommendationsApi` (via network client), plus `services.dart` export barrel.
-
-### State Management
-`flutter_addon/lib/state/state.dart` exposes `ChangeNotifier` stores for network, profile, company, escrow/disputes, stories/posts, chat, analytics, moderation/security, newsletters, and age verification with loading/error/data handling.
-
-### Screens & Widgets
-Located under `flutter_addon/lib/ui`:
-- Network (`network.dart`), Profile (`profile.dart`), Company (`company.dart`), Marketplace (`marketplace.dart`), Stories (`stories.dart`), Posts (`posts.dart`), Chat (`chat.dart`), Analytics (`analytics.dart`), Moderation (`moderation.dart`), Newsletters (`newsletters.dart`), Account/Security (`account_security.dart`), shared components in `common.dart` and `ui.dart`.
-
-### Navigation Hooks
-- `flutter_addon/lib/menu.dart` exports `proNetworkMenuItems` with route keys and builders.
-- `flutter_addon/lib/menu/routes.dart` provides `ProNetworkRoutes` builders for router integration.
-
-### Analytics & Security Hooks
-- `flutter_addon/lib/analytics` contains `AnalyticsClient` to fire screen/action events to `/api/pro-network/analytics/*` endpoints; security metadata can be attached via `ApiClient` headers.
-
-## 3. Integration Points
-- **Feed & Posts:** Post enhancements (polls/threads/reshare/celebrate) and reactions integrate with Sociopro posts via `/api/pro-network/posts/*` and reaction endpoints; hashtags stored via `HashtagService` feed search.
-- **Search:** Tag enrichment through `HashtagService`, `SearchTagsDomain`, and profile/company skill/employment metadata for richer queries.
-- **Analytics:** Backend `AnalyticsService` records metrics/series; Flutter `AnalyticsClient` sends screen/action signals.
-- **Security:** `SecurityEventService` logs events; moderation queue/actions available via API and exposed in Flutter moderation screens; file scan/bad word hooks rely on config toggles.
-- **Storage:** `StorageService` maps to R2/Wasabi/local disks with signed URLs and optional encryption; mobile uploads should honor configured TTLs.
+## Operational Checklist
+- Configure feature flags in `config/pro_network_utilities_security_analytics.php` (`utilities_*`).
+- Ensure middleware stacks reference host guards and locale; apply rate limits using `utilities.limits`.
+- Wire policies so users can only see their own utilities data; enforce admin guard on quick tools/metrics.
+- Schedule cleanup job to prune notifications/activity per `utilities.retention`.
+- In Flutter, set base URL/auth token to match host and register utilities routes in app navigation.

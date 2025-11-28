@@ -27,6 +27,31 @@ return [
         'newsletters' => env('PRO_NETWORK_FEATURE_NEWSLETTERS', false),
         'invite_contributors' => env('PRO_NETWORK_FEATURE_INVITES', false),
         'multi_language_wrapper' => env('PRO_NETWORK_FEATURE_MULTI_LANGUAGE', false),
+        'utilities_notifications_center' => env('PRO_NETWORK_FEATURE_UTILITIES_NOTIFICATIONS', false),
+        'utilities_bookmarks' => env('PRO_NETWORK_FEATURE_UTILITIES_BOOKMARKS', false),
+        'utilities_calendar' => env('PRO_NETWORK_FEATURE_UTILITIES_CALENDAR', false),
+        'utilities_reminders' => env('PRO_NETWORK_FEATURE_UTILITIES_REMINDERS', false),
+        'utilities_quick_tools' => env('PRO_NETWORK_FEATURE_UTILITIES_QUICK_TOOLS', false),
+    ],
+
+    'utilities' => [
+        'prefixes' => [
+            'web' => env('PRO_NETWORK_UTILITIES_WEB_PREFIX', 'utilities'),
+            'api' => env('PRO_NETWORK_UTILITIES_API_PREFIX', 'api/utilities'),
+        ],
+        'middleware' => [
+            'web' => ['web', 'auth', 'verified', 'locale'],
+            'api' => ['api', 'auth:sanctum', 'locale'],
+        ],
+        'limits' => [
+            'saved_items' => env('PRO_NETWORK_UTILITIES_SAVED_ITEMS_LIMIT', 200),
+            'reminders_per_day' => env('PRO_NETWORK_UTILITIES_REMINDER_LIMIT', 20),
+            'notification_batch' => env('PRO_NETWORK_UTILITIES_NOTIFICATION_BATCH', 50),
+        ],
+        'retention' => [
+            'notifications_days' => env('PRO_NETWORK_UTILITIES_NOTIFICATION_RETENTION', 90),
+            'activity_days' => env('PRO_NETWORK_UTILITIES_ACTIVITY_RETENTION', 180),
+        ],
     ],
 
     'analytics' => [

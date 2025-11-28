@@ -34,6 +34,13 @@ These will plug into an existing **Sociopro-based social media platform**, movin
 
 Everything should be **modular**, so features can be turned on/off without breaking the main site or app.
 
+### Gigvora Integration Snapshot
+
+- **Navigation**: keep utilities as supporting surfaces – notification bell + page, saved/bookmarked items reachable from user menus and module-local CTAs (e.g., job cards), calendar/reminders under "My Schedule", admin quick tools under settings/dashboards.
+- **Routing**: web routes grouped under `/utilities` with `web`, `auth`, `verified`, `locale`; API routes grouped under `/api/utilities` with `api`, `auth:sanctum`, `locale` so mobile and SPA clients share the same surface.
+- **Feature flags**: toggle notifications, bookmarks, calendar, reminders, and quick tools via `config/pro_network_utilities_security_analytics.php` (`features.utilities_*`). Limits/retention in `utilities.*` must be honoured by controllers, services, and queue jobs.
+- **Data ownership**: every utility resource is user-scoped unless explicitly admin-only (metrics/export/token). Policies should enforce `user_id` matching and require `platform_admin`/`manageUtilities` for admin endpoints.
+
 ---
 
 ## Part 1 – Laravel Package
