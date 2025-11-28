@@ -1,8 +1,9 @@
 @extends('layouts.app', ['include_menu' => true])
 @section('content')
 <main class="tk-scetiondb">
-	<section>
-		<div class="container">
+        @include('components.navigation.freelance-menu')
+        <section>
+                <div class="container">
 			<div class="row">
 				<div class="col-lg-12">
 					<form class="tk-formsearch tk-formsearchvtwo">

@@ -46,6 +46,28 @@ final List<MenuItem> globalMenu = const [
   MenuItem(title: 'Freelance Setup', route: '/freelance/onboarding', icon: Icons.settings_suggest_outlined),
 ];
 
+List<MenuItem> buildFreelanceMenu({
+  required bool isFreelancer,
+  required bool isClient,
+  bool includeGlobal = true,
+}) {
+  final items = <MenuItem>[];
+
+  if (includeGlobal) {
+    items.addAll(globalMenu);
+  }
+
+  if (isFreelancer) {
+    items.addAll(freelancerMenu);
+  }
+
+  if (isClient) {
+    items.addAll(clientMenu);
+  }
+
+  return items;
+}
+
 Map<String, WidgetBuilder> buildRoutes() => {
       '/freelance/onboarding': (context) => const FreelanceOnboardingScreen(),
       '/freelance/freelancer/dashboard': (context) => const FreelancerDashboardScreen(),
