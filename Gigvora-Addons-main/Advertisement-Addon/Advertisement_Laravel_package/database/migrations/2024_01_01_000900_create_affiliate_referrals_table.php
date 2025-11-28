@@ -9,13 +9,14 @@ return new class extends Migration {
     {
         Schema::create('affiliate_referrals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('referrer_id');
-            $table->unsignedBigInteger('referred_user_id');
+            $table->foreignId('referrer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('referred_user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('campaign_id')->nullable()->constrained('campaigns')->nullOnDelete();
             $table->decimal('commission', 12, 2)->default(0);
-            $table->string('status')->default('pending');
-            $table->dateTime('converted_at')->nullable();
+            $table->string('status')->default('pending')->index();
+            $table->dateTime('converted_at')->nullable()->index();
             $table->timestamps();
+            $table->unique(['referred_user_id', 'campaign_id']);
         });
     }
 

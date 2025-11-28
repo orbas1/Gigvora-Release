@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->string('name');
             $table->decimal('daily_budget', 12, 2)->nullable();
             $table->decimal('bid_amount', 12, 2)->nullable();
-            $table->string('status')->default('active');
+            $table->string('status')->default('active')->index();
             $table->timestamps();
         });
     }

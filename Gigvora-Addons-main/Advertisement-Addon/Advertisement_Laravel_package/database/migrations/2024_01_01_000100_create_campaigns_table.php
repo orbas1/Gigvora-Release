@@ -15,12 +15,14 @@ return new class extends Migration {
             $table->dateTime('end_date');
             $table->decimal('budget', 12, 2);
             $table->enum('bidding', ['click', 'view', 'conversion']);
-            $table->string('status')->default('draft');
+            $table->string('status')->default('draft')->index();
             $table->decimal('spend', 12, 2)->default(0);
-            $table->string('placement');
+            $table->string('placement')->index();
             $table->string('objective')->nullable();
             $table->unsignedBigInteger('targeting_reach')->default(0);
-            $table->string('approval_state')->default('pending');
+            $table->string('approval_state')->default('pending')->index();
+            $table->index(['advertiser_id', 'start_date']);
+            $table->index(['advertiser_id', 'status']);
             $table->timestamps();
         });
     }

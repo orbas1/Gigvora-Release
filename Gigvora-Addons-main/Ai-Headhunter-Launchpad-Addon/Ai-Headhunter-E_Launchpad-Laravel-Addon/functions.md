@@ -161,6 +161,13 @@ UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/ad
 - All routes enforce authentication through Laravel `auth` or `auth:sanctum` middleware.
 - Navigation visibility: the **Talent & AI** menu plus its sub-links (Headhunters, Experience Launchpad, AI Workspace, Volunteering) are shown only when `gigvora_talent_ai.enabled` and the relevant `modules.*.enabled` flags are true; admin entries remain hidden without the `manage_talent_ai` ability.
 
+## Database Structures
+- **Headhunters:** `headhunter_profiles` (FK `user_id`, indexed status), `headhunter_mandates` (FK `organisation_id` → `organizations`, indexed status), `headhunter_candidates`, `headhunter_pipeline_items` (unique per mandate/candidate with indexed stage), `headhunter_interviews` (FK `scheduled_by` → `users`, indexed status/scheduled_at).
+- **Launchpad:** `launchpad_programmes` (indexed creator/status), `launchpad_tasks` (ordered and indexed), `launchpad_applications` (indexed user/status), `launchpad_application_task_progress` (unique per application/task), `launchpad_interviews` (indexed status).
+- **AI Workspace:** `ai_sessions` (indexed by user/tool/status), `ai_byok_credentials` (unique per user/provider), `ai_subscription_plans`, `ai_user_subscriptions` (unique per user/plan + status index), `ai_usage_aggregates` (indexed period/user).
+- **Volunteering:** `volunteering_opportunities` (FK `organisation_id` → `organizations`, indexed creator/status) and `volunteering_applications` (indexed user/status).
+- **Seeders:** `Database\Seeders\TalentAiSeeder` seeds AI subscription plans from `config/gigvora_talent_ai.php` and is invoked through the host `DatabaseSeeder` to keep migrations and baseline plans aligned.
+
 ## UI Function Mapping (Web)
 - Headhunter pipeline drag-and-drop and card hydration: `resources/js/addons/talent_ai/pipeline_board.js` (paired with Blade pipeline components extending `layouts.app`).
 - Launchpad progress steppers and programme cards: `resources/js/addons/talent_ai/launchpad_progress.js`.

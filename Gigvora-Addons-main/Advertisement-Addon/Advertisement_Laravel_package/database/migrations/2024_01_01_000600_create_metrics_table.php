@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->decimal('spend', 12, 2)->default(0);
             $table->dateTime('recorded_at');
             $table->timestamps();
+            $table->index(['campaign_id', 'recorded_at']);
         });
     }
 

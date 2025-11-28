@@ -32,3 +32,10 @@ Policies and the `manage_talent_ai` gate enforce Gigvora admin-only access to ad
 - **API base:** Targets the same Gigvora host endpoints under `/api/addons/talent-ai/*` with the mobile auth token injected via the shared provider.
 - **Navigation:** Mobile routes include `/talent-ai/headhunters`, `/talent-ai/headhunters/mandates/:id`, `/talent-ai/launchpad`, `/talent-ai/launchpad/:id`, `/talent-ai/launchpad/applications/:id`, `/talent-ai/ai-workspace`, `/talent-ai/volunteering`, `/talent-ai/volunteering/:id` surfaced beneath the **Talent & AI** menu. Icons mirror the web set (work_outline, school_outlined, smart_toy_outlined, volunteer_activism_outlined).
 - **Providers:** `GigvoraAddonProviders.talentAi` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) attaches ChangeNotifier providers for Headhunter, Launchpad, AI Workspace, and Volunteering states so screens render live data and analytics.
+
+## Database Schema & Seeders
+- **Headhunters:** `headhunter_profiles` (FK `user_id`, indexed status), `headhunter_mandates` (FK `organisation_id` → `organizations`, indexed status), `headhunter_candidates`, `headhunter_pipeline_items` (unique per mandate/candidate, indexed stage), `headhunter_interviews` (FK `scheduled_by` → `users`, indexed status/schedule).
+- **Launchpad:** `launchpad_programmes`, `launchpad_tasks` (indexed order), `launchpad_applications` (indexed user/status), `launchpad_application_task_progress`, and `launchpad_interviews` (indexed status).
+- **AI Workspace:** `ai_sessions` (indexed by `user_id`, tool, and status), `ai_byok_credentials`, `ai_subscription_plans`, `ai_user_subscriptions` (unique per user/plan with status index), `ai_usage_aggregates` (indexed period/user).
+- **Volunteering:** `volunteering_opportunities` (FK `organisation_id` → `organizations`, creator/status indexes) and `volunteering_applications` (indexed user/status).
+- **Seeders:** `Database\Seeders\TalentAiSeeder` provisions AI subscription plans from `config/gigvora_talent_ai.php` and is invoked automatically from the host `DatabaseSeeder`.

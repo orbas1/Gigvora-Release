@@ -9,14 +9,14 @@ return new class extends Migration {
     {
         Schema::create('advertisers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->index();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('billing_email');
             $table->decimal('daily_spend_limit', 12, 2)->nullable();
             $table->decimal('lifetime_spend_limit', 12, 2)->nullable();
             $table->decimal('wallet_balance', 12, 2)->default(0);
-            $table->string('status')->default('active');
-            $table->unsignedBigInteger('affiliate_id')->nullable();
+            $table->string('status')->default('active')->index();
+            $table->foreignId('affiliate_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

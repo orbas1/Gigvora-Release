@@ -9,11 +9,11 @@ return new class extends Migration {
     {
         Schema::create('affiliate_payouts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('affiliate_id');
+            $table->foreignId('affiliate_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 12, 2);
-            $table->string('status')->default('requested');
-            $table->dateTime('requested_at')->nullable();
-            $table->dateTime('processed_at')->nullable();
+            $table->string('status')->default('requested')->index();
+            $table->dateTime('requested_at')->nullable()->index();
+            $table->dateTime('processed_at')->nullable()->index();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->decimal('estimated_spend', 12, 2)->default(0);
             $table->json('assumptions')->nullable();
             $table->timestamps();
+            $table->index(['campaign_id']);
         });
     }
 

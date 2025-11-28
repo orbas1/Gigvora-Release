@@ -56,3 +56,8 @@
 - `GigvoraAddonNavigation.routes` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) publishes the advertisement routes for the phone app: `/ads/home`, `/ads/campaigns`, `/ads/campaigns/:id`, `/ads/campaigns/create`, `/ads/creatives`, `/ads/keyword-planner`, `/ads/forecast`, `/ads/reports`.
 - `GigvoraAddonProviders.ads` registers the Campaign, Creative, Analytics, Forecast, Keyword Planner, and Affiliate blocs so the Flutter screens hydrate from `/api/advertisement/*` using the shared bearer token provider.
 - Menu labels **Ads Manager**, **Campaigns**, **Ads Reports** reuse Material icons that mirror the web sidebar for brand consistency.
+
+## Database Structures
+- Core tables: `advertisers` (FK `user_id`, optional `affiliate_id`), `campaigns` → `ad_groups` → `creatives`, `placements`, `targeting_rules`, `metrics`, `forecasts`, `keyword_prices`, `affiliate_referrals`, and `affiliate_payouts`.
+- Indexing: status/placement/approval fields are indexed on campaigns and creatives, placements are unique by name and indexed by channel, metrics are indexed on `campaign_id` + `recorded_at`, and affiliate/referral status/timestamps carry supporting indexes.
+- Seeders: `Database\Seeders\AdvertisementSeeder` (auto-called from the host `DatabaseSeeder`) seeds deterministic placements and keyword prices so dashboards, planners, and pricing endpoints have baseline data.

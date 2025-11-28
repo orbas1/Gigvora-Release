@@ -9,10 +9,10 @@ return new class extends Migration {
     {
         Schema::create('placements', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('channel');
+            $table->string('name')->unique();
+            $table->string('channel')->index();
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
         });
     }

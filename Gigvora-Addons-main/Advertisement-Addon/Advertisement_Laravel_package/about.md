@@ -23,3 +23,8 @@ The addon is designed to interoperate with the Gigvora core feed, search, gigs, 
 - **API base:** Points to the same Gigvora Laravel host at `/api/advertisement/*` with bearer token injection via the shell’s auth repository.
 - **Navigation:** Mobile routes mirror web: `/ads/home`, `/ads/campaigns`, `/ads/campaigns/:id`, `/ads/campaigns/create`, `/ads/creatives`, `/ads/keyword-planner`, `/ads/forecast`, `/ads/reports`, surfaced under the **Ads Manager** menu with matching icons.
 - **Providers:** `GigvoraAddonProviders.ads` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) wires the Campaign, Creative, Analytics, Forecast, Keyword Planner, and Affiliate blocs so screens render live data.
+
+## Database Schema & Seeders
+- **Tables:** advertisers (links to `users` + optional `affiliate_id`), campaigns → ad_groups → creatives, placements, targeting_rules, metrics, forecasts, keyword_prices, affiliate_referrals, and affiliate_payouts. Campaign status/placement/approval columns and related status fields are indexed for fast dashboards, with placements uniquely keyed by name and metrics indexed by `campaign_id` + `recorded_at`.
+- **Foreign keys:** advertisers, affiliate_referrals, and affiliate_payouts enforce relationships to the core `users` table; campaign trees cascade on delete; placement/channel rows stay constrained via ad group/creative relationships.
+- **Seeders:** `Database\Seeders\AdvertisementSeeder` seeds safe defaults for placements and deterministic keyword pricing and is wired into the host `DatabaseSeeder` so `php artisan db:seed` pulls addon data automatically.
