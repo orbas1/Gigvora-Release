@@ -1,0 +1,23 @@
+name: webinar_networking_interview_podcast_flutter_addon
+description: Flutter addon providing webinar, networking, interview, and podcast flows wired to the Laravel WNIP package.
+version: 0.1.0
+publish_to: "none"
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.13.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  meta: ^1.10.0
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

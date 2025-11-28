@@ -1,0 +1,159 @@
+# ==========================================
+# GIGVORA MASTER .gitignore
+# Laravel + Flutter + Node + Composer + Sociopro
+# ==========================================
+
+############################################
+# LARAVEL / PHP
+############################################
+
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+/storage/app/public
+/storage/framework/cache/data
+/storage/logs
+/storage/app/*.zip
+/storage/debugbar
+/.env
+/.env.*
+.env.backup
+.env.local
+.env.production
+.env.development
+Homestead.yaml
+Homestead.json
+.phpunit.result.cache
+composer.lock
+composer.phar
+
+# Ignore IDE helpers
+/_ide_helper.php
+/_ide_helper_models.php
+
+# Ignore Laravel Telescope dumps
+/telescope/entries
+
+# Cache routes, config
+/bootstrap/cache/*.php
+
+############################################
+# SOCIOPRO / ADDON STRUCTURE
+############################################
+
+/updates/*
+/install/*
+/installer/*
+/core/license/*
+/core/licensing/*
+/addons/*/vendor/
+/addons/*/node_modules/
+/addons/*/storage/
+/addons/*/*.zip
+
+# Any Envato marketplace or licensing remnants
+/envato/*
+/codecanyon/*
+/marketplace/*
+/core/envato/*
+/modules/envato/*
+/modules/licensing/*
+/app/Helpers/licensing.php
+
+############################################
+# FRONTEND ASSET BUILD (Laravel Mix / Vite)
+############################################
+
+/public/js/*.map
+/public/css/*.map
+/public/hot
+/public/build
+/public/mix-manifest.json
+
+############################################
+# FLUTTER (MOBILE APP)
+############################################
+
+**/build/
+/.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+.packages
+.pub-cache
+.pub/
+/android/app/debug
+/android/app/profile
+/android/app/release
+/ios/Pods
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/.symlinks
+/ios/Flutter/App.framework
+/ios/DerivedData
+/ios/build
+
+# Flutter environment
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.dart_tool/
+.packages
+
+############################################
+# NODE / JS / FRONTEND
+############################################
+
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+/dist
+/.vite
+/.vite-cache
+
+############################################
+# LOGS / CACHE / TEMP
+############################################
+
+*.log
+*.cache
+*.tmp
+*.temp
+*.pid
+*.seed
+*.bak
+
+############################################
+# OS / EDITOR / SYSTEM FILES
+############################################
+
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+/*.iml
+
+############################################
+# GIT LARGE FILE STORAGE
+############################################
+
+*.zip
+*.rar
+*.7z
+*.psd
+*.ai
+*.apk
+*.ipa
+*.jpg
+*.png
+*.gif
+*.mp4
+*.mp3
+*.mov
+*.avi

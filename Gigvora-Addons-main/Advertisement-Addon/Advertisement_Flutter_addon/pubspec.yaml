@@ -1,0 +1,24 @@
+name: advertisement_flutter_addon
+description: Flutter addon package providing advertiser experience with campaign management, forecasting, keyword planner, and affiliate flows connecting to the Laravel advertisement package.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  equatable: ^2.0.5
+  flutter_bloc: ^8.1.3
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_lints: ^3.0.1
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

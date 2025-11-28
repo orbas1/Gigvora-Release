@@ -1,0 +1,99 @@
+# ---------------------------------
+# OS / Editor junk
+# ---------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# ---------------------------------
+# Laravel / PHP
+# ---------------------------------
+/vendor/
+/bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+.env
+.env.*
+.phpunit.result.cache
+
+/storage/*.key
+/storage/logs/*
+/storage/framework/*
+!/storage/framework/.gitignore
+!/storage/logs/.gitignore
+
+# Laravel mix / build artifacts
+/public/hot
+/public/storage
+/public/mix-manifest.json
+/public/js/*.map
+/public/css/*.map
+
+# Composer
+composer.lock
+composer.phar
+
+# ---------------------------------
+# Node / Frontend
+# ---------------------------------
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# ---------------------------------
+# Flutter / Dart
+# ---------------------------------
+**/build/
+**/.dart_tool/
+**/.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+coverage/
+flutter_export_environment.sh
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/App.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Runner.xcworkspace/xcuserdata/
+
+# Android
+**/android/.gradle/
+**/android/local.properties
+**/android/app/build/
+**/android/**/GeneratedPluginRegistrant.java
+
+# Built app bundles (VERY IMPORTANT – avoid >100MB)
+*.apk
+*.aab
+*.ipa
+
+# ---------------------------------
+# Ruby / Bundler (in case anything like Taskup_phone_app sneaks in)
+# ---------------------------------
+/vendor/bundle/
+/.bundle/
+Gemfile.lock
+
+# ---------------------------------
+# Logs / Misc
+# ---------------------------------
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ---------------------------------
+# IDE-specific workspace files
+# ---------------------------------
+*.code-workspace

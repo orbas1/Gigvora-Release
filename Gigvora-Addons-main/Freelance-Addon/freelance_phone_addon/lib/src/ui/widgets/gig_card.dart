@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+
+import '../../models/gig.dart';
+
+class GigCard extends StatelessWidget {
+  const GigCard({
+    super.key,
+    required this.gig,
+    required this.onTap,
+    required this.onFavourite,
+  });
+
+  final Gig gig;
+  final VoidCallback onTap;
+  final VoidCallback onFavourite;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = gig.attachments.files.isNotEmpty ? gig.attachments.files.first.filePath : null;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              width: 110,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+                image: image != null
+                    ? DecorationImage(image: NetworkImage(image), fit: BoxFit.cover)
+                    : null,
+                color: Colors.grey.shade200,
+              ),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: gig.isFavourite
+                      ? const Icon(Icons.favorite, color: Colors.red)
+                      : const Icon(Icons.favorite_border),
+                  onPressed: onFavourite,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      gig.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    if (gig.user != null)
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage:
+                                gig.user!.avatar != null ? NetworkImage(gig.user!.avatar!) : null,
+                            child: gig.user!.avatar == null ? const Icon(Icons.person_outline) : null,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(gig.user!.name, style: Theme.of(context).textTheme.bodyMedium),
+                        ],
+                      ),
+                    const SizedBox(height: 6),
+                    Text(
+                      gig.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.star, size: 16, color: Colors.orange.shade600),
+                        const SizedBox(width: 4),
+                        Text('${gig.rating?.toStringAsFixed(1) ?? '0.0'} (${gig.reviews ?? 0} reviews)'),
+                        const Spacer(),
+                        Text(
+                          '\$${gig.price.toStringAsFixed(0)}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

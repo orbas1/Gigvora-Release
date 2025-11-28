@@ -1,0 +1,165 @@
+.talent-ai-page {
+    background-color: #f9fafb;
+    padding: 1.5rem;
+}
+
+.talent-ai-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.talent-ai-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+}
+
+.talent-ai-card h3,
+.talent-ai-card h4 {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+}
+
+.talent-ai-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.talent-ai-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.talent-ai-table th,
+.talent-ai-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.talent-ai-badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.pipeline-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.pipeline-stage {
+    background: #f8fafc;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    min-height: 240px;
+}
+
+.pipeline-stage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.pipeline-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    transition: box-shadow 0.2s ease;
+}
+
+.pipeline-card.dragging {
+    opacity: 0.7;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.progress-bar {
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    height: 10px;
+}
+
+.progress-bar .progress {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #22c55e);
+}
+
+.ai-workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.ai-tool-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.filter-bar input,
+.filter-bar select {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.status-pill {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    border: 1px solid #d1d5db;
+    background: #f3f4f6;
+}
+
+.alert-muted {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    color: #475569;
+}
+
+@media (max-width: 640px) {
+    .talent-ai-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .table-actions {
+        flex-direction: column;
+    }
+}
