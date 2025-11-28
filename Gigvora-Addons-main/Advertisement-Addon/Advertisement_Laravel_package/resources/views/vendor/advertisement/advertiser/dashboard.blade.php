@@ -13,6 +13,7 @@
 
 @section('content')
 <div class="container py-4">
+<div id="ads-dashboard-feedback" class="alert alert-warning d-none" role="status"></div>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h3 mb-1">Ads Performance</h1>
@@ -114,6 +115,22 @@
         </table>
     </div>
 </div>
+</div>
+</div>
+
+<div class="modal fade" id="campaignDetailModal" tabindex="-1" aria-labelledby="campaignDetailLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="campaignDetailLabel">Campaign details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="campaign-detail-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
