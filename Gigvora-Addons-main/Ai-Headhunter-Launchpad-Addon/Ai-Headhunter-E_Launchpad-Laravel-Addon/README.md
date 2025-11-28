@@ -1,6 +1,6 @@
 # Talent & AI Laravel Package
 
-This package provides the Laravel backend and web UI for the Talent & AI addon, covering Headhunters, Experience Launchpad, AI Workspace, and Volunteering. It is intended to be installed into a Sociopro-based host app and paired with the Flutter addon when mobile support is required.
+This package provides the Laravel backend and web UI for the Talent & AI addon, covering Headhunters, Experience Launchpad, AI Workspace, and Volunteering. It is intended to be installed into a Gigvora-based host app and paired with the Flutter addon when mobile support is required.
 
 ## Getting Started
 - Require the package via Composer and ensure `Gigvora\\TalentAi\\Providers\\TalentAiServiceProvider` is loaded (auto-discovery is enabled).

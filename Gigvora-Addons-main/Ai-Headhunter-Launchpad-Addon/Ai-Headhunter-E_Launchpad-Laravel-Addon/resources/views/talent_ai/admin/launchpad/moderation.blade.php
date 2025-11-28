@@ -1,13 +1,18 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', __('talent_ai::addons_talent_ai.menu.launchpad_moderation'))
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @section('content')
-<div class="talent-ai-page">
+<div class="container py-4">
+    <div class="talent-ai-card mb-3">
+        <ul class="nav nav-pills flex-column flex-lg-row gap-2">
+            @include('talent_ai::admin.partials.menu')
+        </ul>
+    </div>
     <div class="talent-ai-header">
         <div>
             <h1 class="h4 mb-1">Launchpad moderation</h1>

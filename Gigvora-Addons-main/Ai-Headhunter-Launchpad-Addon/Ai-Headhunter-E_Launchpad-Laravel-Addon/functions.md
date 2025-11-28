@@ -1,6 +1,18 @@
 # Talent & AI Backend Functions & Endpoints
 
 ## Web (`web` + `auth` middleware, gated by `gigvora_talent_ai.enabled` and module toggles)
+UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/addons/talent_ai/talent_ai.css` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles.
+
+### Primary screens
+- `GET /addons/talent-ai/headhunters/dashboard` → `view('talent_ai::headhunters.dashboard')` (name: `addons.talent_ai.headhunters.dashboard`)
+  - Presents mandate and candidate summaries with pipeline drag-and-drop hooks (`pipeline_board.js`).
+- `GET /addons/talent-ai/launchpad/programmes` → `view('talent_ai::launchpad.programmes.index')` (name: `addons.talent_ai.launchpad.programmes.index`)
+  - Lists Experience Launchpad programmes with pagination and progress context (`launchpad_progress.js`).
+- `GET /addons/talent-ai/ai-workspace` → `view('talent_ai::ai_workspace.index')` (name: `addons.talent_ai.ai_workspace.index`)
+  - Surfaces AI tool tiles wired to API endpoints (`ai_workspace.js`).
+- `GET /addons/talent-ai/volunteering/opportunities` → `view('talent_ai::volunteering.opportunities.index')` (name: `addons.talent_ai.volunteering.opportunities.index`)
+  - Provides volunteering discovery with client-side filters (`volunteering_filters.js`).
+
 ### Headhunters (`modules.headhunters.enabled`)
 - `POST /addons/talent-ai/headhunter/profile` → `HeadhunterProfileController@store` (`addons.talent_ai.headhunter.profile.store`)
   - Creates a headhunter profile for the authenticated user.
@@ -106,6 +118,11 @@
 - `GET /api/addons/talent-ai/volunteering/applications/{application}` → `VolunteeringApplicationController@show` (`api.addons.talent_ai.volunteering.applications.show`)
   - Shows a single volunteering application with opportunity context.
 
+## Mobile Screens & Flows
+- `GigvoraAddonNavigation.routes` (see `Sociopro Flutter Mobile App/App/lib/addons_integration.dart`) publishes named routes for Headhunters, Launchpad, AI Workspace, and Volunteering to the Flutter shell.
+- `GigvoraAddonProviders.talentAi` registers ChangeNotifier providers for `HeadhunterState`, `LaunchpadState`, `AiWorkspaceState`, and `VolunteeringState`, each backed by `/api/addons/talent-ai/*` endpoints and the shared token provider.
+- Mobile navigation labels mirror web: **Talent & AI** > **Headhunters**, **Experience Launchpad**, **AI Workspace**, **Volunteering**, with Material icons matching the Laravel menu and feature flag visibility tied to `gigvora_talent_ai.enabled` + per-module toggles.
+
 ### AI Workspace (`modules.ai_workspace.enabled`)
 - `POST /api/addons/talent-ai/ai/cv-writer` → `ToolController@cvWriter` (`api.addons.talent_ai.ai.cv_writer`)
   - Generates CV content.
@@ -140,5 +157,20 @@
 
 ## Permissions & Policies
 - Policies mapped for headhunter, launchpad, and volunteering domain models ensure per-resource authorization.
-- `manage_talent_ai` gate restricts admin routes to Sociopro admins (`user_role === 'admin'`).
+- `manage_talent_ai` gate restricts admin routes to Gigvora admins (`user_role === 'admin'`).
 - All routes enforce authentication through Laravel `auth` or `auth:sanctum` middleware.
+- Navigation visibility: the **Talent & AI** menu plus its sub-links (Headhunters, Experience Launchpad, AI Workspace, Volunteering) are shown only when `gigvora_talent_ai.enabled` and the relevant `modules.*.enabled` flags are true; admin entries remain hidden without the `manage_talent_ai` ability.
+
+## Database Structures
+- **Headhunters:** `headhunter_profiles` (FK `user_id`, indexed status), `headhunter_mandates` (FK `organisation_id` → `organizations`, indexed status), `headhunter_candidates`, `headhunter_pipeline_items` (unique per mandate/candidate with indexed stage), `headhunter_interviews` (FK `scheduled_by` → `users`, indexed status/scheduled_at).
+- **Launchpad:** `launchpad_programmes` (indexed creator/status), `launchpad_tasks` (ordered and indexed), `launchpad_applications` (indexed user/status), `launchpad_application_task_progress` (unique per application/task), `launchpad_interviews` (indexed status).
+- **AI Workspace:** `ai_sessions` (indexed by user/tool/status), `ai_byok_credentials` (unique per user/provider), `ai_subscription_plans`, `ai_user_subscriptions` (unique per user/plan + status index), `ai_usage_aggregates` (indexed period/user).
+- **Volunteering:** `volunteering_opportunities` (FK `organisation_id` → `organizations`, indexed creator/status) and `volunteering_applications` (indexed user/status).
+- **Seeders:** `Database\Seeders\TalentAiSeeder` seeds AI subscription plans from `config/gigvora_talent_ai.php` and is invoked through the host `DatabaseSeeder` to keep migrations and baseline plans aligned.
+
+## UI Function Mapping (Web)
+- Headhunter pipeline drag-and-drop and card hydration: `resources/js/addons/talent_ai/pipeline_board.js` (paired with Blade pipeline components extending `layouts.app`).
+- Launchpad progress steppers and programme cards: `resources/js/addons/talent_ai/launchpad_progress.js`.
+- AI workspace tool tiles and BYOK interactions: `resources/js/addons/talent_ai/ai_workspace.js`.
+- Volunteering filters and card interactions: `resources/js/addons/talent_ai/volunteering_filters.js`.
+- Admin settings, plan management, and guardrail toggles: `resources/js/addons/talent_ai/admin_settings.js`.

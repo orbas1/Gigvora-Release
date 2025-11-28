@@ -11,12 +11,12 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('campaign_id')->constrained('campaigns')->cascadeOnDelete();
             $table->foreignId('ad_group_id')->nullable()->constrained('ad_groups')->nullOnDelete();
-            $table->string('type');
+            $table->string('type')->index();
             $table->string('title');
             $table->text('body')->nullable();
             $table->string('destination_url')->nullable();
             $table->string('media_path')->nullable();
-            $table->string('status')->default('draft');
+            $table->string('status')->default('draft')->index();
             $table->string('cta')->nullable();
             $table->timestamps();
         });

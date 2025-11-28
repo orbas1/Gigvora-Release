@@ -1,50 +1,58 @@
-# Sociopro Flutter Mobile App Integration
+# Gigvora Mobile Addon Integration (Flutter)
 
-The core Sociopro Flutter shell can consume the Gigvora addons shipped in this repository without changing their code. Wire the phone app to the Laravel host (`Sociopro`) and the Flutter addon packages as follows:
+The Sociopro Flutter shell integrates Gigvora-branded addons for Advertisement and Talent & AI using the existing addon packages in this repository. The steps below align navigation, API clients, theming, and analytics with the Gigvora Laravel backend.
 
-## Addon dependencies
-Add the advertisement and Talent & AI Flutter addons as local path dependencies in your app `pubspec.yaml`:
+## Path dependencies
+Add both addons as local dependencies in your app `pubspec.yaml` (see `App/pubspec.yaml` for a ready-to-use example):
 
 ```yaml
 dependencies:
   advertisement_flutter_addon:
     path: ../Gigvora-Addons-main/Advertisement-Addon/Advertisement_Flutter_addon
-  pro_network_utilities_security_analytics:
+  talent_ai_flutter_addon:
     path: ../Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-flutter_addon
+  flutter_bloc: ^8.1.3
+  provider: ^6.0.5
 ```
+
+Run `flutter pub get` after adding the paths.
 
 ## API client wiring
-Both addons expect the Sociopro Laravel host to expose the following Sanctum-protected endpoints:
-
-- Advertisement: `/api/advertisement/*`
-- Talent & AI: `/api/addons/talent-ai/*` (headhunter, launchpad, volunteering, AI workspace)
-
-Instantiate each client with the Sociopro base URL and an auth token provider:
+Point both addons at the Gigvora Laravel host (`https://your-gigvora-host.com`) and reuse the shell auth token provider:
 
 ```dart
+final tokenProvider = () async => authRepository.currentToken;
 final adsApi = AdvertisementApiClient(
-  baseUrl: 'https://your-sociopro-host.com',
-  tokenProvider: () async => authRepository.currentToken,
+  baseUrl: gigvoraBaseUrl,
+  tokenProvider: tokenProvider,
 );
-
-final talentApi = BaseApiService(
-  baseUrl: 'https://your-sociopro-host.com',
-  tokenProvider: () async => authRepository.currentToken,
+final talentApis = TalentAiApis.fromBaseUrl(
+  baseUrl: gigvoraBaseUrl,
+  tokenProvider: tokenProvider,
 );
 ```
 
-## Navigation hooks
-Expose the addon menus inside your app shell:
+## Navigation & routes
+Merge addon routes into the host router:
 
-```dart
-for (final item in defaultAdsMenu) {
-  navigationRegistry.register(item.title, item.builder);
-}
+- Advertisement: `/ads/home`, `/ads/campaigns`, `/ads/campaigns/:id`, `/ads/campaigns/create`, `/ads/creatives`, `/ads/keyword-planner`, `/ads/forecast`, `/ads/reports`.
+- Talent & AI: `/talent-ai/headhunters`, `/talent-ai/headhunters/mandates/:id`, `/talent-ai/launchpad`, `/talent-ai/launchpad/:id`, `/talent-ai/launchpad/applications/:id`, `/talent-ai/ai-workspace`, `/talent-ai/volunteering`, `/talent-ai/volunteering/:id`.
 
-final talentMenu = buildTalentAiMenu(analyticsClient);
-for (final item in talentMenu) {
-  navigationRegistry.register(item.title, item.builder);
-}
-```
+Menu labels/icons mirror the Laravel web menus:
 
-This keeps the phone app aligned with the Sociopro backend while preserving the addon isolation model.
+- **Ads Manager**, **Campaigns**, **Ads Reports** (Material icons: `campaign_outlined`, `list_alt_outlined`, `analytics_outlined`).
+- **Talent & AI** with children **Headhunters** (`work_outline`), **Experience Launchpad** (`school_outlined`), **AI Workspace** (`smart_toy_outlined`), **Volunteering** (`volunteer_activism_outlined`).
+
+Feature flags from the backend (`advertisement.enabled`, `gigvora_talent_ai.enabled`, and nested module flags) should hide corresponding menu entries.
+
+## Providers & theming
+Wrap the root app with addon providers so state and routes are available everywhere. `App/lib/addons_integration.dart` exposes helpers:
+
+- `GigvoraAddonProviders.ads(...)` – creates `BlocProvider`s for Campaign, Creative, Analytics, Forecast, Keyword Planner, and Affiliate flows.
+- `GigvoraAddonProviders.talentAi(...)` – creates `ChangeNotifierProvider`s for Headhunters, Launchpad, AI Workspace, and Volunteering.
+- `GigvoraAddonNavigation.routes(...)` – merges the addon route maps with your existing router.
+
+All addon screens inherit the host `ThemeData` colours and typography; avoid overriding fonts or colours to stay on-brand.
+
+## Analytics & security
+Forward addon events into the host analytics layer via `TalentAiAnalyticsClient` and your existing analytics hooks (e.g., `ads_campaign_created`, `headhunter_pipeline_stage_moved`, `ai_tool_ran`, `launchpad_applied`, `volunteering_applied`). AI calls remain server-side; no AI keys are stored on device.

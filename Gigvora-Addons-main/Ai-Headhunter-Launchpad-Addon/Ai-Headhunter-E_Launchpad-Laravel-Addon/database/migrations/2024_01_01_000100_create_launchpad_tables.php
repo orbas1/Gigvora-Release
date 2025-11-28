@@ -20,8 +20,9 @@ return new class extends Migration {
             $table->boolean('reference_offered')->default(false);
             $table->boolean('qualification_offered')->default(false);
             $table->decimal('pay_reduction_percentage', 5, 2)->nullable();
-            $table->string('status')->default('draft');
+            $table->string('status')->default('draft')->index();
             $table->timestamps();
+            $table->index(['creator_id', 'status']);
         });
 
         Schema::create('launchpad_tasks', function (Blueprint $table) {
@@ -32,13 +33,14 @@ return new class extends Migration {
             $table->integer('order')->default(0);
             $table->integer('estimated_hours')->default(0);
             $table->timestamps();
+            $table->index(['launchpad_programme_id', 'order']);
         });
 
         Schema::create('launchpad_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('launchpad_programme_id')->constrained('launchpad_programmes');
             $table->foreignId('user_id')->constrained('users');
-            $table->string('status')->default('submitted');
+            $table->string('status')->default('submitted')->index();
             $table->text('motivation')->nullable();
             $table->boolean('reference_issued')->default(false);
             $table->boolean('qualification_issued')->default(false);
@@ -53,7 +55,7 @@ return new class extends Migration {
             $table->foreignId('launchpad_application_id')->constrained('launchpad_applications');
             $table->foreignId('scheduled_by')->constrained('users');
             $table->timestamp('scheduled_at');
-            $table->string('status')->default('scheduled');
+            $table->string('status')->default('scheduled')->index();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

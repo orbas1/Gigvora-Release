@@ -60,7 +60,7 @@ submitBtn?.addEventListener('click', async () => {
     try {
         submitBtn.disabled = true;
         await post(form.action, formData);
-        window.location.href = '/advertisement/campaigns';
+        window.location.href = '/addons/advertisement/campaigns';
     } catch (e) {
         alert('Unable to save campaign');
     } finally {

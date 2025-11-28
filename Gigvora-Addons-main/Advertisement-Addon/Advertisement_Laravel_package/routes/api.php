@@ -3,6 +3,7 @@
 use Advertisement\Http\Controllers\AffiliateController;
 use Advertisement\Http\Controllers\AdvertiserController;
 use Advertisement\Http\Controllers\CampaignController;
+use Advertisement\Http\Controllers\DashboardController;
 use Advertisement\Http\Controllers\CreativeController;
 use Advertisement\Http\Controllers\KeywordPlannerController;
 use Advertisement\Http\Controllers\ReportController;
@@ -17,6 +18,7 @@ Route::prefix('api/advertisement')
             return;
         }
 
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::get('advertisers', [AdvertiserController::class, 'index'])->name('advertisers.index');
         Route::post('advertisers', [AdvertiserController::class, 'store'])->name('advertisers.store');
         Route::put('advertisers/{advertiser}', [AdvertiserController::class, 'update'])->name('advertisers.update');

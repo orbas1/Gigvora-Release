@@ -3,7 +3,7 @@
 @section('title', ($opportunity->exists ?? false) ? 'Edit opportunity' : 'Post opportunity')
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @section('content')

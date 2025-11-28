@@ -10,9 +10,10 @@ return new class extends Migration {
         Schema::create('targeting_rules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('campaign_id')->constrained('campaigns')->cascadeOnDelete();
-            $table->string('type');
+            $table->string('type')->index();
             $table->string('value');
             $table->string('operator')->nullable();
+            $table->index(['campaign_id', 'type']);
             $table->timestamps();
         });
     }

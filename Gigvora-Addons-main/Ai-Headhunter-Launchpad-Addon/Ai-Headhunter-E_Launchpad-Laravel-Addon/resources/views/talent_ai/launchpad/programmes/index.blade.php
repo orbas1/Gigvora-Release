@@ -3,15 +3,16 @@
 @section('title', __('talent_ai::addons_talent_ai.launchpad.programmes'))
 
 @push('styles')
-    @vite('resources/css/addons/talent_ai/talent_ai.css')
+    <link rel="stylesheet" href="{{ mix('css/addons/talent_ai/talent_ai.css') }}">
 @endpush
 
 @push('scripts')
-    @vite('resources/js/addons/talent_ai/talent_ai.js')
+    <script src="{{ mix('js/addons/talent_ai/launchpad_progress.js') }}" defer></script>
 @endpush
 
 @section('content')
-<div class="talent-ai-page">
+<div class="container py-4">
+    <div class="talent-ai-page">
     <div class="talent-ai-header">
         <div>
             <h1 class="h4 mb-1">@lang('talent_ai::addons_talent_ai.launchpad.programmes')</h1>
@@ -61,5 +62,6 @@
         </div>
         <div class="mt-3">{{ $programmes->links() ?? '' }}</div>
     @endif
+    </div>
 </div>
 @endsection

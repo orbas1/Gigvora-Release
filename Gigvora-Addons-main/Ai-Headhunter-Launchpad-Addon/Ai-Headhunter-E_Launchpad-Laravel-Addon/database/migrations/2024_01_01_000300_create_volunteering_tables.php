@@ -11,7 +11,7 @@ return new class extends Migration {
     {
         Schema::create('volunteering_opportunities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organisation_id')->nullable()->constrained('organisations');
+            $table->foreignId('organisation_id')->nullable()->constrained('organizations');
             $table->foreignId('creator_id')->constrained('users');
             $table->string('title');
             $table->string('sector');
@@ -19,16 +19,18 @@ return new class extends Migration {
             $table->string('commitment')->nullable();
             $table->boolean('expenses_covered')->default(false);
             $table->boolean('verified')->default(false);
-            $table->string('status')->default('draft');
+            $table->string('status')->default('draft')->index();
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->index(['creator_id', 'status']);
+            $table->index(['organisation_id']);
         });
 
         Schema::create('volunteering_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('volunteering_opportunity_id')->constrained('volunteering_opportunities');
             $table->foreignId('user_id')->constrained('users');
-            $table->string('status')->default('submitted');
+            $table->string('status')->default('submitted')->index();
             $table->text('motivation')->nullable();
             $table->integer('hours_contributed')->default(0);
             $table->timestamps();

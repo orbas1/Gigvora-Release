@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->json('output')->nullable();
             $table->timestamps();
             $table->index(['user_id', 'tool']);
+            $table->index(['status']);
         });
 
         Schema::create('ai_byok_credentials', function (Blueprint $table) {
@@ -47,8 +48,9 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('ai_subscription_plan_id')->constrained('ai_subscription_plans');
             $table->date('renews_at')->nullable();
-            $table->string('status')->default('active');
+            $table->string('status')->default('active')->index();
             $table->timestamps();
+            $table->unique(['user_id', 'ai_subscription_plan_id']);
         });
 
         Schema::create('ai_usage_aggregates', function (Blueprint $table) {

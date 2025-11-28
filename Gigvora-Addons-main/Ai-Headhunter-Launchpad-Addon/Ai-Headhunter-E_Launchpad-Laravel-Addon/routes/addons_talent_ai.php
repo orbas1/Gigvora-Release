@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Gigvora\TalentAi\Domain\Headhunters\Models\HeadhunterMandate;
+use Gigvora\TalentAi\Domain\Headhunters\Models\HeadhunterProfile;
+use Gigvora\TalentAi\Domain\Launchpad\Models\LaunchpadProgramme;
+use Gigvora\TalentAi\Domain\Volunteering\Models\VolunteeringOpportunity;
 use Gigvora\TalentAi\Http\Controllers\Admin\AdminController;
 use Gigvora\TalentAi\Http\Controllers\AiWorkspace\ByokController;
 use Gigvora\TalentAi\Http\Controllers\AiWorkspace\StatusController;
@@ -16,6 +20,7 @@ use Gigvora\TalentAi\Http\Controllers\Launchpad\InterviewController as Launchpad
 use Gigvora\TalentAi\Http\Controllers\Launchpad\ProgrammeController;
 use Gigvora\TalentAi\Http\Controllers\Volunteering\ApplicationController as VolunteeringApplicationController;
 use Gigvora\TalentAi\Http\Controllers\Volunteering\OpportunityController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -26,6 +31,46 @@ Route::group([
     if (!config('gigvora_talent_ai.enabled')) {
         return;
     }
+
+    Route::get('headhunters/dashboard', function (Request $request) {
+        abort_unless(config('gigvora_talent_ai.modules.headhunters.enabled'), 403);
+
+        $profile = HeadhunterProfile::query()
+            ->with(['mandates.pipelineItems', 'candidates'])
+            ->firstWhere('user_id', $request->user()->id);
+
+        $mandates = $profile?->mandates ?? collect();
+        $pipelineSummary = [
+            'active' => $mandates->sum(fn (HeadhunterMandate $mandate) => $mandate->pipelineItems->count()),
+        ];
+        $candidates = $profile?->candidates ?? collect();
+        $suggestions = [];
+
+        return view('talent_ai::headhunters.dashboard', compact('mandates', 'pipelineSummary', 'candidates', 'suggestions'));
+    })->name('addons.talent_ai.headhunters.dashboard');
+
+    Route::get('launchpad/programmes', function () {
+        abort_unless(config('gigvora_talent_ai.modules.launchpad.enabled'), 403);
+
+        $programmes = LaunchpadProgramme::query()->latest()->paginate(12);
+
+        return view('talent_ai::launchpad.programmes.index', compact('programmes'));
+    })->name('addons.talent_ai.launchpad.programmes.index');
+
+    Route::get('ai-workspace', function () {
+        abort_unless(config('gigvora_talent_ai.modules.ai_workspace.enabled'), 403);
+
+        return view('talent_ai::ai_workspace.index');
+    })->name('addons.talent_ai.ai_workspace.index');
+
+    Route::get('volunteering/opportunities', function () {
+        abort_unless(config('gigvora_talent_ai.modules.volunteering.enabled'), 403);
+
+        $opportunities = VolunteeringOpportunity::query()->latest()->paginate(12);
+        $sectors = config('gigvora_talent_ai.volunteering.default_categories', []);
+
+        return view('talent_ai::volunteering.opportunities.index', compact('opportunities', 'sectors'));
+    })->name('addons.talent_ai.volunteering.opportunities.index');
 
     if (config('gigvora_talent_ai.modules.headhunters.enabled')) {
         Route::post('headhunter/profile', [HeadhunterProfileController::class, 'store'])->name('headhunter.profile.store');

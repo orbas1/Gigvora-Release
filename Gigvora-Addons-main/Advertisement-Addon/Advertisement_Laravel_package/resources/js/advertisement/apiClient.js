@@ -1,8 +1,14 @@
 import axios from 'axios';
 
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+const apiBase = document.querySelector('meta[name="gigvora-ads-api-base"]')?.getAttribute('content') || '/api/advertisement';
+
 const apiClient = axios.create({
+    baseURL: apiBase,
+    withCredentials: true,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
+        ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
     },
 });
 
