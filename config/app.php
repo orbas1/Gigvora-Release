@@ -29,9 +29,11 @@ return [
     | framework needs to place the application's name in a notification or
     | any other location as required by the application or its packages.
     |
-     */
+    | By default we fall back to "Gigvora" so the site branding is consistent
+    | even if APP_NAME is not set in the environment.
+    */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Gigvora'),
 
     /*
     |--------------------------------------------------------------------------
