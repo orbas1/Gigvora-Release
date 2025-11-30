@@ -29,6 +29,8 @@ mix.js('resources/js/live/app.js', 'public/js/live')
         require('autoprefixer'),
     ]);
 
+mix.js('Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package/resources/js/live/interviewDashboard.js', 'public/js/live');
+mix.js('Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package/resources/js/live/interviewerScoring.js', 'public/js/live');
 mix.js('Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package/resources/js/live/podcastPlayer.js', 'public/js/live');
 
 mix.js('Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package/resources/js/advertisement/dashboard.js', 'public/js/advertisement');
