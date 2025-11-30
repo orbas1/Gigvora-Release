@@ -1,7 +1,29 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-11-30
+Last updated: 2025-12-01
+
+## Snapshot – 2025-12-01 – Task 19 (Networking Sessions Completion)
+
+### Todo – Task 19
+
+- [in_progress] Wire Utilities sync + exports for networking notes/contact exchange and reminders after live rotations.
+- [done] Refresh waiting room with countdown gating, rotation/price pills, and intro card persistence.
+- [done] Add live rotation timer/progress, partner card CTA, and local note saves aligned with Utilities recap expectations.
+- [todo] Mirror the updated waiting/live shells in Flutter with the same countdown/progress + local draft storage.
+
+### 1. Networking surfaces (index/show/waiting/live)
+
+- Index cards now surface ticket status (free vs paid pricing), rotation counts/duration, and expected end times so hosts can sell paid seats and attendees can plan commitments before opening detail pages.
+- Detail page adds explicit ticketing copy, rotation totals, and a follow-up/reminder block (roster export + reminder buttons) to keep CRM/Utilities handoffs visible. Registration CTA keeps tokenized alerts for paid vs free states.
+- Waiting room now shows countdown with CTA gating, rotation/price pills, and a persisted intro card (headline/bio/goal) stored locally to hydrate Utilities recap once APIs are wired; join button respects start time/status via the new `NetworkingSession::is_joinable` helper.
+- Live shell introduces rotation timer/progress UI, partner card contact exchange CTA, and local note persistence so participants can capture connections during rotations and sync later. Rotation metadata and follow-ups rely on new model helpers (`ends_at`, `rotation_count`, `is_live`).
+
+### 2. Docs & QA
+
+- `logic_flows.md#3.3` documents the updated waiting-room gating, rotation timers, and follow-up/CRM expectations for networking sessions.
+- `docs/ui-audit.md` adds a Live/Networking polish note calling out the refreshed waiting room and live shell plus Flutter parity requirements.
+- `docs/qa-bugs.md#section-–-task-19-networking-sessions-completion` logs manual smoke coverage (index/detail/waiting/live) and reiterates the outstanding build/test blockers (Mix/yargs + env setup). Automated suites remain pending and must run before release.
 
 ## Snapshot – 2025-11-30 – Task 15 (Interactive / Live Addon Alignment)
 

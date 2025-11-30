@@ -18,6 +18,9 @@
                 <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
                     {{ $session->starts_at?->format('M j • g:i A') }}
                     • {{ $session->rotation_interval }} {{ get_phrase('second rotations') }}
+                    @if($session->rotation_count)
+                        • {{ get_phrase(':count total rotations', ['count' => $session->rotation_count]) }}
+                    @endif
                 </p>
             </div>
             <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
@@ -38,6 +41,7 @@
                     <li>{{ get_phrase('Meet new peers every :seconds seconds', ['seconds' => $session->rotation_interval ?? 60]) }}</li>
                     <li>{{ get_phrase('Auto-rotation and partner assignments') }}</li>
                     <li>{{ get_phrase('Exportable connection list and reminders') }}</li>
+                    <li>{{ get_phrase('Post-session follow-up plan with reminders and contact exchange') }}</li>
                 </ul>
             </div>
         </div>
@@ -62,7 +66,13 @@
             @auth
                 <form method="post" action="{{ route('wnip.networking.register', $session) }}" class="space-y-3">
                     @csrf
-                    <button class="gv-btn gv-btn-primary w-full" type="submit">
+                    <div class="gv-alert gv-alert-info" role="status">
+                        <div class="font-semibold">{{ get_phrase('Ticketing') }}</div>
+                        <p class="text-sm mb-0">
+                            {{ $session->is_paid ? get_phrase('Paid session from :amount', ['amount' => currency_format($session->price ?? 0)]) : get_phrase('Free ticket – instant confirmation') }}
+                        </p>
+                    </div>
+                    <button class="gv-btn gv-btn-primary w-full" type="submit" @if($participant) aria-disabled="true" @endif>
                         {{ $participant ? get_phrase('Registered') : get_phrase('Register') }}
                     </button>
                 </form>
@@ -91,6 +101,22 @@
                         {{ get_phrase('No participants yet.') }}
                     </p>
                 @endforelse
+            </div>
+        </div>
+
+        <div class="gv-card space-y-3">
+            <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Follow-up & reminders') }}</h4>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+                {{ get_phrase('Add a reminder to send your notes, share your contact card, and confirm next steps after rotations end.') }}
+            </p>
+            <ul class="list-disc pl-5 text-sm text-[var(--gv-color-neutral-600)] space-y-1">
+                <li>{{ get_phrase('Schedule a recap 15 minutes after the final rotation (Utilities reminder).') }}</li>
+                <li>{{ get_phrase('Export matched contacts to CRM or Jobs/Freelance invites once the session is marked complete.') }}</li>
+                <li>{{ get_phrase('Keep notes synced so profile/feed follow-ups surface the new connections.') }}</li>
+            </ul>
+            <div class="grid gap-2 sm:grid-cols-2">
+                <button class="gv-btn gv-btn-secondary" type="button">{{ get_phrase('Add reminder') }}</button>
+                <button class="gv-btn gv-btn-ghost" type="button">{{ get_phrase('Download roster (.csv)') }}</button>
             </div>
         </div>
     </aside>
