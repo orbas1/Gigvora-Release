@@ -2,7 +2,7 @@
 
 @section('title', 'Manage Gigs')
 
-@section('content')
+@section('freelance-content')
 <div class="container-fluid py-4" id="admin-gigs">
     <h1 class="mb-3">Gigs</h1>
     @component('vendor.freelance.components.filter_bar', [

@@ -8,7 +8,18 @@ class ApplicationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        if (! auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+        $allowedRoles = (array) config('jobs.roles.employer_access', []);
+
+        if (in_array($user->user_role, $allowedRoles, true) || $user->can('access_admin_panel')) {
+            return true;
+        }
+
+        return (int) $this->input('candidate_id') === (int) $user->id;
     }
 
     public function rules(): array

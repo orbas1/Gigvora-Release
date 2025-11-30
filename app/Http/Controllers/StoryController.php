@@ -9,6 +9,7 @@ use DB, Session;
 //used models
 use App\Models\FileUploader;
 use App\Models\{Stories,Media_files};
+use App\Services\MediaStudioService;
 
 class StoryController extends Controller
 {
@@ -79,6 +80,9 @@ class StoryController extends Controller
     function create_story(Request $request){
 
         $all_data = $request->all();
+        $mediaStudio = app(MediaStudioService::class);
+        $studioManifest = $mediaStudio->sanitizeManifest($request->input('studio_manifest'));
+        $resolutionPreset = $mediaStudio->sanitizeResolution($request->input('resolution_preset'));
 
         $data['publisher'] = $all_data['publisher'];
         $data['content_type'] = $all_data['content_type'];
@@ -105,6 +109,10 @@ class StoryController extends Controller
         $data['updated_at'] = $data['created_at'];
         $data['user_id'] = $this->user->id;
         $data['status'] = 'active';
+        $data['resolution_preset'] = $resolutionPreset;
+        if (!empty($studioManifest)) {
+            $data['studio_manifest'] = json_encode($studioManifest);
+        }
         $story_id = Stories::insertGetId($data);
 
         if($request->content_type != 'text'){
@@ -133,15 +141,32 @@ class StoryController extends Controller
                         $file_type = 'image';
                     }
 
-
                     $media_file_data = array('user_id' => $this->user->id, 'story_id' => $story_id, 'file_name' => $file_name, 'file_type' => $file_type, 'privacy' => $request->privacy);
                     $media_file_data['created_at'] = time();
                     $media_file_data['updated_at'] = $media_file_data['created_at'];
-                    Media_files::create($media_file_data);
+                    $mediaRecord = Media_files::create($media_file_data);
+
+                    $absolutePath = $this->absoluteStoryPath($file_type, $file_name);
+                    $dimension = $mediaStudio->ensureResolution($absolutePath, $file_type, $resolutionPreset);
+                    if (!empty($studioManifest)) {
+                        $mediaStudio->applyFilter($absolutePath, $file_type, $studioManifest['filter'] ?? 'none');
+                    }
+                    $mediaRecord->resolution_preset = $resolutionPreset;
+                    $mediaRecord->processing_manifest = $mediaStudio->sanitizeProcessingMeta($studioManifest, $resolutionPreset, $dimension);
+                    $mediaRecord->save();
                 endif;
             }
         }
 
         return redirect('/');
+    }
+
+    protected function absoluteStoryPath(string $fileType, string $fileName): string
+    {
+        $directory = $fileType === 'video'
+            ? public_path('storage/story/videos')
+            : public_path('storage/story/images');
+
+        return rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
     }
 }

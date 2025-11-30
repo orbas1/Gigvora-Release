@@ -9,7 +9,7 @@
 		</div>
 		<x-projects :limit="pagesetting('no_of_projects') ?? 6" />
 		<div class="tk-button-wrapper">
-			<a href="{{ route('search-projects') }}" class="tk-btn-two tk-btn-task">
+			<a href="{{ route('freelance.search.projects') }}" class="tk-btn-two tk-btn-task">
 				@if(!empty(pagesetting('btn_text')))
 					<span>{{ pagesetting('btn_text') }}</span>
 				@endif 

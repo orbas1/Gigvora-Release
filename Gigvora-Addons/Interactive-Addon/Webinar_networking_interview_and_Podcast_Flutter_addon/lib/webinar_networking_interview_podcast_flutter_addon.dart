@@ -42,3 +42,4 @@ export 'src/pages/interviews/interview_waiting_room_screen.dart';
 export 'src/pages/interviews/interview_live_screen.dart';
 export 'src/pages/interviews/interviewer_panel_screen.dart';
 export 'src/widgets/live_cards.dart';
+export 'src/integration.dart';

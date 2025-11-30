@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0">Global Settings</h5>

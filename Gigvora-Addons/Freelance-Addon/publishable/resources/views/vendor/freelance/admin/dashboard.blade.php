@@ -2,7 +2,7 @@
 
 @section('title', 'Freelance Admin Dashboard')
 
-@section('content')
+@section('freelance-content')
 <div class="container-fluid py-4" id="admin-freelance-dashboard">
     <h1 class="mb-4">Freelance Overview</h1>
     @component('vendor.freelance.components.dashboard_kpi_cards', ['kpis' => $kpis ?? []])

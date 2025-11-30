@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 
 // Admin related routes
-Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth','role:admin','verified'])->as('admin.')->group(function () {
     
     Route::get('project-categories',    App\Http\Livewire\Admin\Taxonomies\ProjectCategories\ProjectCategories::class)->name('project-categories');
     Route::get('gig-categories',        App\Http\Livewire\Admin\Taxonomies\GigCategories\GigCategories::class)->name('gig-categories');
@@ -32,10 +32,10 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->group(function () {
     Route::get('projects',              App\Http\Livewire\Admin\Projects\Projects::class)->name('projects');
     Route::get('proposals',             App\Http\Livewire\Admin\Proposals\Proposals::class)->name('proposals');
     Route::get('gigs',                  App\Http\Livewire\Admin\Gigs\Gigs::class)->name('gigs');
-    Route::get('gig-orders',            App\Http\Livewire\Admin\Gigs\GigOrders::class)->name('admin-gig-orders');
+    Route::get('gig-orders',            App\Http\Livewire\Admin\Gigs\GigOrders::class)->name('gig-orders');
     Route::get('users',                 App\Http\Livewire\Admin\Users\Users::class)->name('users');
-    Route::get('earnings',              App\Http\Livewire\Admin\Earnings\Earnings::class)->name('admin-earnings');
-    Route::get('email-settings',        App\Http\Livewire\Admin\EmailTemplates\EmailTemplates::class)->name('EmailTemplates');
+    Route::get('earnings',              App\Http\Livewire\Admin\Earnings\Earnings::class)->name('earnings');
+    Route::get('email-settings',        App\Http\Livewire\Admin\EmailTemplates\EmailTemplates::class)->name('email-templates');
     Route::get('dispute-view',          App\Http\Livewire\Admin\Disputes\DisputeDetail::class)->name('dispute-view');
     Route::get('manage-menu',           App\Http\Livewire\Admin\Menu\ManageMenu::class)->name('manage-menu');
     Route::get('withdraw-requests',     App\Http\Livewire\Admin\WithdrawRequests\WithdrawRequest::class)->name('withdraw-requests');

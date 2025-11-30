@@ -28,6 +28,6 @@
                 </div>
             </li>
         </ul>
-        @if( $step == 4 )<a href="{{ route('project-listing') }}" class="tk-btn-solid-lg-lefticon">{{ __('project.go_to_project') }} <i class="icon-chevron-right"></i></a>@endif
+        @if( $step == 4 )<a href="{{ route('freelance.projects.index') }}" class="tk-btn-solid-lg-lefticon">{{ __('project.go_to_project') }} <i class="icon-chevron-right"></i></a>@endif
     </aside>
 </div>

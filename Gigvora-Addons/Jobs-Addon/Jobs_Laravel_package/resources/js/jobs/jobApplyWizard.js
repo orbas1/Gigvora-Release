@@ -5,12 +5,12 @@ const prevBtn = document.querySelector('#prev-step');
 let currentStep = 0;
 
 const setStep = (index) => {
-    steps.forEach((step, i) => step.classList.toggle('d-none', i !== index));
+    steps.forEach((step, i) => step.classList.toggle('hidden', i !== index));
     if (progress) {
         const pct = ((index + 1) / steps.length) * 100;
         progress.style.width = `${pct}%`;
     }
-    prevBtn?.classList.toggle('disabled', index === 0);
+    prevBtn?.toggleAttribute('disabled', index === 0);
     if (nextBtn) nextBtn.textContent = index === steps.length - 1 ? 'Submit' : 'Next';
 };
 
@@ -20,9 +20,9 @@ const validateStep = (index) => {
     fields.forEach((field) => {
         if (!field.value) {
             valid = false;
-            field.classList.add('is-invalid');
+            field.classList.add('border-red-500', 'ring-1', 'ring-red-500/40');
         } else {
-            field.classList.remove('is-invalid');
+            field.classList.remove('border-red-500', 'ring-1', 'ring-red-500/40');
         }
     });
     return valid;

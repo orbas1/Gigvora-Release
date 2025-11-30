@@ -1,27 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'Interview Calendar')
+@section('title', get_phrase('Interview calendar'))
 
-@section('breadcrumbs')
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/employer">Employer</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('employer.interviews.index') }}">Interviews</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Calendar</li>
-    </ol>
-</nav>
+@section('page-header')
+    <div class="flex items-center justify-between flex-wrap gap-2">
+        <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Interview calendar') }}</h1>
+        <button class="gv-btn gv-btn-primary" id="new-slot">
+            <i class="fa-solid fa-plus me-2"></i>{{ get_phrase('Schedule interview') }}
+        </button>
+    </div>
 @endsection
 
 @section('content')
-<div class="container py-4" id="interview-calendar-page">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Interview Calendar</h1>
-        <button class="btn btn-primary" id="new-slot">Schedule Interview</button>
-    </div>
     @include('vendor.jobs.components.calendar_widget', ['events' => $events ?? []])
-</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/jobs/interviewCalendar.js') }}"></script>
+    <script type="module" src="{{ mix('resources/js/jobs/interviewCalendar.js') }}"></script>
 @endpush

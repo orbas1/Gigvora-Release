@@ -1,258 +1,212 @@
+@php
+    $composerAssets = $composerAssets ?? [
+        'reactions' => [],
+        'emoji_packs' => [],
+        'sticker_packs' => [],
+        'gif' => ['enabled' => false, 'endpoint' => null],
+    ];
+@endphp
 
-<div class="message-box chat_control bg-white border radius-8">
+<div class="gv-chat-thread__container">
     @if(!empty($reciver_data))
-    <div class="modal-header d-flex bg-secondary">
-       
-        <div class="avatar d-flex">
-            <a href="#" class="d-flex align-items-center">
-                <div class="avatar avatar-lg me-2">
-                    <img src="{{ get_user_image($reciver_data->photo,'optimized') }}" class="rounded-circle h-45" alt="">
+        <header class="gv-chat-thread__header">
+            <div class="flex items-center gap-3">
+                <div class="gv-chat-thread__avatar">
+                    <img src="{{ get_user_image($reciver_data->photo,'optimized') }}" alt="{{ $reciver_data->name }}">
                     @if ($reciver_data->isOnline())
-                        <span class="online-status active"></span>
+                        <span class="gv-chat-thread__status" aria-label="{{ get_phrase('Online') }}"></span>
                     @endif
                 </div>
-                <div class="name">
-                    <h4 class="m-0 h6">{{ $reciver_data->name }}</h4>
+                <div>
+                    <h2 class="text-lg font-semibold text-[var(--gv-color-neutral-900)] mb-0">
+                        {{ $reciver_data->name }}
+                    </h2>
                     @if ($reciver_data->isOnline())
-                        <small class="d-block">{{ get_phrase('Active now') }}</small>   
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Active now') }}</p>
                     @else
-                        <small class="d-block"> {{ \Carbon\Carbon::parse($reciver_data->lastActive)->diffForHumans();  }}</small>   
+                        <p class="gv-muted text-sm mb-0">
+                            {{ \Carbon\Carbon::parse($reciver_data->lastActive)->diffForHumans() }}
+                        </p>
                     @endif
                 </div>
-            </a>
-        </div>
-        <div class="chat-actions">
-            <a class="dropdown-toggle" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="{{ route('user.profile.view',$reciver_data->id) }}"><i class="fa fa-user"></i>
-                        {{ get_phrase('View Profile') }}</a></li>
-            </ul>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('user.profile.view',$reciver_data->id) }}" class="gv-btn gv-btn-ghost">
+                    <i class="fa-regular fa-user me-1"></i> {{ get_phrase('View profile') }}
+                </a>
+            </div>
+        </header>
 
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="modal-inner" id="messageShowDiv">
-            <div class="message-body" id="message_body">
+        <div class="gv-chat-thread__messages" id="messageShowDiv">
+            <div id="message_body">
                 @include('frontend.chat.single-message')
             </div>
         </div>
 
-     @endif   
-        
         @php
-            if(session()->has('product_ref_id')){
-                $product_url =  url('/')."/product/view/".session('product_ref_id');
-            }
+            $product_url = session()->has('product_ref_id') ? url('/')."/product/view/".session('product_ref_id') : null;
+            Session::forget('product_ref_id');
         @endphp
-        
-        <div class="mt-action"> 
-            @if(!empty($reciver_data))
-            <!-- Chat textarea -->
-            <form class="ajaxForm" id="chatMessageFieldForm" action="{{ route('chat.save') }}" method="POST" enctype="multipart/form-data">
+
+        <div class="gv-chat-composer"
+            data-gv-composer='@json($composerAssets)'
+            data-gv-gif-endpoint="{{ $composerAssets['gif']['enabled'] && $composerAssets['gif']['endpoint'] ? route('api.utilities.composer.gifs') : '' }}">
+            <div class="gv-chat-composer__toolbar">
+                <button type="button" class="gv-btn gv-btn-icon" data-gv-composer-toggle="emoji" aria-label="{{ get_phrase('Insert emoji') }}">
+                    <i class="fa-regular fa-face-smile"></i>
+                </button>
+                <button type="button" class="gv-btn gv-btn-icon" data-gv-composer-toggle="sticker" aria-label="{{ get_phrase('Insert sticker') }}">
+                    <i class="fa-regular fa-note-sticky"></i>
+                </button>
+                <button type="button" class="gv-btn gv-btn-icon" data-gv-composer-toggle="gif" aria-label="{{ get_phrase('Search GIFs') }}">
+                    <i class="fa-regular fa-file-video"></i>
+                </button>
+                <button type="button" class="gv-btn gv-btn-icon" data-gv-attachment-trigger aria-label="{{ get_phrase('Attach files') }}">
+                    <i class="fa-solid fa-paperclip"></i>
+                </button>
+            </div>
+            <form class="ajaxForm gv-chat-composer__form" id="chatMessageFieldForm" action="{{ route('chat.save') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                 <div class="nm_footer d-flex">
-                    
-                    <div class="d-flex w-100 message_b">
-                            <input type="hidden" name="reciver_id" value="{{ $reciver_data->id }}" id="">
-                            @if ($product!=null)
-                                <input type="hidden" name="product_id" value="{{ $product }}" >
-                            @endif
-                            <input type="hidden" name="thumbsup" value="0" id="ChatthumbsUpInput">
-                            <input type="text" class="form-control mb-sm-0 mb-3 ms-1 " name="message" id="ChatmessageField" value="@if(isset($product_url)&&$product_url!=null) {{ $product_url }} @endif" placeholder="Type a message">
-                            
-                            <button class="btn btn-primary send no-processing no-uploading" id="ChatsentButton"><i class="fa-solid fa-paper-plane"></i></button>
-                            {{-- <button type="submit" class="btn btn-primary  send  no_loading no-processing no-uploading"  id="ChatthumbsUp"><i class="fa-solid fa-thumbs-up"></i> </button> --}}
-                    </div>
-                   
-                 </div>
-                <button type="reset" id="messageResetBox" class="visibility-hidden">{{get_phrase('Reset')}}</button>
-                <div class="mt-footer">
-                    <div class="input-images d-hidden  image-uploader_custom_css" id="messageFileUploder">
-                    </div>
-                    <a href="javascript:void(0)" id="messgeImageUploader"><img src="{{ asset('assets/frontend/images/image-a.png') }}" alt=""></a>
-                    
+                <input type="hidden" name="reciver_id" value="{{ $reciver_data->id }}">
+                @if ($product != null)
+                    <input type="hidden" name="product_id" value="{{ $product }}">
+                @endif
+                <input type="hidden" name="thumbsup" value="0" id="ChatthumbsUpInput">
+                <textarea class="gv-chat-composer__input" name="message" id="ChatmessageField" rows="1" placeholder="{{ get_phrase('Type a message') }}">{{ $product_url }}</textarea>
+                <div class="gv-chat-composer__actions">
+                    <input type="file" name="multiple_files[]" id="chatAttachmentInput" class="sr-only" multiple>
+                    <button type="button" class="gv-btn gv-btn-text" data-gv-attachment-trigger>
+                        <i class="fa-solid fa-paperclip me-1"></i>{{ get_phrase('Add files') }}
+                    </button>
+                    <button class="gv-btn gv-btn-primary no-processing no-uploading" id="ChatsentButton">
+                        <i class="fa-solid fa-paper-plane me-1"></i>{{ get_phrase('Send') }}
+                    </button>
                 </div>
+                <button type="reset" id="messageResetBox" class="hidden">{{ get_phrase('Reset') }}</button>
             </form>
-            <!-- Button -->
-            @php
-                Session::forget('product_ref_id')
-            @endphp
-             
-              @else
-              <div style="width: 100%; height: 500px; display:flex; justify-content:center; align-items:center; font-size:20px;">
-                 <p>{{get_phrase('No Conversion Start!')}}</p>
-              </div> 
-              @endif
+            <div class="gv-composer-panels">
+                <div class="gv-composer-panel" data-gv-composer-panel="emoji">
+                    @forelse($composerAssets['emoji_packs'] as $pack)
+                        <div class="gv-composer-group">
+                            <p class="gv-composer-group__label">{{ $pack['label'] }}</p>
+                            <div class="gv-composer-grid">
+                                @foreach($pack['items'] as $emoji)
+                                    <button type="button" class="gv-composer-emoji" data-gv-insert="{{ $emoji }}">{{ $emoji }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @empty
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Emoji packs unavailable.') }}</p>
+                    @endforelse
+                </div>
+                <div class="gv-composer-panel" data-gv-composer-panel="sticker">
+                    @forelse($composerAssets['sticker_packs'] as $pack)
+                        <div class="gv-composer-group">
+                            <p class="gv-composer-group__label">{{ $pack['label'] }}</p>
+                            <div class="gv-composer-grid">
+                                @foreach($pack['items'] as $sticker)
+                                    <button type="button" class="gv-composer-sticker" data-gv-insert="{{ $sticker['emoji'] }}">
+                                        <span class="text-2xl">{{ $sticker['emoji'] }}</span>
+                                        <span class="text-xs">{{ $sticker['label'] }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @empty
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Sticker packs unavailable.') }}</p>
+                    @endforelse
+                </div>
+                <div class="gv-composer-panel" data-gv-composer-panel="gif">
+                    <form class="gv-composer-gif-search" data-gv-gif-search>
+                        <input type="search" placeholder="{{ get_phrase('Search GIFs') }}" aria-label="{{ get_phrase('Search GIFs') }}">
+                        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>
+                    <div class="gv-composer-gif-results" data-gv-gif-results>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Enter a keyword to load GIF suggestions.') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      
-    </div>
+    @else
+        <div class="gv-empty min-h-[320px] flex items-center justify-center">
+            <p class="mb-0">{{ get_phrase('Select a conversation to start messaging.') }}</p>
+        </div>
+    @endif
 </div>
 
+@push('scripts')
+    <script>
+        "use strict";
 
-
-@section('custom_js_code_for_chat')
-
-<script>
-    "use strict";
-
-    $("#ChatmessageField").emojioneArea({
-            pickerPosition: "top"
-        });
-    
-    
-    $(document).ready(function(){
-        //msg scrolling
-        var elem = document.getElementById('messageShowDiv');
-        elem.scrollTop = elem.scrollHeight;
-
-          
-        setInterval(ajaxCallForDataLoad, 4000);   
-    });
-
-    $('.input-images:not(.initialized)').imageUploader({
-        imagesInputName:'multiple_files',
-        extensions: ['.jpg','.jpeg','.png','.gif','.svg'],
-        mimes: ['image/jpeg','image/png','image/gif','image/svg+xml'],
-        label: 'Drag & Drop files here or click to browse'
-    });
-
-        // $('.emojionearea').keyup(function() {
-        //     let value = $('emojionearea').val();
-        //     let stringlength = value.length;
-        //     if(stringlength > 0){
-        //         $('#ChatsentButton').removeClass('d-none');
-        //         $('#ChatthumbsUp').addClass('d-none');
-        //         $('#ChatthumbsUpInput').val('0');
-        //     }else{
-        //         $('#ChatsentButton').addClass('d-none');
-        //         $('#ChatthumbsUp').removeClass('d-none');
-        //         $('#ChatthumbsUpInput').val('1');
-        //     }
-        // });
-
-
-    // $(document).ready(function() {
-    //     setTimeout(function() {
-    //         $('#ChatmessageField').val('');
-    //     }, 2000);
-    // });
-
-
-
-
-
-
-    //imagae upload 
-    $( "#messgeImageUploader" ).click(function() {
-        $('#ChatsentButton').removeClass('d-none');
-        $('#ChatthumbsUp').addClass('d-none');
-        $('#messageFileUploder').toggle();
-      });
-
-
-
-
-    function ajaxCallForDataLoad() {
-        var currentURL = $(location).attr('href'); 
-        var id = currentURL.substring(currentURL.lastIndexOf('/') + 1);
-        $.ajax({
-            type : 'get',
-            url : '{{URL::to('/chat/inbox/load/data/ajax/' )}}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
-            },
-            data:{'id':id},
-            success:function(response){
-                console.log(response);
-                distributeServerResponse(response);
-                if(response.content !==undefined){
-                    var elem = document.getElementById('messageShowDiv');
-                    elem.scrollTop = elem.scrollHeight;
-                } 
+        $(document).ready(function(){
+            const messageWrapper = document.getElementById('messageShowDiv');
+            if (messageWrapper) {
+                messageWrapper.scrollTop = messageWrapper.scrollHeight;
             }
+
+            window.ajaxCallForDataLoad = function () {
+                const currentURL = window.location.href;
+                const id = currentURL.substring(currentURL.lastIndexOf('/') + 1);
+                $.ajax({
+                    type : 'get',
+                    url : '{{ url('/chat/inbox/load/data/ajax/') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
+                    },
+                    data:{'id':id},
+                    success:function(response){
+                        distributeServerResponse(response);
+                        if(messageWrapper){
+                            messageWrapper.scrollTop = messageWrapper.scrollHeight;
+                        }
+                    }
+                });
+            };
+
+            setInterval(window.ajaxCallForDataLoad, 4000);
+
+            $('#chatSearch').on('keyup', function () {
+                const value = $(this).val();
+                $.ajax({
+                    type : 'get',
+                    url : '{{ url('/chat/profile/search/') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
+                    },
+                    data:{'search':value},
+                    success:function(response){
+                        $('#chatFriendList').html(response);
+                    }
+                });
+            });
+
+            $('#chatMessageFieldForm').on('submit', function(e) {
+                e.preventDefault();
+                const form = $(this)[0];
+                const formData = new FormData(form);
+
+                $.ajax({
+                    type: $(this).attr('method'),
+                    url: $(this).attr('action'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        distributeServerResponse(response);
+                        $('#ChatmessageField').val('');
+                        form.reset();
+                        setTimeout(() => {
+                            if (messageWrapper) {
+                                messageWrapper.scrollTop = messageWrapper.scrollHeight;
+                            }
+                        }, 300);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
         });
-    }
+    </script>
+@endpush
 
-
-    function ajaxCallForReadData() {
-        var currentURL = $(location).attr('href'); 
-        var id = currentURL.substring(currentURL.lastIndexOf('/') + 1);
-        $.ajax({
-            type : 'get',
-            url : '{{URL::to('/chat/inbox/read/message/ajax/' )}}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
-            },
-            data:{'id':id},
-            success:function(response){
-                console.log(response);
-            }
-        });
-    }
-
-    //chat search 
-    $("#chatSearch").keyup(function(){
-        
-        let value= $(this).val();
-        $.ajax({
-            type : 'get',
-            url : '{{URL::to('/chat/profile/search/')}}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
-            },
-            data:{'search':value},
-            success:function(response){
-                console.log(response);
-                $('#chatFriendList').html(response);
-            }
-        });
-    });
-
-    $(document).ready(function() {
-    $('#chatMessageFieldForm').on('submit', function(e) {
-        e.preventDefault(); // Prevent the form from submitting the traditional way
-        
-        var form = $(this);
-        var formData = form.serialize(); // Serialize the form data
-
-        $.ajax({
-            type: form.attr('method'),
-            url: form.attr('action'),
-            data: formData,
-            success: function(response) {
-                // Clear the input field
-                $('#ChatmessageField').val('');
-                // Optionally, you can also reset the Emoji area if you’re using emojioneArea:
-                $("#ChatmessageField").emojioneArea().data("emojioneArea").setText('');
-                
-                // Append the new message to the message body
-                $('#message_body').append(response.message); // Assuming `response.message` contains the new message HTML
-                
-                setTimeout(() => {
-                    var elem = document.getElementById('messageShowDiv');
-                    elem.scrollTop = elem.scrollHeight;
-                }, 500);
-                // Scroll to the bottom of the message container
-                
-            },
-            error: function(xhr, status, error) {
-                console.log(error); // Handle any errors here
-            }
-        });
-    });
-});
-
-
-
-
-
-</script>
-
-
-
-
-
-@endsection

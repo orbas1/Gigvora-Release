@@ -8,7 +8,17 @@ class JobRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        if (! auth()->check()) {
+            return false;
+        }
+
+        $job = $this->route('job');
+        if ($job) {
+            return auth()->user()->can('manage', $job);
+        }
+
+        $allowedRoles = (array) config('jobs.roles.employer_access', []);
+        return in_array(auth()->user()->user_role, $allowedRoles, true) || auth()->user()->can('access_admin_panel');
     }
 
     public function rules(): array

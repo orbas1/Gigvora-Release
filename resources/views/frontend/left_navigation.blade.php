@@ -1,140 +1,168 @@
+@php
+    $currentRoute = Route::currentRouteName();
+
+    $navItems = [
+        [
+            'label' => get_phrase('Feed'),
+            'route' => route('timeline'),
+            'icon' => asset('storage/images/timeline-2.svg'),
+            'active' => in_array($currentRoute, ['timeline', 'single.post']),
+        ],
+        [
+            'label' => get_phrase('Memories'),
+            'route' => route('memories'),
+            'icon' => asset('storage/images/memories.svg'),
+            'active' => $currentRoute === 'memories',
+        ],
+        [
+            'label' => get_phrase('Blog'),
+            'route' => route('blogs'),
+            'icon' => asset('storage/images/blogging-2.svg'),
+            'active' => in_array($currentRoute, ['blogs', 'create.blog', 'myblog', 'blog.edit', 'single.blog', 'category.blog']),
+        ],
+    ];
+
+    if (config('jobs.features.enabled') && Route::has('jobs.index')) {
+        $navItems[] = [
+            'label' => get_phrase('Jobs'),
+            'route' => route('jobs.index'),
+            'icon' => asset('storage/images/jobs.svg'),
+            'active' => \Illuminate\Support\Str::startsWith($currentRoute, 'jobs.') ||
+                \Illuminate\Support\Str::startsWith($currentRoute, 'employer.'),
+        ];
+    }
+
+    if (addon_status('fundraiser') == 1) {
+        $navItems[] = [
+            'label' => get_phrase('Fundraiser'),
+            'route' => route('fundraiser.index'),
+            'icon' => asset('assets/frontend/css/fundraiser/images/fundraiser/explore.svg'),
+            'active' => $currentRoute === 'fundraiser.index',
+        ];
+    }
+
+    if (addon_status('paid_content') == 1) {
+        $navItems[] = [
+            'label' => get_phrase('Paid content'),
+            'route' => route('paid.content'),
+            'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" fill="currentColor"><path d="M512 256c0 141.4-114.6 256-256 256S0 397.4 0 256 114.6 0 256 0s256 114.6 256 256Z" opacity=".25"/><path d="M270.91 131.2v32.26c19.64 1.67 37.77 5.83 54.4 12.46 10.67 3.98 19.98 8.68 27.94 14.08l-15.49 28.45c-1.19-1.18-3.35-2.79-6.44-4.79-3.12-2.01-6.94-3.99-11.42-5.94-4.49-1.95-9.36-3.65-14.57-5.1-5.27-1.33-10.49-2.01-15.63-2.02-13.73 0-23.06 2.32-27.99 6.97-4.96 4.63-7.46 10.62-7.49 18-.02 3.74.82 6.96 2.55 9.65 1.73 2.69 4.23 4.84 7.53 6.43 3.27 1.62 7.54 3.17 12.79 4.64 2.67.75 5.58 1.58 8.69 2.5 6.73 1.9 13.8 3.98 21.15 6.2 8.84 2.4 16.85 4.95 24.07 7.67 7.21 2.7 13.3 6.08 18.28 10.13 4.99 4.04 8.86 9.14 11.61 15.31 2.73 6.16 4.11 13.12 4.11 20.87 0 9.65-1.82 17.9-5.44 24.76-3.65 6.85-8.56 12.42-14.74 16.71-6.18 4.22-13.3 7.31-21.33 9.27-4.4 1.06-8.92 1.84-13.55 2.35v34.96h-30v-66.13c-7.34-.64-14.63-2.08-21.84-4.28-10.36-3.16-19.63-7.73-27.82-13.7l15.49-30.22c1.53 1.5 4.28 3.54 8.27 6.13 4.01 2.58 8.8 4.96 14.37 7.14 5.53 2.21 11.6 4.1 18.25 5.67 5.42 1.29 10.94 1.98 16.56 2.16 1.22.06 2.46.08 3.69.08 9.93 0 17.97-1.57 24.11-4.71 6.15-3.17 9.22-8.41 9.22-15.71 0-3.63-.99-6.82-2.99-9.56-1.94-2.76-5-5.13-9.17-7.12-4.13-2.02-9.04-3.93-14.74-5.76-1.69-.53-3.5-1.08-5.41-1.65-4.38-1.3-9.14-2.63-14.3-4.04-8.72-2.42-16.36-4.94-22.93-7.57-6.57-2.65-12.1-5.95-16.59-9.9-4.48-3.94-7.78-8.75-9.89-14.43-2.11-5.71-3.16-12.24-3.16-19.62 0-9.15 1.73-17.24 5.21-24.3 3.49-7.02 8.42-12.9 14.77-17.63 6.35-4.71 13.9-8.27 22.64-10.66 3.16-.87 6.43-1.55 9.81-2.07v-32.68z"/></svg>',
+            'active' => in_array($currentRoute, ['paid.content', 'creator.timeline', 'creator', 'settings', 'general.timeline']),
+        ];
+    }
+
+    $groups = \App\Models\Group_member::with('getGroup')
+        ->where('user_id', auth()->user()->id)
+        ->where('is_accepted', 1)
+        ->latest('id')
+        ->limit(6)
+        ->get()
+        ->map(function ($membership) {
+            return $membership->getGroup;
+        })
+        ->filter();
+
+    $ownedPages = \App\Models\Page::where('user_id', auth()->user()->id)
+        ->latest('id')
+        ->limit(6)
+        ->get();
+
+    $likedPages = \App\Models\Page_like::with('pageData')
+        ->where('user_id', auth()->user()->id)
+        ->latest('id')
+        ->limit(6)
+        ->get()
+        ->map(function ($like) {
+            return $like->pageData;
+        })
+        ->filter();
+
+    $pages = $ownedPages->merge($likedPages)->unique('id')->take(6);
+@endphp
+
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
     <div class="offcanvas-header res_logo d-lg-none py-4">
         <div class="logo">
-            <img class="max-width-200" width="80%"
-                src="{{ asset('storage/logo/dark/' . get_settings('system_dark_logo')) }}" alt="">
+            <img class="max-width-200" width="80%" src="{{ asset('storage/logo/dark/' . get_settings('system_dark_logo')) }}" alt="">
         </div>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close">x</button>
     </div>
     <div class="offcanvas-body s_offcanvas">
-        <div class="timeline-navigation">
-            <nav class="menu-wrap">
-                <ul>
-                    <li class="@if (Route::currentRouteName() == 'timeline' || Route::currentRouteName() == 'single.post') active @endif"><a href="{{ route('timeline') }}"><img
-                                src="{{ asset('storage/images/timeline-2.svg') }}"
-                                alt="Timeline">{{ get_phrase('Timeline') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'memories') active @endif"><a href="{{ route('memories') }}"><img
-                                src="{{ asset('storage/images/memories.svg') }}"
-                                alt="memories">{{ get_phrase('Memories') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'badge') active @endif"><a href="{{ route('badge') }}"><img
-                                src="{{ asset('storage/images/badge.svg') }}"
-                                alt="Badge">{{ get_phrase('Badge') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'profile' ||
-                            Route::currentRouteName() == 'profile.friends' ||
-                            Route::currentRouteName() == 'profile.photos' ||
-                            Route::currentRouteName() == 'profile.album' ||
-                            Route::currentRouteName() == 'profile.videos') active @endif"><a href="{{ route('profile') }}"><img
-                                src="{{ asset('storage/images/man-2.svg') }}"
-                                alt="Profile">{{ get_phrase('Profile') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'groups' ||
-                            Route::currentRouteName() == 'single.group' ||
-                            Route::currentRouteName() == 'group.people.info' ||
-                            Route::currentRouteName() == 'group.event.view' ||
-                            Route::currentRouteName() == 'single.group.photos') active @endif"><a href="{{ route('groups') }}"><img
-                                src="{{ asset('storage/images/group-2.svg') }}"
-                                alt="Group">{{ get_phrase('Group') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'pages' ||
-                            Route::currentRouteName() == 'single.page' ||
-                            Route::currentRouteName() == 'single.page.photos' ||
-                            Route::currentRouteName() == 'page.videos') active @endif"><a href="{{ route('pages') }}"><img
-                                src="{{ asset('storage/images/page-2.svg') }}"
-                                alt="Page">{{ get_phrase('Page') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'allproducts' ||
-                            Route::currentRouteName() == 'userproduct' ||
-                            Route::currentRouteName() == 'single.product' ||
-                            Route::currentRouteName() == 'filter.product' ||
-                            Route::currentRouteName() == 'product.saved') active @endif"><a
-                            href="{{ route('allproducts') }}"><img
-                                src="{{ asset('storage/images/marketplace-2.svg') }}"
-                                alt="Marketplace">{{ get_phrase('Marketplace') }}</a>
-                    </li>
-                    <li class="@if (Route::currentRouteName() == 'videos' ||
-                            Route::currentRouteName() == 'video.detail.info' ||
-                            Route::currentRouteName() == 'shorts' ||
-                            Route::currentRouteName() == 'save.all.view') active @endif"><a href="{{ route('videos') }}"><img
-                                src="{{ asset('storage/images/video-2.svg') }}"
-                                alt="Video and Shorts">{{ get_phrase('Video and Shorts') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'event' ||
-                            Route::currentRouteName() == 'userevent' ||
-                            Route::currentRouteName() == 'single.event') active @endif"><a href="{{ route('event') }}"><img
-                                src="{{ asset('storage/images/events-2.svg') }}"
-                                alt="Event">{{ get_phrase('Event') }}</a></li>
-                    <li class="@if (Route::currentRouteName() == 'blogs' ||
-                            Route::currentRouteName() == 'create.blog' ||
-                            Route::currentRouteName() == 'myblog' ||
-                            Route::currentRouteName() == 'blog.edit' ||
-                            Route::currentRouteName() == 'single.blog' ||
-                            Route::currentRouteName() == 'category.blog') active @endif"><a href="{{ route('blogs') }}"><img
-                                src="{{ asset('storage/images/blogging-2.svg') }}"
-                                alt="Blog">{{ get_phrase('Blog') }}</a></li>
-                       {{-- Job Addon  --}}
-                     @if (addon_status('job') == 1)          
-                        <li class="@if (Route::currentRouteName() == 'jobs') active @endif"><a href="{{ route('jobs') }}"><img
-                            src="{{ asset('storage/images/jobs.svg') }}"
-                            alt="Jobs">{{ get_phrase('Jobs') }}</a>
-                        </li>
+        <div class="space-y-4">
+            <div class="gv-card p-0">
+                <nav class="flex flex-col gap-1 p-4">
+                    @include('frontend.partials.nav-items', ['navItems' => $navItems])
+                </nav>
+                <div class="px-4 pb-4">
+                    @if ($groups->isNotEmpty())
+                        <div class="gv-community-collection">
+                            <p class="gv-community-collection__title">{{ get_phrase('My groups') }}</p>
+                            @foreach ($groups as $group)
+                                <a href="{{ route('single.group', $group->id) }}" class="gv-community-item">
+                                    <img src="{{ get_group_logo($group->logo, 'logo') }}" alt="{{ $group->title }}">
+                                    <span>{{ ellipsis($group->title, 26) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
                     @endif
-                    {{-- Job Addon  --}}
-                    @if (addon_status('fundraiser') == 1)
-                        <li class="@if (Route::currentRouteName() == 'fundraiser.index') active @endif"><a
-                                href="{{ route('fundraiser.index') }}"><img
-                                    src="{{ asset('assets/frontend/css/fundraiser/images/fundraiser/explore.svg') }}"
-                                    alt="Fundraiser">{{ get_phrase('Fundraiser') }}</a></li>
+                    @if ($pages->isNotEmpty())
+                        <div class="gv-community-collection">
+                            <p class="gv-community-collection__title">{{ get_phrase('My pages') }}</p>
+                            @foreach ($pages as $page)
+                                <a href="{{ route('single.page', $page->id) }}" class="gv-community-item">
+                                    <img src="{{ get_page_logo($page->logo, 'logo') }}" alt="{{ $page->title }}">
+                                    <span>{{ ellipsis($page->title, 26) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
                     @endif
-
-                    {{-- paid content --}}
-                    @if (addon_status('paid_content') == 1)
-                        <li class="@if (Route::currentRouteName() == 'paid.content' ||
-                                Route::currentRouteName() == 'creator.timeline' ||
-                                Route::currentRouteName() == 'creator' ||
-                                Route::currentRouteName() == 'settings' ||
-                                Route::currentRouteName() == 'general.timeline') active @endif">
-                            <a href="{{ route('paid.content') }}">
-                                <svg class="me-1" xmlns="http://www.w3.org/2000/svg" width="25" height="25"
-                                    version="1.1" viewBox="0 0 512 512">
-                                    <g id="surface1">
-                                        <path
-                                            d="M 512 256 C 512 324.378906 485.371094 388.671875 437.019531 437.019531 C 388.671875 485.371094 324.378906 512 256 512 C 187.621094 512 123.328125 485.371094 74.980469 437.019531 C 26.628906 388.671875 0 324.378906 0 256 C 0 187.621094 26.628906 123.328125 74.980469 74.980469 C 123.328125 26.628906 187.621094 0 256 0 C 324.378906 0 388.671875 26.628906 437.019531 74.980469 C 485.371094 123.328125 512 187.621094 512 256 Z M 512 256 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,66.666667%,12.54902%);fill-opacity:1;" />
-                                        <path
-                                            d="M 512 256 C 512 324.378906 485.371094 388.671875 437.019531 437.019531 C 388.671875 485.371094 324.378906 512 256 512 L 256 0 C 324.378906 0 388.671875 26.628906 437.019531 74.980469 C 485.371094 123.328125 512 187.621094 512 256 Z M 512 256 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,53.72549%,0%);fill-opacity:1;" />
-                                        <path
-                                            d="M 458 256 C 458 367.378906 367.378906 458 256 458 C 144.621094 458 54 367.378906 54 256 C 54 144.621094 144.621094 54 256 54 C 367.378906 54 458 144.621094 458 256 Z M 458 256 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,92.54902%,59.215686%);fill-opacity:1;" />
-                                        <path
-                                            d="M 458 256 C 458 367.378906 367.378906 458 256 458 L 256 54 C 367.378906 54 458 144.621094 458 256 Z M 458 256 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,85.882353%,17.647059%);fill-opacity:1;" />
-                                        <path
-                                            d="M 325.988281 292.609375 C 325.988281 302.261719 324.171875 310.511719 320.53125 317.371094 C 316.890625 324.230469 311.980469 329.78125 305.800781 334.011719 C 299.621094 338.238281 292.5 341.328125 284.460938 343.28125 C 280.058594 344.339844 275.539062 345.109375 270.910156 345.589844 L 270.910156 380.550781 L 240.910156 380.550781 L 240.910156 344.929688 C 233.570312 343.921875 226.289062 342.328125 219.058594 340.101562 C 205.851562 336.039062 194 330.28125 183.5 322.828125 L 198.988281 292.609375 C 200.519531 294.128906 203.269531 296.121094 207.25 298.570312 C 211.21875 301.03125 215.921875 303.488281 221.339844 305.941406 C 226.761719 308.398438 232.769531 310.46875 239.378906 312.160156 C 244.800781 313.558594 250.339844 314.371094 256 314.609375 C 257.230469 314.671875 258.460938 314.699219 259.699219 314.699219 C 279 314.699219 288.648438 308.519531 288.648438 296.160156 C 288.648438 292.269531 287.550781 288.96875 285.351562 286.261719 C 283.148438 283.550781 280.019531 281.179688 275.949219 279.140625 C 271.890625 277.109375 266.980469 275.25 261.21875 273.558594 C 259.539062 273.058594 257.800781 272.550781 256 272.03125 C 251.648438 270.761719 246.949219 269.410156 241.921875 267.96875 C 233.28125 265.601562 225.789062 263.011719 219.441406 260.21875 C 213.089844 257.429688 207.789062 254.121094 203.558594 250.308594 C 199.328125 246.5 196.148438 242.101562 194.039062 237.109375 C 191.921875 232.109375 190.859375 226.148438 190.859375 219.199219 C 190.859375 210.058594 192.550781 201.929688 195.941406 194.820312 C 199.328125 187.699219 204.03125 181.78125 210.039062 177.039062 C 216.050781 172.300781 223.03125 168.699219 231 166.238281 C 234.199219 165.25 237.511719 164.46875 240.910156 163.878906 L 240.910156 131.199219 L 270.910156 131.199219 L 270.910156 163.460938 C 278.21875 164.398438 285.148438 166.089844 291.699219 168.53125 C 302.371094 172.511719 311.679688 177.210938 319.640625 182.621094 L 304.148438 211.070312 C 302.960938 209.890625 300.800781 208.28125 297.671875 206.25 C 294.539062 204.210938 290.71875 202.230469 286.238281 200.28125 C 281.75 198.328125 276.878906 196.679688 271.640625 195.320312 C 266.5 194 261.289062 193.320312 256 193.300781 C 255.878906 193.289062 255.75 193.289062 255.628906 193.289062 C 245.980469 193.289062 238.78125 195.070312 234.039062 198.628906 C 229.300781 202.179688 226.929688 207.179688 226.929688 213.609375 C 226.929688 217.339844 227.820312 220.429688 229.601562 222.878906 C 231.378906 225.339844 233.960938 227.5 237.351562 229.359375 C 240.730469 231.230469 245 232.921875 250.171875 234.441406 C 252.011719 234.980469 253.949219 235.539062 256 236.101562 C 259.691406 237.121094 263.710938 238.179688 268.078125 239.269531 C 276.878906 241.640625 284.878906 244.179688 292.078125 246.890625 C 299.28125 249.601562 305.371094 252.980469 310.371094 257.050781 C 315.359375 261.109375 319.21875 265.980469 321.929688 271.648438 C 324.628906 277.328125 325.988281 284.308594 325.988281 292.609375 Z M 325.988281 292.609375 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,66.666667%,12.54902%);fill-opacity:1;" />
-                                        <path
-                                            d="M 271.640625 195.320312 C 266.5 194 261.289062 193.320312 256 193.300781 L 256 131.199219 L 270.910156 131.199219 L 270.910156 163.460938 C 278.21875 164.398438 285.148438 166.089844 291.699219 168.53125 C 302.371094 172.511719 311.679688 177.210938 319.640625 182.621094 L 304.148438 211.070312 C 302.960938 209.890625 300.800781 208.28125 297.671875 206.25 C 294.539062 204.210938 290.71875 202.230469 286.238281 200.28125 C 281.75 198.328125 276.878906 196.679688 271.640625 195.320312 Z M 271.640625 195.320312 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,53.72549%,0%);fill-opacity:1;" />
-                                        <path
-                                            d="M 325.988281 292.609375 C 325.988281 302.261719 324.171875 310.511719 320.53125 317.371094 C 316.890625 324.230469 311.980469 329.78125 305.800781 334.011719 C 299.621094 338.238281 292.5 341.328125 284.460938 343.28125 C 280.058594 344.339844 275.539062 345.109375 270.910156 345.589844 L 270.910156 380.550781 L 256 380.550781 L 256 314.609375 C 257.230469 314.671875 258.460938 314.699219 259.699219 314.699219 C 279 314.699219 288.648438 308.519531 288.648438 296.160156 C 288.648438 292.269531 287.550781 288.96875 285.351562 286.261719 C 283.148438 283.550781 280.019531 281.179688 275.949219 279.140625 C 271.890625 277.109375 266.980469 275.25 261.21875 273.558594 C 259.539062 273.058594 257.800781 272.550781 256 272.03125 L 256 236.101562 C 259.691406 237.121094 263.710938 238.179688 268.078125 239.269531 C 276.878906 241.640625 284.878906 244.179688 292.078125 246.890625 C 299.28125 249.601562 305.371094 252.980469 310.371094 257.050781 C 315.359375 261.109375 319.21875 265.980469 321.929688 271.648438 C 324.628906 277.328125 325.988281 284.308594 325.988281 292.609375 Z M 325.988281 292.609375 "
-                                            style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,53.72549%,0%);fill-opacity:1;" />
-                                    </g>
-                                </svg>
-                                {{ get_phrase('Paid content') }}</a>
-                        </li>
-                    @endif
-                </ul>
-            </nav>
-            <div class="footer-nav">
-                <div class="footer-menu">
-                    <ul>
-                        <li><a href="{{ route('about.view') }}">{{ get_phrase('About') }}</a></li>
-                        <li><a href="{{ route('policy.view') }}">{{ get_phrase('Privacy Policy') }}</a></li>
-                    </ul>
-                </div>
-                <div class="copy-rights text-muted">
-                    @php
-                        $sitename = \App\Models\Setting::where('type', 'system_name')->value('description');
-                    @endphp
-                    <p>© {{ date('Y') }} {{ $sitename }}</p>
                 </div>
             </div>
+            <div class="gv-card text-sm text-[var(--gv-color-neutral-500)] space-y-2 p-4">
+                <div class="flex gap-4 text-xs uppercase tracking-wide text-[var(--gv-color-neutral-400)]">
+                    <a href="{{ route('about.view') }}">{{ get_phrase('About') }}</a>
+                    <a href="{{ route('policy.view') }}">{{ get_phrase('Privacy Policy') }}</a>
+                </div>
+                <p class="text-xs">© {{ date('Y') }} {{ get_settings('system_name') }}</p>
+            </div>
         </div>
+    </div>
+</div>
+
+<div class="hidden lg:block space-y-4">
+    <div class="gv-card p-0">
+        <nav class="flex flex-col gap-1 p-4">
+            @include('frontend.partials.nav-items', ['navItems' => $navItems])
+        </nav>
+        <div class="px-4 pb-4">
+            @if ($groups->isNotEmpty())
+                <div class="gv-community-collection">
+                    <p class="gv-community-collection__title">{{ get_phrase('My groups') }}</p>
+                    @foreach ($groups as $group)
+                        <a href="{{ route('single.group', $group->id) }}" class="gv-community-item">
+                            <img src="{{ get_group_logo($group->logo, 'logo') }}" alt="{{ $group->title }}">
+                            <span>{{ ellipsis($group->title, 26) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+            @if ($pages->isNotEmpty())
+                <div class="gv-community-collection">
+                    <p class="gv-community-collection__title">{{ get_phrase('My pages') }}</p>
+                    @foreach ($pages as $page)
+                        <a href="{{ route('single.page', $page->id) }}" class="gv-community-item">
+                            <img src="{{ get_page_logo($page->logo, 'logo') }}" alt="{{ $page->title }}">
+                            <span>{{ ellipsis($page->title, 26) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+    <div class="gv-card text-sm text-[var(--gv-color-neutral-500)] space-y-2 p-4">
+        <div class="flex gap-4 text-xs uppercase tracking-wide text-[var(--gv-color-neutral-400)]">
+            <a href="{{ route('about.view') }}">{{ get_phrase('About') }}</a>
+            <a href="{{ route('policy.view') }}">{{ get_phrase('Privacy Policy') }}</a>
+        </div>
+        <p class="text-xs">© {{ date('Y') }} {{ get_settings('system_name') }}</p>
     </div>
 </div>

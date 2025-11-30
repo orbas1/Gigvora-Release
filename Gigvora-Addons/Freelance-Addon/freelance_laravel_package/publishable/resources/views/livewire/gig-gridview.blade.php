@@ -32,7 +32,7 @@
                                 }
                             @endphp
 
-                            <a href="{{route('gig-detail',['slug' => $gig->slug])}}">
+                            <a href="{{route('freelance.gigs.detail',['slug' => $gig->slug])}}">
                                 <img src="{{ asset($gig_image) }}" alt="{{ __('gig.alt_image') }}">
                             </a>
                             @if($roleName == 'buyer' || Auth::guest())
@@ -51,14 +51,14 @@
                             <div class="tk-topservicetask__content">
                                 <div class="tk-title-wrapper">
                                     <div class="tk-card-title">
-                                        <a href="{{route('seller-profile', ['slug' => $gig->gigAuthor->slug ])}}">
+                                        <a href="{{route('freelance.sellers.profile', ['slug' => $gig->gigAuthor->slug ])}}">
                                             {{$gig->gigAuthor->full_name}}
                                         </a>
                                         @if($gig->gigAuthor->user->userAccountSetting->verification == 'approved')
                                             <x-verified-tippy /> 
                                         @endif
                                     </div>
-                                    <h5><a href="{{route('gig-detail',['slug' => $gig->slug])}}">{{$gig->title}}</a></h5>
+                                    <h5><a href="{{route('freelance.gigs.detail',['slug' => $gig->slug])}}">{{$gig->title}}</a></h5>
                                 </div>
                                 <div class="tk-featureRating">
                                     <div class="tk-featureRating tk-featureRatingv2">

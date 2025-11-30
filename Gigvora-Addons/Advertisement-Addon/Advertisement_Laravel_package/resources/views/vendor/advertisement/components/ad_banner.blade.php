@@ -1,10 +1,14 @@
-<div class="gigvora-ad gigvora-ad--banner my-3" data-ad-id="{{ $ad->id ?? '' }}" aria-label="Gigvora banner advertisement">
-    <div class="gigvora-ad__shell d-flex align-items-center justify-content-between p-3 border rounded">
-        <div class="gigvora-ad__body">
-            <p class="text-muted small mb-1">{{ __('Sponsored') }}</p>
-            <h6 class="mb-1">{{ $ad->title ?? 'Banner Ad' }}</h6>
-            <p class="text-muted mb-0">{{ $ad->description ?? 'Promotional text appears here.' }}</p>
+<article class="gv-ad-banner" data-ad-id="{{ $ad->id ?? '' }}" aria-label="{{ __('Sponsored placement') }}">
+    <div class="gv-ad-banner__copy">
+        <p class="gv-ad-chip gv-ad-chip--ghost mb-2">{{ __('Sponsored') }}</p>
+        <h4 class="gv-ad-banner__title">{{ $ad->title ?? __('Promoted update') }}</h4>
+        <p class="gv-ad-banner__text">{{ $ad->description ?? __('Reach Gigvora profiles, pages, and groups with premium creatives styled by the design system.') }}</p>
+        <div class="gv-ad-banner__meta">
+            <span>{{ $ad->display_url ?? parse_url($ad->url ?? '', PHP_URL_HOST) }}</span>
+            @if(!empty($ad->metrics['ctr']))
+                <span>{{ __('CTR') }} {{ $ad->metrics['ctr'] }}</span>
+            @endif
         </div>
-        <a href="{{ $ad->url ?? '#' }}" class="btn btn-primary">{{ $ad->cta ?? __('Learn more') }}</a>
     </div>
-</div>
+    <a href="{{ $ad->url ?? '#' }}" class="gv-btn gv-btn-gradient gv-btn-md">{{ $ad->cta ?? __('Boost now') }}</a>
+</article>

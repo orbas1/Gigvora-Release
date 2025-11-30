@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './gigvora/tokens.css';
+
+body {
+    font-family: var(--gv-font-family-base, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    color: var(--gv-color-neutral-800);
+    background-color: var(--gv-color-neutral-50);
+}
+
+a {
+    color: var(--gv-color-primary-600);
+    transition: var(--gv-transition-base);
+}
+
+a:hover {
+    color: var(--gv-color-primary-700);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: none;
+    box-shadow: var(--gv-focus-ring);
+    border-color: var(--gv-color-primary-500);
+}
+
+.gv-skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--gv-color-primary-600);
+    color: #fff;
+    padding: var(--gv-space-2) var(--gv-space-4);
+    border-radius: 0 0 var(--gv-radius-sm) var(--gv-radius-sm);
+    transition: var(--gv-transition-base);
+    z-index: 999;
+}
+
+.gv-skip-link:focus {
+    top: 0;
+}
+

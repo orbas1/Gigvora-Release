@@ -1,46 +1,44 @@
-<div class="page-content ng_page_tab">
-    <div class="page-tab bg-white   p-3 pb-1">
-        <div class="d-flex pagetab-head  justify-content-between">
-            <h3 class="h5"><span><i class="fa fa-flag"></i></span> {{get_phrase('Pages')}}</h3>
-            <a href="javascript:void(0)" onclick="showCustomModal('{{route('load_modal_content', ['view_path' => 'frontend.pages.create_page'])}}', '{{get_phrase('Create Page')}}');"  data-bs-toggle="modal"
-                data-bs-target="#createPage" class="btn common_btn"> <i class="fa fa-plus-circle"></i>{{get_phrase('Create Page')}}</a>
+<div class="gv-card space-y-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Communities & companies') }}</p>
+            <h2 class="gv-heading text-lg mb-0">{{ get_phrase('Pages you manage & follow') }}</h2>
         </div>
-        <ul class="nav ct-tab mt-1" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="mypage-tab" data-bs-toggle="tab"
-                    data-bs-target="#mypage" type="button" role="tab" aria-controls="mypage"
-                    aria-selected="true">{{ get_phrase('My Pages') }} </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="suggest-page-tab" data-bs-toggle="tab"
-                    data-bs-target="#suggest-page" type="button" role="tab"
-                    aria-controls="suggest-page" aria-selected="false"> {{ get_phrase('Suggested Pages') }}</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="linked-page-tab" data-bs-toggle="tab"
-                    data-bs-target="#linked-page" type="button" role="tab"
-                    aria-controls="linked-page" aria-selected="false">{{ get_phrase('Liked Pages') }}</button>
-            </li>
-        </ul>
+        <button class="gv-btn gv-btn-primary"
+            onclick="showCustomModal('{{ route('load_modal_content', ['view_path' => 'frontend.pages.create_page']) }}', '{{ get_phrase('Create Page') }}');"
+            data-bs-toggle="modal" data-bs-target="#createPage">
+            <i class="fa-solid fa-plus"></i> {{ get_phrase('Create Page') }}
+        </button>
     </div>
-    <div class="tab-content bg-white p-3 rounded mt-3" id="myTabContent">
-        <div class="tab-pane fade show active" id="mypage" role="tabpanel"
-            aria-labelledby="mypage-tab">
-                @include('frontend.pages.single-page')
-        </div><!--  Tab Pane End -->
-        
-        <div class="tab-pane fade" id="suggest-page" role="tabpanel"
-            aria-labelledby="suggest-page-tab">
-            
+
+    <ul class="gv-profile-tabs">
+        <li>
+            <button class="gv-nav-link gv-nav-link--active" data-bs-toggle="tab" data-bs-target="#mypage" type="button">
+                {{ get_phrase('My Pages') }}
+            </button>
+        </li>
+        <li>
+            <button class="gv-nav-link" data-bs-toggle="tab" data-bs-target="#suggest-page" type="button">
+                {{ get_phrase('Suggested') }}
+            </button>
+        </li>
+        <li>
+            <button class="gv-nav-link" data-bs-toggle="tab" data-bs-target="#linked-page" type="button">
+                {{ get_phrase('Liked Pages') }}
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pagesTab">
+        <div class="tab-pane fade show active" id="mypage">
+            @include('frontend.pages.single-page')
+        </div>
+        <div class="tab-pane fade" id="suggest-page">
             @include('frontend.pages.suggested')
-
-        </div><!--  Tab Pane End -->
-        <div class="tab-pane fade" id="linked-page" role="tabpanel"
-            aria-labelledby="linked-page-tab">
-
+        </div>
+        <div class="tab-pane fade" id="linked-page">
             @include('frontend.pages.liked-page')
-            
-        </div><!--  Tab Pane End -->
-    </div> <!-- Tab Content End -->
-</div> <!-- Page Content End -->
+        </div>
+    </div>
+</div>
 

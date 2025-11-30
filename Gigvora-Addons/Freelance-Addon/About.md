@@ -31,12 +31,30 @@ This will sit **inside a social/LinkedIn-style platform**, sharing users but add
 - **Menu integration**: use `resources/views/components/navigation/freelance-menu.blade.php` for web (Gigvora tokens + BEM classes) and `buildFreelanceMenu` in the Flutter add-on to merge items into existing drawers/tabs depending on the current role.
 - **Authentication**: rely on the host Gigvora login/registration/reset flows only—no additional login UI or API endpoints should be enabled inside the freelance add-on.
 
-### Layout & navigation glue (web + mobile)
+### Layout, assets & navigation glue (web + mobile)
 
 - Web views should extend the shared `layouts.freelance` wrapper (which itself extends `layouts.app`) so the host header/footer are preserved, the freelance navigation component is injected once, and the `freelance-shell` grid provides consistent spacing.
 - The `freelance-menu` Blade component now pulls its role gates from `config('freelance.default_roles')` and only renders when the authenticated user has the matching role; unauthenticated visitors see a one-line reminder that Gigvora single sign-on applies.
-- Styling for the menu is centralized in `resources/css/freelance/navigation.css` (BEM classes, Gigvora tokens) and loaded via Vite through the layout/component.
+- Styling/assets are centralized in `resources/css/freelance/app.css` and `resources/js/freelance/app.js`. Both are compiled via Mix/Vite (see `webpack.mix.js`) and injected through `freelance::layouts.freelance`, so no Blade file should load ad‑hoc CSS/JS anymore.
 - Flutter should keep using the host’s navigation container; call `buildFreelanceMenu` to fetch role-filtered items and inject them into the existing drawer/tab model rather than spawning a new stack.
+- Route prefixes/middleware are driven by `config('freelance.web.prefix')`/`config('freelance.api.prefix')` (default `/freelance/*` and `/api/freelance/*`). Update `.env` (`FREELANCE_WEB_PREFIX`, `FREELANCE_WEB_MIDDLEWARE`, `FREELANCE_API_PREFIX`, `FREELANCE_API_MIDDLEWARE`) to match your Sociopro guard stack.
+- Flutter integrations now rely on `freelance_phone_addon` and the new `FreelanceAddonIntegration` helpers. The Gigvora shell wires them through `FreelanceIntegrationOptions` (see `Gigvora Flutter Mobile App/App/lib/addons_integration.dart`) so every `/freelance/*` route is wrapped inside a `ProviderScope` with base URL, API prefix, token provider, and optional timeout overrides.
+
+### Database & migrations
+
+- Publishable migrations live in `freelance_laravel_package/publishable/database/migrations` and cover:  
+  - **Core entities**: `projects`, `gigs`, `gig_orders`, `gig_order_activities`, `project_activities`, `project_categories`, `gig_categories`, `gig_category_features`, `gig_plans`, `gig_addons`, `gig_faqs`, `gig_tags`, `gig_category_link`.  
+  - **Taxonomy/lookups**: `project_durations`, `project_locations`, `escrow_disburse_methods`.  
+  - **Collaboration**: `seller_project_invites`, `disputes`, `dispute_conversations`.  
+  - **Extensibility**: `freelance_extensions` (2024_01_01_000000) for feature toggles/timestamps.
+- All tables store foreign keys as profile/user IDs (unsigned bigints) but defer actual FK constraints so they can point at Sociopro’s existing `profiles`/`users` tables. Add optional FK constraints if your host database allows.
+- Most columns already include fulltext indexes (MySQL) on titles/descriptions and btree indexes on status/budget fields, aligning with feed/search requirements; keep those indexes intact.
+- Apply migrations from the package without publishing duplicates:  
+  ```
+  php artisan migrate --path=Gigvora-Addons/Freelance-Addon/freelance_laravel_package/publishable/database/migrations
+  ```  
+  Run this after configuring your prefixes to ensure `/api/freelance/*` works out of the box.
+- There are no default seeders in the package; seed project/gig categories, skills, and locations via your host seeder (or create a dedicated `FreelanceSeeder` in your app and call it from `DatabaseSeeder`).
 
 > ⚠️ Do **not** add or touch binary files (images, fonts, compiled JS/CSS bundles, `.exe`, `.dll`, `.so`, `.apk`, `.ipa`, etc.). Only templates, Dart/JS/TS, CSS/SCSS and configuration.
 

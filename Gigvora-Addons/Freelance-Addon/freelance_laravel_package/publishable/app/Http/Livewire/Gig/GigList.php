@@ -46,7 +46,9 @@ class GigList extends Component
         $sitInfo    = getSiteInfo();
         $siteTitle  = $sitInfo['site_name'];
         $title      = $siteTitle . ' | ' . __('general.my_gigs'); 
-        return view('livewire.gig.gig-list', compact('gigs'))->extends('layouts.app',  compact('title'));
+        return view('livewire.gig.gig-list', compact('gigs'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function updateStatus($status, $id){

@@ -44,7 +44,7 @@ class Checkout extends Component
         $package_data    = session()->get('package_data');
         $gig_data        = session()->get('gig_data');
         if( empty($project_data) && empty($package_data) && empty($gig_data) ){
-            return redirect()->route('settings');
+            return redirect()->route('freelance.settings');
         }
         $user                   = getUserRole();
         $this->profile_id       = $user['profileId'];
@@ -109,7 +109,9 @@ class Checkout extends Component
 
         // }
         $title = __('general.checkout');
-        return view('livewire.components.checkout', compact('countries', 'project_data', 'package_data', 'gig_data'))->extends('layouts.app', compact('title'));
+        return view('livewire.components.checkout', compact('countries', 'project_data', 'package_data', 'gig_data'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     function updatedCountryId( $id ){
@@ -241,7 +243,7 @@ class Checkout extends Component
                 $paymentService->createProjectTransaction($validated_data);
             }elseif( !empty($validated_data['gig_data']) ){
                 $paymentService->createGigOrderTransaction($validated_data);
-                $validated_data['return_url'] = !empty($response['return_url']) ? $response['return_url'] : route('dashboard');
+                $validated_data['return_url'] = !empty($response['return_url']) ? $response['return_url'] : route('freelance.dashboard');
             }elseif( !empty($validated_data['package_data']) ){
                 $paymentService->createPackageTransaction($validated_data);
             }
@@ -260,7 +262,7 @@ class Checkout extends Component
             $validated_data['proposal_id']          = $project_data['proposal_id'];
             $validated_data['milestone_id']         = !empty($project_data['milestone_id']) ? $project_data['milestone_id'] : 0;
             $validated_data['timecard_id']          = !empty($project_data['timecard_id']) ? $project_data['timecard_id'] : 0;
-            $validated_data['return_url']           = route('project-activity', ['slug' => $project_data['project_slug'], 'id'=> $project_data['proposal_id']]);
+            $validated_data['return_url']           = route('freelance.projects.activity', ['slug' => $project_data['project_slug'], 'id'=> $project_data['proposal_id']]);
 
         }elseif( !empty($package_data) ){
 
@@ -282,7 +284,7 @@ class Checkout extends Component
             $validated_data['plan_price']           = $gig_data['plan_price'];
             $validated_data['gig_addons']           = $gig_data['gig_addons'];
             $validated_data['downloadable']         = $gig_data['downloadable'];
-            $validated_data['return_url']           = route('dashboard');
+            $validated_data['return_url']           = route('freelance.dashboard');
         }
 
         $validated_data['project_data']   = $project_data;
@@ -393,7 +395,7 @@ class Checkout extends Component
             $response = $paymentService->createProjectTransaction($params, $transaction);
         }elseif( !empty($params['gig_data']) ){
             $response = $paymentService->createGigOrderTransaction($params, $transaction);
-            $response['return_url'] = !empty($response['return_url']) ? $response['return_url'] : route('dashboard');
+            $response['return_url'] = !empty($response['return_url']) ? $response['return_url'] : route('freelance.dashboard');
         }elseif( !empty($params['package_data']) ){
             $params['package_id']       = $transaction->TransactionDetail->type_ref_id;
             $params['package_price']    = $transaction->TransactionDetail->amount;
@@ -418,7 +420,7 @@ class Checkout extends Component
         if($request['payment_method'] == 'payfast') {
             return $this->handleCompleteTransaction([
                 'type' => 'success',
-                'return_url' => route('invoices'),
+                'return_url' => route('freelance.invoices.index'),
                 'flash_message' => __('settings.payment_success_msg')
             ]);
         } else {
@@ -428,7 +430,7 @@ class Checkout extends Component
                 if (!empty($paymentData) && $paymentData['status'] == Response::HTTP_OK) {
                     return $this->paymentSuccess($paymentData);
                 } else {
-                    return redirect(route('invoices'))->with('payment_cancel',__('general.payment_cancelled_desc'));
+                    return redirect(route('freelance.invoices.index'))->with('payment_cancel',__('general.payment_cancelled_desc'));
                 }
             }
 

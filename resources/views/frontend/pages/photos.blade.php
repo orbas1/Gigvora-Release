@@ -10,7 +10,7 @@
                 
                 <div class="friends-tab pg_tab_main ct-tab bg-white radius-8">
                     <div class="d-flex align-items-center justify-content-between gp_grap">
-                        <h3 class="h6 fw-7 m-0">{{get_phrase('Photos')}}</h3>
+                        <h3 class="h6 fw-7 m-0">{{get_phrase('Photos & Reels')}}</h3>
                         <div class="gap_m e_media d-flex align-items-center justify-content-end gap-2">
                                 <a onclick="showCustomModal('{{route('load_modal_content', ['view_path' => 'frontend.profile.album_create_form','page_id'=>$page->id])}}', '{{get_phrase('Create Album')}}');" data-bs-toggle="modal" data-bs-target="#albumModal"
                                     class="btn media_text">

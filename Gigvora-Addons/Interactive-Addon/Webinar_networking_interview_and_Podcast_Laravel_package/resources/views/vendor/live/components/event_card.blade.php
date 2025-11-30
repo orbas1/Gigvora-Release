@@ -1,19 +1,60 @@
 @php
-    $cta = $cta ?? 'View Details';
+    use Illuminate\Support\Str;
+
+    $title = $title ?? get_phrase('Live event');
+    $description = $description ?? null;
+    $meta = $meta ?? null;
+    $caption = $caption ?? null;
+    $status = $status ?? null;
+    $tag = $tag ?? null;
+    $cta = $cta ?? get_phrase('View details');
+    $href = $href ?? '#';
 @endphp
-<div class="card h-100 shadow-sm">
-    <div class="card-body d-flex flex-column">
-        <div class="d-flex align-items-center mb-2">
-            <div class="flex-grow-1">
-                <h5 class="card-title mb-1">{{ $title ?? 'Event Title' }}</h5>
-                <p class="card-subtitle text-muted small">{{ $host ?? 'Host name' }} • {{ $datetime ?? 'Date & Time' }}</p>
+
+<article class="gv-card space-y-3">
+    <div class="flex items-start justify-between gap-3">
+        <div class="space-y-1">
+            @if (!empty($eyebrow))
+                <p class="gv-eyebrow mb-1">{{ $eyebrow }}</p>
+            @endif
+            <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)]">
+                {{ $title }}
+            </h3>
+            <div class="text-sm text-[var(--gv-color-neutral-500)] flex flex-wrap gap-2">
+                @if ($caption)
+                    <span>{{ $caption }}</span>
+                @endif
+                @if ($meta)
+                    <span>{{ $meta }}</span>
+                @endif
             </div>
-            <span class="badge bg-light text-dark border">{{ $tag ?? 'Free' }}</span>
         </div>
-        <p class="text-muted mb-3">{{ $description ?? 'Short description of the event goes here.' }}</p>
-        <div class="d-flex align-items-center mt-auto">
-            <span class="badge bg-{{ ($status ?? 'Scheduled') === 'Live' ? 'danger' : 'secondary' }} me-2">{{ $status ?? 'Scheduled' }}</span>
-            <a href="{{ $href ?? '#' }}" class="btn btn-sm btn-primary ms-auto">{{ $cta }}</a>
+        <div class="flex flex-col items-end gap-2 text-sm">
+            @if ($status)
+                <span class="gv-pill {{ Str::of($status)->lower()->contains('live') ? 'gv-pill--danger' : '' }}">
+                    {{ $status }}
+                </span>
+            @endif
+            @if ($tag)
+                <span class="gv-pill gv-pill--success">
+                    {{ $tag }}
+                </span>
+            @endif
         </div>
     </div>
-</div>
+
+    @if ($description)
+        <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+            {{ $description }}
+        </p>
+    @endif
+
+    <div class="flex items-center justify-between gap-3">
+        <div class="text-sm text-[var(--gv-color-neutral-500)]">
+            {{ $detail ?? '' }}
+        </div>
+        <a href="{{ $href }}" class="gv-btn gv-btn-ghost">
+            {{ $cta }}
+        </a>
+    </div>
+</article>

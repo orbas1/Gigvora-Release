@@ -1,43 +1,40 @@
-@foreach ( $previousChatList as $previousChatList)
+@forelse ($previousChatList as $thread)
     @php
-        $msg_starter_id = $previousChatList->sender_id == auth()->user()->id ? $previousChatList->reciver_id:$previousChatList->sender_id;
-        if($msg_starter_id==auth()->user()->id){
+        $msgStarterId = $thread->sender_id == auth()->user()->id ? $thread->reciver_id : $thread->sender_id;
+        if ($msgStarterId == auth()->user()->id) {
             continue;
         }
-        $user = \App\Models\User::find($msg_starter_id);
-        $lastMsg = \App\Models\Chat::where('message_thrade',$previousChatList->id)->orderBy('id', 'desc')->first();
-        $unreadMsgCount = \App\Models\Chat::where('message_thrade',$previousChatList->id)->where('reciver_id',$user->id)->where('read_status', '0')->count();
+        $user = \App\Models\User::find($msgStarterId);
+        if (!$user) {
+            continue;
+        }
+        $lastMsg = \App\Models\Chat::where('message_thrade', $thread->id)->orderBy('id', 'desc')->first();
+        $unreadMsgCount = \App\Models\Chat::where('message_thrade', $thread->id)->where('reciver_id', auth()->user()->id)->where('read_status', '0')->count();
+        $isActive = isset($reciver_data) && $reciver_data && $reciver_data->id === $user->id;
     @endphp
-    <div class="single-contact message_ava d-flex align-items-center justify-content-between @if($unreadMsgCount>1) bg-my-black @endif">
-            <div class="avatar d-flex align-items-center">
-                <a href="{{ route('chat',$user->id) }}" class="d-flex align-items-center">
-                    <div class="avatar">
-                        <img src="{{ get_user_image($user->photo,'optimized') }}" class="img-fluid rounded-circle w-100" alt="">
-                        @if ($user->isOnline())
-                            <span class="online-status active"></span>
-                        @endif
-                    </div>
-                </a>
-                <div class="avatar-info">
-                    <a href="{{ route('chat',$user->id) }}"><h3 class="h6 mb-0">{{ $user->name }}</h3></a>
-                    <span>
-                        @if(!empty($lastMsg->thumbsup))
-                                <i class="fa-solid fa-thumbs-up fs-6"></i>
-                        @else
-                            <a href="{{ route('chat',$user->id) }}">{{ isset($lastMsg->message) ? ellipsis($lastMsg->message,30):"" }} @if ($unreadMsgCount>1) <span class="badge bg-primary">{{ $unreadMsgCount }}</span>@endif</a>
-                        @endif
-                    </span>
-                </div>
-            </div>
-            <div class="m-user-action">
-                <div class="post-controls dropdown dotted">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{{ route('user.profile.view',$user->id) }}"><i class="fa fa-user"></i> {{ get_phrase('View Profile') }} </a></li>
-                    </ul>
-                </div>
-            </div>
-    </div> 
-@endforeach
+    <a href="{{ route('chat', $user->id) }}" class="gv-conversation-row {{ $isActive ? 'gv-conversation-row--active' : '' }}">
+        <div class="gv-conversation-row__avatar">
+            <img src="{{ get_user_image($user->photo,'optimized') }}" alt="{{ $user->name }}">
+            @if ($user->isOnline())
+                <span class="gv-conversation-row__status" aria-label="{{ get_phrase('Online') }}"></span>
+            @endif
+        </div>
+        <div class="gv-conversation-row__body">
+            <p class="gv-conversation-row__name">{{ $user->name }}</p>
+            <p class="gv-conversation-row__preview">
+                @if(!empty($lastMsg?->thumbsup))
+                    <i class="fa-solid fa-thumbs-up me-1"></i>{{ get_phrase('Reacted') }}
+                @else
+                    {{ isset($lastMsg->message) ? ellipsis(strip_tags($lastMsg->message), 42) : get_phrase('New conversation') }}
+                @endif
+            </p>
+        </div>
+        @if ($unreadMsgCount > 0)
+            <span class="gv-badge gv-badge-primary">{{ $unreadMsgCount }}</span>
+        @endif
+    </a>
+@empty
+    <div class="gv-empty">
+        <p class="mb-0">{{ get_phrase('No conversations yet.') }}</p>
+    </div>
+@endforelse

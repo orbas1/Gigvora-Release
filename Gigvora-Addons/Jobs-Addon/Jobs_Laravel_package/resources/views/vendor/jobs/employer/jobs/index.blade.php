@@ -1,72 +1,62 @@
 @extends('layouts.app')
 
-@section('title', 'My Jobs')
+@section('title', get_phrase('Jobs'))
 
-@section('breadcrumbs')
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/employer">Employer</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Jobs</li>
-    </ol>
-</nav>
+@section('page-header')
+    <div class="flex items-center justify-between flex-wrap gap-2">
+        <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Job postings') }}</h1>
+        <a class="gv-btn gv-btn-primary" href="{{ route('employer.jobs.create') }}">
+            <i class="fa-solid fa-plus me-2"></i>{{ get_phrase('Post a job') }}
+        </a>
+    </div>
 @endsection
 
 @section('content')
-<div class="container py-4" id="employer-jobs-list">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Jobs</h1>
-        <a class="btn btn-primary" href="{{ route('employer.jobs.create') }}">Post a Job</a>
-    </div>
-    <div class="mb-3">
-        <div class="d-flex flex-wrap gap-2">
-            @foreach(['draft' => 'Draft', 'open' => 'Open', 'paused' => 'Paused', 'closed' => 'Closed'] as $value => $label)
-                <button class="btn btn-sm btn-outline-secondary filter-status" data-status="{{ $value }}">{{ $label }}</button>
+    <div class="gv-card space-y-4" id="employer-jobs-list">
+        <div class="flex flex-wrap gap-2">
+            @foreach(['draft' => get_phrase('Draft'), 'published' => get_phrase('Open'), 'paused' => get_phrase('Paused'), 'closed' => get_phrase('Closed')] as $value => $label)
+                <button class="gv-chip cursor-pointer filter-status" data-status="{{ $value }}">
+                    {{ $label }}
+                </button>
             @endforeach
         </div>
-    </div>
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Title</th>
-                            <th>Ref ID</th>
-                            <th>Created</th>
-                            <th>Expires</th>
-                            <th>Status</th>
-                            <th>Applications</th>
-                            <th></th>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="text-left text-[var(--gv-color-neutral-500)] border-b border-[var(--gv-color-border)]">
+                    <tr>
+                        <th class="py-2 pr-4">{{ get_phrase('Title') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Created') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Status') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Applications') }}</th>
+                        <th class="py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--gv-color-border)]">
+                    @forelse($jobs as $job)
+                        <tr data-status="{{ $job->status }}">
+                            <td class="py-3 pr-4">
+                                <p class="font-medium text-[var(--gv-color-neutral-900)] mb-1">{{ $job->title }}</p>
+                                <p class="gv-muted text-xs mb-0">{{ optional($job->company)->name }}</p>
+                            </td>
+                            <td class="py-3 pr-4">{{ optional($job->created_at)->format('M d, Y') }}</td>
+                            <td class="py-3 pr-4">
+                                <span class="gv-chip gv-chip-muted">{{ ucfirst($job->status ?? 'draft') }}</span>
+                            </td>
+                            <td class="py-3 pr-4">{{ $job->applications_count ?? 0 }}</td>
+                            <td class="py-3 text-right space-x-2">
+                                <a href="{{ route('jobs.show', $job) }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('View') }}</a>
+                                <a href="{{ route('employer.jobs.edit', $job) }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Edit') }}</a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse(($jobs ?? []) as $job)
-                            <tr data-status="{{ $job->status ?? 'draft' }}">
-                                <td>{{ $job->title ?? '' }}</td>
-                                <td>{{ $job->reference ?? '#' }}</td>
-                                <td>{{ optional($job->created_at)->format('M d, Y') }}</td>
-                                <td>{{ optional($job->expires_at)->format('M d, Y') }}</td>
-                                <td><span class="badge bg-light text-dark text-uppercase">{{ $job->status ?? 'Draft' }}</span></td>
-                                <td>{{ $job->applications_count ?? 0 }}</td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('employer.jobs.show', $job->id ?? null) }}" class="btn btn-outline-primary">View</a>
-                                        <a href="{{ route('employer.jobs.edit', $job->id ?? null) }}" class="btn btn-outline-secondary">Edit</a>
-                                        <button class="btn btn-outline-danger close-job" data-job-id="{{ $job->id ?? '' }}">Close</button>
-                                    </div>
-                                    <div class="d-flex justify-content-end gap-1 mt-1">
-                                        <button class="btn btn-link btn-sm duplicate-job" data-job-id="{{ $job->id ?? '' }}">Duplicate</button>
-                                        <button class="btn btn-link btn-sm promote-job" data-job-id="{{ $job->id ?? '' }}">Promote</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="7" class="text-center text-muted py-4">No jobs yet.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-6 text-center gv-muted">{{ get_phrase('No jobs yet. Post your first role to get started.') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+        {{ $jobs->onEachSide(1)->links('vendor.jobs.components.pagination') }}
     </div>
-</div>
 @endsection

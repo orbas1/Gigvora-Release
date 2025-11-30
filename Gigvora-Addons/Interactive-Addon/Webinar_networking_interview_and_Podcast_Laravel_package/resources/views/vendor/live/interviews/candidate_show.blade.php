@@ -1,8 +1,11 @@
-@extends('layouts.app')
+@extends('wnip::layouts.live')
 
-@section('title', 'Interview Detail')
-
-@section('content')
+@section('live-header')
+    <div>
+        <p class="gv-eyebrow mb-1">{{ get_phrase('Interview detail') }}</p>
+        <h1 class="live-header__title">{{ get_phrase('Interview overview & prep') }}</h1>
+        <p class="live-header__subtitle">{{ get_phrase('Review interview details, join links, and attachments.') }}</p>
+    </div>
 @php
     $interview = $interview ?? [
         'role' => 'Senior Engineer',
@@ -14,43 +17,45 @@
         'instructions' => 'Join 5 minutes early and test your mic.',
     ];
 @endphp
-<div class="container py-4" id="candidate-interview" data-waiting-url="{{ route('wnip.interviews.waiting', ['interview' => $interview['id'] ?? 1]) ?? '#' }}">
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <h1 class="mb-1">{{ $interview['role'] }} at {{ $interview['company'] }}</h1>
-            <div class="text-muted mb-3">{{ $interview['datetime'] }} • {{ $interview['duration'] }} • {{ $interview['type'] }}</div>
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h6>Interviewers</h6>
-                    <p class="mb-0">{{ $interview['interviewers'] }}</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <h6>Instructions</h6>
-                    <p class="mb-0">{{ $interview['instructions'] }}</p>
-                </div>
-            </div>
+@endsection
+
+@section('live-content')
+<div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_320px]" id="candidate-interview"
+    data-waiting-url="{{ route('wnip.interviews.waiting', ['interview' => $interview['id'] ?? 1]) ?? '#' }}">
+    <div class="space-y-4">
+        <div class="gv-card space-y-2">
+            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                {{ $interview['role'] }} {{ get_phrase('at') }} {{ $interview['company'] }}
+            </h2>
+            <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
+                {{ $interview['datetime'] }} • {{ $interview['duration'] }} • {{ $interview['type'] }}
+            </p>
         </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="fw-semibold mb-2">Join</div>
-                    <button class="btn btn-primary w-100" id="join-waiting">Join Waiting Room</button>
-                    <button class="btn btn-outline-secondary w-100 mt-2" id="join-interview" disabled>Join Interview</button>
-                </div>
-            </div>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6>Attachments</h6>
-                    <ul class="list-unstyled mb-0">
-                        <li><a href="#">Job description</a></li>
-                        <li><a href="#">Prep doc</a></li>
-                    </ul>
-                </div>
-            </div>
+        <div class="gv-card space-y-2">
+            <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Interviewers') }}</h3>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ $interview['interviewers'] }}</p>
+        </div>
+        <div class="gv-card space-y-2">
+            <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Instructions') }}</h3>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ $interview['instructions'] }}</p>
         </div>
     </div>
+    <aside class="space-y-4">
+        <div class="gv-card space-y-3">
+            <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Join') }}</h4>
+            <button class="gv-btn gv-btn-primary w-full" id="join-waiting">{{ get_phrase('Join waiting room') }}</button>
+            <button class="gv-btn gv-btn-ghost w-full opacity-50 pointer-events-none" id="join-interview" aria-disabled="true">
+                {{ get_phrase('Join interview') }}
+            </button>
+        </div>
+        <div class="gv-card space-y-2">
+            <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Attachments') }}</h4>
+            <ul class="space-y-1 text-sm">
+                <li><a href="#" class="text-[var(--gv-color-primary-600)]">{{ get_phrase('Job description') }}</a></li>
+                <li><a href="#" class="text-[var(--gv-color-primary-600)]">{{ get_phrase('Prep doc') }}</a></li>
+            </ul>
+        </div>
+    </aside>
 </div>
 @endsection
 

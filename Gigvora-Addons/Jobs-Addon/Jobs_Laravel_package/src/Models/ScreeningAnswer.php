@@ -14,4 +14,9 @@ class ScreeningAnswer extends Model
         'screening_question_id',
         'answer',
     ];
+
+    public function question()
+    {
+        return $this->belongsTo(ScreeningQuestion::class, 'screening_question_id');
+    }
 }

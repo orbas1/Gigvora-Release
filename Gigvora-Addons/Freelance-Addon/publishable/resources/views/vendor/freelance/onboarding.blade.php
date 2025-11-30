@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Freelance Onboarding')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('freelance-content')
 <div class="container py-4" id="freelance-onboarding" data-fetch-url="{{ $saveUrl ?? '#' }}">
     <div class="row mb-4">
         <div class="col-12">

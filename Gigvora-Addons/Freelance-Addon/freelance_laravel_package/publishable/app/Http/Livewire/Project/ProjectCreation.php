@@ -240,7 +240,9 @@ class ProjectCreation extends Component
             }
         }
         $title = __('general.create_project');
-        return view('livewire.project.project-creation', $data)->extends('layouts.app', compact('title'));
+        return view('livewire.project.project-creation', $data)
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     private function resetInputfields(){
@@ -688,7 +690,7 @@ class ProjectCreation extends Component
         }
 
         if( $status == 'draft' ){
-            return redirect()->route('project-listing');
+            return redirect()->route('freelance.projects.index');
         }
     }  
 
@@ -772,7 +774,7 @@ class ProjectCreation extends Component
                 $params['template_type']    = 'project_posted';
                 $params['email_params']     = array(
                     'user_name'             => $profileInfo->full_name,
-                    'project_link'          => route('project-detail',['slug' => $project_slug]),
+                    'project_link'          => route('freelance.projects.detail',['slug' => $project_slug]),
                     'email_subject'         => !empty($template_data['subject'])    ? $template_data['subject'] : '',     
                     'email_greeting'        => !empty($template_data['greeting'])   ? $template_data['greeting'] : '',     
                     'email_content'         => !empty($template_data['content'])    ? $template_data['content'] : '',     

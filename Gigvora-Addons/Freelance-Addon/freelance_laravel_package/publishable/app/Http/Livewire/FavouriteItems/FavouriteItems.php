@@ -102,7 +102,9 @@ class FavouriteItems extends Component
         $siteTitle  = $sitInfo['site_name'];
         $title      = $siteTitle . ' | ' . __('general.favourite_items');
 
-        return view('livewire.favourite-items.favourite-items', compact('items'))->extends('layouts.app', compact('title'));
+        return view('livewire.favourite-items.favourite-items', compact('items'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function updatedFilterBy(){

@@ -20,6 +20,10 @@
       </div>
     </div>
 
+    <div class="mb-4">
+        @include('components.utilities.quick-tools', ['context' => 'admin', 'variant' => 'compact'])
+    </div>
+
 
     <div class="row justify-content-evenly g-3">
 

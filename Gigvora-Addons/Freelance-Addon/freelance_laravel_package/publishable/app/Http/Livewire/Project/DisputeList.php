@@ -76,6 +76,8 @@ class DisputeList extends Component
         $siteTitle    = $sitInfo['site_name'];
         $title        = $siteTitle . ' | ' . __('general.dispute_list'); 
   
-        return view('livewire.project.dispute-list', compact('disputes'))->extends('layouts.app', compact('title'));
+        return view('livewire.project.dispute-list', compact('disputes'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 }

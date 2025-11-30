@@ -16,6 +16,7 @@ import '../models/profile_portfolio.dart';
 import '../models/education_entry.dart';
 import '../models/certification.dart';
 import '../models/profile_review.dart';
+import '../models/workspace_snapshot.dart';
 
 class FreelanceRepository {
   FreelanceRepository({required this.apiClient});
@@ -47,6 +48,10 @@ class FreelanceRepository {
 
   Future<FreelanceRecommendations> fetchRecommendations({int limit = 10}) {
     return apiClient.fetchRecommendations(limit: limit);
+  }
+
+  Future<WorkspaceSnapshot> fetchWorkspaceSnapshot() {
+    return apiClient.fetchWorkspaceSnapshot();
   }
   Future<GigManagement> fetchGigManagement(int id) => apiClient.fetchGigManagement(id);
   Future<List<DisputeStage>> fetchDisputeStages(int disputeId) => apiClient.fetchDisputeStages(disputeId);

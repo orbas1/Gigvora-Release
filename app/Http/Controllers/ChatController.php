@@ -8,13 +8,22 @@ use App\Models\Friendships;
 use App\Models\Media_files;
 use App\Models\Message_thrade;
 use App\Models\FileUploader;
+use App\Services\UtilitiesComposerAssetsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use ProNetwork\Services\ReactionsService;
+use ProNetwork\Support\Enums\ReactionType;
 use Session;
 use Image;
 use DB;
 class ChatController extends Controller
 {
+    public function __construct(
+        protected UtilitiesComposerAssetsService $composerAssets,
+        protected ReactionsService $reactionsService
+    ) {
+    }
+
     public function chat($reciver = null ,$product=null){
         $user_id  = auth()->user()->id;
         $messageThrade = Message_thrade::where(function ($query) use($reciver,$user_id) {
@@ -28,9 +37,13 @@ class ChatController extends Controller
         $reciver_data = User::find($reciver);
         if(!empty($messageThrade)){
             Chat::where('message_thrade',$messageThrade->id)->where('reciver_id',$reciver)->where('read_status','0')->update(['read_status' => '1']);
-            $message = Chat::where('message_thrade',$messageThrade->id)->orderBy('id','DESC')->limit('20')->get();
+            $message = Chat::with(['reactions', 'mediaFiles'])
+                ->where('message_thrade',$messageThrade->id)
+                ->orderBy('id','DESC')
+                ->limit(20)
+                ->get();
         }else{
-            $message = [];
+            $message = collect();
         }
         if(isset($product)&&$product!=null){
             $product_url = url('/').'/product/view/'.$product;
@@ -38,7 +51,14 @@ class ChatController extends Controller
             $product_url=null;
         }
         $previousChatList = Message_thrade::where('reciver_id',auth()->user()->id)->orWhere('sender_id',auth()->user()->id)->orderBy('id','DESC')->get();
-        return view('frontend.chat.index',compact('reciver_data','message','previousChatList','product_url','product'));
+        return view('frontend.chat.index',[
+            'reciver_data' => $reciver_data,
+            'message' => $message,
+            'previousChatList' => $previousChatList,
+            'product_url' => $product_url,
+            'product' => $product,
+            'composerAssets' => $this->composerAssets->payload(),
+        ]);
     }
 
 
@@ -110,7 +130,11 @@ class ChatController extends Controller
                         Media_files::create($media_file_data);
                     }
                 }
-                $page_data['message'] = Chat::where('message_thrade',$messageThrade->id)->orderBy('id','DESC')->limit('1')->get();
+                $page_data['message'] = Chat::with(['reactions', 'mediaFiles'])
+                    ->where('message_thrade',$messageThrade->id)
+                    ->orderBy('id','DESC')
+                    ->limit(1)
+                    ->get();
                 $message = view('frontend.chat.single-message', $page_data)->render();
                 $url = url('/').'/chat/inbox/'.$request->reciver_id;
                 if(isset($request->product_id)&&!empty($request->product_id)){
@@ -162,7 +186,11 @@ class ChatController extends Controller
                     Media_files::create($media_file_data);
                 }
             }
-            $page_data['message'] = Chat::where('message_thrade',$firstmessageThrade->id)->orderBy('id','DESC')->limit('1')->get();
+            $page_data['message'] = Chat::with(['reactions', 'mediaFiles'])
+                ->where('message_thrade',$firstmessageThrade->id)
+                ->orderBy('id','DESC')
+                ->limit(1)
+                ->get();
             $message = view('frontend.chat.single-message', $page_data)->render();
             $url = url('/').'/chat/inbox/'.$request->reciver_id;;
             if(isset($request->product_id)&&!empty($request->product_id)){
@@ -182,17 +210,34 @@ class ChatController extends Controller
 
 
     public function react_chat(Request $request){
-        $form_data = $request->all();
-        if($form_data['requestType'] == 'update'){
-            $chat = Chat::find($form_data['messageId']);
-            $chat->react = $form_data['react'];
-            $chat->save();
+        $request->validate([
+            'react' => ['required', 'string'],
+            'messageId' => ['required', 'integer'],
+        ]);
 
-            $page_data['message'] = Chat::find($form_data['messageId']);
-            $message = view('frontend.chat.chat_react', $page_data)->render();
-            $response = array('elemSelector' => '#ShowReactId_'.$form_data['messageId'],'content' => $message);
-            return json_encode($response);
+        $chat = Chat::with('reactions')->findOrFail($request->messageId);
+
+        if($chat->sender_id != auth()->user()->id && $chat->reciver_id != auth()->user()->id){
+            abort(403);
         }
+
+        $type = ReactionType::tryFrom($request->react) ?? ReactionType::LIKE;
+        $existing = $chat->reactions->firstWhere('user_id', auth()->user()->id);
+        $existingType = $existing ? ($existing->type instanceof ReactionType ? $existing->type : ReactionType::from($existing->type)) : null;
+
+        if($existing && $existingType && $existingType->value === $type->value){
+            $this->reactionsService->remove($chat, auth()->user()->id);
+        }else{
+            $this->reactionsService->react($chat, auth()->user()->id, $type);
+        }
+
+        $chat->refresh()->load('reactions');
+
+        $page_data['message'] = $chat;
+        $page_data['reactionOptions'] = collect($this->composerAssets->reactions())->keyBy('type');
+        $message = view('frontend.chat.chat_react', $page_data)->render();
+        $response = array('elemSelector' => '#ShowReactId_'.$chat->id,'content' => $message);
+        return json_encode($response);
     }
 
 

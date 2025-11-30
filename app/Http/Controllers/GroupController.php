@@ -10,6 +10,8 @@ use App\Models\Friendships;
 use App\Models\Media_files;
 use App\Models\Posts;
 use App\Models\Albums;
+use App\Services\AdvertisementSurfaceService;
+use App\Services\CommunitySurfaceService;
 use App\Models\Event;
 use App\Models\Invite;
 use App\Models\Notification;
@@ -33,7 +35,8 @@ class GroupController extends Controller
 
 
     public function single_group($id){
-        $page_data['group'] = Group::find($id);
+        $group = Group::find($id);
+        $page_data['group'] = $group;
         $posts =  Posts::where('posts.privacy', '!=', 'private')
                         ->where('posts.publisher', 'group')
                         ->where('posts.publisher_id', $id)
@@ -57,6 +60,13 @@ class GroupController extends Controller
 
         $page_data['membercount'] = $totalmember;
         $page_data['posts'] = $posts;
+        $page_data['groupPanels'] = app(CommunitySurfaceService::class)->groupPanels($group);
+        $page_data['activeSection'] = request()->query('section', 'feed');
+        $page_data['groupAd'] = app(AdvertisementSurfaceService::class)->forSlot('groups');
+        $page_data['hasJoinedGroup'] = Group_member::where('group_id', $id)
+            ->where('user_id', auth()->user()->id)
+            ->where('is_accepted', '1')
+            ->exists();
         $page_data['view_path'] = 'frontend.groups.discuss';
         return view('frontend.index', $page_data);
     }
@@ -215,8 +225,8 @@ class GroupController extends Controller
 
     public function group_photos($id){
         $page_data['group'] = Group::find($id);
-        $page_data['all_photos'] = Media_files::where('group_id', $id)->where('file_type', 'image')->orderBy('id', 'DESC')->get();
-        $page_data['all_videos'] = Media_files::where('group_id', $id)->where('file_type', 'video')->orderBy('id', 'DESC')->get();
+        $page_data['all_photos'] = Media_files::where('group_id', $id)->photosAndReels()->orderBy('id', 'DESC')->get();
+        $page_data['all_videos'] = Media_files::where('group_id', $id)->longVideos()->orderBy('id', 'DESC')->get();
         $page_data['all_albums'] = Albums::where('group_id', $id)->orderBy('id', 'DESC')->get();
 
         $page_data['page_identifire'] = 'albums';

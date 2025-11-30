@@ -320,7 +320,7 @@ class GigActivityController extends Controller
             'title'         => __('general.success_title'),
             'type'          => 'success',
             'message'       => __('general.success_message'),
-            'redirectUrl'   => route('gig-activity',[ 'slug' => $gig->slug, 'order_id' => $request['order_id']]),
+            'redirectUrl'   => route('freelance.gigs.activity',[ 'slug' => $gig->slug, 'order_id' => $request['order_id']]),
             'autoClose'     => 3000,
         ]]);
     }
@@ -603,7 +603,7 @@ class GigActivityController extends Controller
                     'type'          => 'success',
                     'title'         => __('general.success_title'),
                     'message'       => __('gig.gig_disputed_alert'),
-                    'redirectUrl'   => route('gig-activity',[ 'slug' => $gig->slug, 'order_id' => $gig_order->id]),
+                    'redirectUrl'   => route('freelance.gigs.activity',[ 'slug' => $gig->slug, 'order_id' => $gig_order->id]),
                     'autoClose'     => 2000,
                 ]]);
             }catch(\Exception $e) {

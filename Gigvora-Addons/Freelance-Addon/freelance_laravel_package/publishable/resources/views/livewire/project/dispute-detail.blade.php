@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <div class="preloader-outer" wire:loading wire:target="refundAction">
         <div class="tk-preloader">
@@ -278,6 +281,7 @@
         </div>
     </section>
 </main>
+@endsection
 @push('scripts')
     <script>
         document.addEventListener('livewire:load', function () {

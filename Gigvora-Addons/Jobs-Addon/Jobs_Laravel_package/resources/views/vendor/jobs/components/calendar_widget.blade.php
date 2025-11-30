@@ -1,16 +1,14 @@
-<div class="card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+<section class="gv-card space-y-4">
+    <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
-            <div class="fw-semibold">Interview Calendar</div>
-            <small class="text-muted">Select a date to schedule</small>
+            <h2 class="text-lg font-semibold mb-1">{{ get_phrase('Interview calendar') }}</h2>
+            <p class="gv-muted text-sm mb-0">{{ get_phrase('Select a date to review or schedule interviews.') }}</p>
         </div>
-        <div class="btn-group" role="group">
-            <button class="btn btn-outline-secondary btn-sm" data-calendar-nav="prev">Prev</button>
-            <button class="btn btn-outline-secondary btn-sm" data-calendar-nav="today">Today</button>
-            <button class="btn btn-outline-secondary btn-sm" data-calendar-nav="next">Next</button>
+        <div class="flex gap-2">
+            <button class="gv-btn gv-btn-ghost gv-btn-sm" data-calendar-nav="prev">{{ get_phrase('Prev') }}</button>
+            <button class="gv-btn gv-btn-ghost gv-btn-sm" data-calendar-nav="today">{{ get_phrase('Today') }}</button>
+            <button class="gv-btn gv-btn-ghost gv-btn-sm" data-calendar-nav="next">{{ get_phrase('Next') }}</button>
         </div>
     </div>
-    <div class="card-body">
-        <div id="interview-calendar" class="calendar-widget" data-events='@json($events ?? [])'></div>
-    </div>
-</div>
+    <div id="interview-calendar" class="space-y-3" data-events='@json($events ?? [])'></div>
+</section>

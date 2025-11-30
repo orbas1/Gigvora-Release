@@ -13,6 +13,8 @@ class CampaignRequest extends FormRequest
 
     public function rules(): array
     {
+        $placements = implode(',', array_keys(config('advertisement.placements', [])));
+
         return [
             'advertiser_id' => 'required|integer|exists:advertisers,id',
             'title' => 'required|string|max:255',
@@ -20,7 +22,7 @@ class CampaignRequest extends FormRequest
             'end_date' => 'required|date|after:start_date',
             'budget' => 'required|numeric|min:' . config('advertisement.minimum_budget'),
             'bidding' => 'required|string|in:click,view,conversion',
-            'placement' => 'required|string|in:' . implode(',', config('advertisement.placements')),
+            'placement' => $placements ? 'required|string|in:' . $placements : 'required|string',
             'objective' => 'nullable|string',
             'status' => 'nullable|string',
         ];

@@ -1,4 +1,4 @@
-@extends('layouts.freelance')
+@extends('freelance::layouts.freelance')
 
 @section('freelance-content')
         <section aria-label="{{ __('Freelance gig search') }}">
@@ -92,6 +92,8 @@
 				</div>
 			</div>
 
+                        @php($freelanceAd = config('advertisement.enabled') ? app(\App\Services\AdvertisementSurfaceService::class)->forSlot('freelance') : null)
+                        @includeWhen($freelanceAd, 'advertisement::components.ad_banner', ['ad' => $freelanceAd])
                         <livewire:gig.search-gigs :view_type="$view" :selected_category="$selected_category"/>
                 </div>
         </section>

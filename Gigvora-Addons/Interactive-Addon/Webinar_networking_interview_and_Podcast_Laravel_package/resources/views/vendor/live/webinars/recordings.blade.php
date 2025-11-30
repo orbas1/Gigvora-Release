@@ -1,49 +1,63 @@
-@extends('layouts.app')
+@extends('wnip::layouts.live')
 
-@section('title', 'Webinar Recordings')
-
-@section('breadcrumbs')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('wnip.webinars.index') ?? '#' }}">Webinars</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Recordings</li>
-    </ol>
-</nav>
+@section('live-header')
+    <div>
+        <p class="gv-eyebrow mb-1">{{ get_phrase('Replays') }}</p>
+        <h1 class="live-header__title">{{ get_phrase('Webinar recordings') }}</h1>
+        <p class="live-header__subtitle">{{ get_phrase('Catch up with recent sessions, highlights, and chaptered replays.') }}</p>
+    </div>
 @endsection
 
-@section('content')
-<div class="container py-4" id="recordings-catalogue">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="mb-0">Recordings</h1>
-        <div class="d-flex gap-2">
-            <input type="search" class="form-control" placeholder="Search recordings" name="search">
-            <select class="form-select" name="category">
-                <option value="">All categories</option>
-                <option>Engineering</option>
-                <option>Product</option>
-            </select>
-        </div>
-    </div>
+@section('live-content')
     @php
         $recordings = $recordings ?? [
             ['title' => 'Designing with AI', 'date' => 'Mar 3', 'duration' => '54m', 'tags' => 'Design, AI'],
             ['title' => 'Scaling APIs', 'date' => 'Mar 10', 'duration' => '48m', 'tags' => 'Backend'],
         ];
     @endphp
-    <div class="list-group">
-        @foreach($recordings as $recording)
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="fw-semibold">{{ $recording['title'] }}</div>
-                    <div class="text-muted small">{{ $recording['date'] }} • {{ $recording['duration'] }} • {{ $recording['tags'] }}</div>
-                </div>
-                <a class="btn btn-outline-primary" href="{{ route('wnip.webinars.recording', ['recording' => $loop->index + 1]) ?? '#' }}">Watch Replay</a>
+    <div class="space-y-4">
+        <div class="gv-card space-y-3">
+            <div class="grid gap-4 md:grid-cols-3">
+                <label class="space-y-1">
+                    <span class="gv-label">{{ get_phrase('Search recordings') }}</span>
+                    <input type="search" class="gv-input" name="search" placeholder="{{ get_phrase('Title or topic') }}">
+                </label>
+                <label class="space-y-1">
+                    <span class="gv-label">{{ get_phrase('Category') }}</span>
+                    <select class="gv-input" name="category">
+                        <option value="">{{ get_phrase('All categories') }}</option>
+                        <option>{{ get_phrase('Engineering') }}</option>
+                        <option>{{ get_phrase('Product') }}</option>
+                    </select>
+                </label>
             </div>
-        @endforeach
+        </div>
+
+        <div class="space-y-2">
+            @forelse($recordings as $recording)
+                <div class="gv-card flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="text-base font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                            {{ $recording['title'] }}
+                        </p>
+                        <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
+                            {{ $recording['date'] }} • {{ $recording['duration'] }} • {{ $recording['tags'] }}
+                        </p>
+                    </div>
+                    <a class="gv-btn gv-btn-ghost"
+                        href="{{ route('wnip.webinars.recording', ['recording' => $loop->index + 1]) ?? '#' }}">
+                        {{ get_phrase('Watch replay') }}
+                    </a>
+                </div>
+            @empty
+                <div class="gv-empty">
+                    {{ get_phrase('No recordings available yet.') }}
+                </div>
+            @endforelse
+        </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('js/live/podcastPlayer.js') }}"></script>
+    <script type="module" src="{{ mix('js/live/podcastPlayer.js') }}"></script>
 @endpush

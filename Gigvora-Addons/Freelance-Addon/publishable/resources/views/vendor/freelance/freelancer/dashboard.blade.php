@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Freelancer Dashboard')
 
@@ -11,72 +11,106 @@
 </nav>
 @endsection
 
-@section('content')
-<div class="container py-4" id="freelancer-dashboard">
-    @component('vendor.freelance.components.dashboard_kpi_cards', ['kpis' => $kpis ?? []])
-    @endcomponent
+@section('freelance-content')
+<div class="space-y-4" id="freelancer-dashboard">
+    @component('vendor.freelance.components.dashboard_kpi_cards', ['kpis' => $kpis ?? []])@endcomponent
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Earnings (last 6 months)</h5>
-            <div id="earnings-chart" class="chart-placeholder" style="height:280px;"></div>
-        </div>
-    </div>
-
-    <div class="row mt-4 g-4">
+    <div class="row g-3">
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Open Contracts</span>
-                    <a href="/freelance/contracts" class="small">View all</a>
+            <article class="gv-card space-y-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="gv-eyebrow mb-1">{{ get_phrase('Open contracts') }}</p>
+                        <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Delivery queue') }}</h3>
+                    </div>
+                    <a href="{{ route('freelance.gigs.orders') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('View all') }}</a>
                 </div>
-                <div class="card-body">
-                    @forelse($openContracts ?? [] as $contract)
-                        <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="space-y-3">
+                    @forelse(($contracts ?? []) as $contract)
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <div class="fw-semibold">{{ $contract['title'] }}</div>
-                                <small class="text-muted">{{ $contract['client'] }}</small>
+                                <p class="mb-0 fw-semibold">{{ $contract['title'] }}</p>
+                                @if (!empty($contract['link']))
+                                    <a href="{{ $contract['link'] }}" class="gv-link text-sm">{{ get_phrase('Open workspace') }}</a>
+                                @endif
                             </div>
-                            <span class="badge bg-light text-dark">{{ $contract['status'] }}</span>
+                            <span class="gv-pill">{{ $contract['status'] }}</span>
                         </div>
                     @empty
-                        <p class="text-muted">No open contracts.</p>
+                        <p class="gv-muted mb-0">{{ get_phrase('No active contracts yet.') }}</p>
                     @endforelse
                 </div>
-            </div>
+            </article>
         </div>
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Latest Messages</span>
-                    <a href="/messages" class="small">Open inbox</a>
+            <article class="gv-card space-y-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="gv-eyebrow mb-1">{{ get_phrase('Escrow overview') }}</p>
+                        <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Recent payouts') }}</h3>
+                    </div>
+                    <a href="{{ route('freelance.invoices.index') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Manage invoices') }}</a>
                 </div>
-                <div class="card-body">
-                    @forelse($messages ?? [] as $message)
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="space-y-3">
+                    @forelse(($escrow ?? []) as $item)
+                        <div class="d-flex justify-content-between">
                             <div>
-                                <div class="fw-semibold">{{ $message['from'] }}</div>
-                                <small class="text-muted">{{ $message['excerpt'] }}</small>
+                                <p class="mb-0 fw-semibold">{{ $item['title'] }}</p>
+                                <span class="gv-muted text-sm">{{ get_phrase('Escrow #:id', ['id' => $item['id']]) }}</span>
                             </div>
-                            <small class="text-muted">{{ $message['time'] }}</small>
+                            <div class="text-end">
+                                <p class="mb-0 fw-semibold">
+                                    {{ $item['amount'] ? (setting('_general.currency').' '.number_format($item['amount'], 2)) : get_phrase('—') }}
+                                </p>
+                                <span class="gv-pill gv-pill--success text-xs">{{ ucfirst($item['status'] ?? 'pending') }}</span>
+                            </div>
                         </div>
                     @empty
-                        <p class="text-muted">No recent messages.</p>
+                        <p class="gv-muted mb-0">{{ get_phrase('No escrow activity yet.') }}</p>
                     @endforelse
                 </div>
-            </div>
+            </article>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Recommended Projects</span>
-            <button class="btn btn-sm btn-outline-secondary" id="refresh-recommended">Refresh</button>
+    <article class="gv-card space-y-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <p class="gv-eyebrow mb-1">{{ get_phrase('Recommendations') }}</p>
+                <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Projects curated for you') }}</h3>
+            </div>
+            <a href="{{ route('freelance.projects.index') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Refresh') }}</a>
         </div>
-        <div class="card-body" id="recommended-projects" data-fetch-url="{{ $recommendedUrl ?? '' }}">
-            <div class="text-muted">Loading recommendations...</div>
+        <div class="row g-3">
+            @forelse(($recommendations ?? []) as $project)
+                <div class="col-md-4">
+                    <div class="gv-freelance-card h-100">
+                        <div class="gv-freelance-card__eyebrow">{{ $project['type'] ?? get_phrase('Fixed') }}</div>
+                        <h4 class="gv-freelance-card__title">{{ $project['title'] }}</h4>
+                        <p class="gv-freelance-card__summary">{{ $project['summary'] }}</p>
+                        <div class="gv-freelance-card__meta">
+                            <span><i class="fa-regular fa-user"></i>{{ $project['owner'] }}</span>
+                            @if (!empty($project['budget']))
+                                <span><i class="fa-solid fa-coins"></i>{{ $project['budget'] }}</span>
+                            @endif
+                        </div>
+                        <div class="gv-freelance-card__actions">
+                            <a href="{{ $project['link'] }}" class="gv-btn gv-btn-primary gv-btn-sm">{{ get_phrase('Open brief') }}</a>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <p class="gv-muted mb-0">{{ get_phrase('No recommendations yet. Explore projects to get matched.') }}</p>
+            @endforelse
         </div>
-    </div>
+    </article>
+
+    @if(!empty($ads))
+        <article class="gv-card">
+            <p class="gv-eyebrow mb-2">{{ get_phrase('Sponsored') }}</p>
+            @include('advertisement::components.ad_banner', ['ad' => $ads])
+        </article>
+    @endif
 </div>
 @endsection
 

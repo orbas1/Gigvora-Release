@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Post a Project')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('freelance-content')
 <div class="container py-4" id="project-wizard" data-save-url="{{ $saveUrl ?? '' }}">
     <div class="card">
         <div class="card-body">

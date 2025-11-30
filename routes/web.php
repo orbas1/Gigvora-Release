@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InstallController;
+use App\Http\Controllers\LiveEngagementController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MemoriesController;
 use App\Http\Controllers\BadgeController;
@@ -8,6 +9,9 @@ use App\Http\Controllers\ModalController;
 use App\Http\Controllers\Profile;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\Updater;
+use App\Http\Controllers\UtilitiesExperienceController;
+use App\Http\Controllers\UtilitiesPortalController;
+use App\Http\Controllers\UtilitiesNotificationActionController;
 use Illuminate\Http\Request;
 use App\Models\Account_active_request;
 use Illuminate\Support\Facades\Route;
@@ -180,6 +184,7 @@ Route::controller(Profile::class)->middleware('auth', 'verified', 'user', 'activ
     Route::get('/profile', 'profile')->name('profile');
     Route::get('/profile/load_post_by_scrolling', 'load_post_by_scrolling')->name('profile.load_post_by_scrolling');
     Route::get('/profile/friends', 'friends')->name('profile.friends');
+    Route::get('/profile/media-hub', 'mediaHub')->name('profile.mediaHub');
 
     Route::get('/profile/photos', 'photos')->name('profile.photos');
     Route::get('/profile/load_photos', 'load_photos')->name('profile.load_photos');
@@ -214,6 +219,39 @@ Route::controller(Profile::class)->middleware('auth', 'verified', 'user', 'activ
 
 });
 
+Route::middleware(['auth', 'verified', 'user', 'activity', 'prevent-back-history'])
+    ->prefix('utilities')
+    ->name('utilities.')
+    ->group(function () {
+        Route::get('/hub', [UtilitiesPortalController::class, 'hub'])->name('hub');
+        Route::get('/my-network', [UtilitiesPortalController::class, 'myNetwork'])->name('network');
+        Route::get('/professional-profile', [UtilitiesPortalController::class, 'professionalProfile'])->name('professional');
+        Route::get('/company-upgrades', [UtilitiesPortalController::class, 'companyProfile'])->name('company');
+        Route::get('/stories/create', [UtilitiesPortalController::class, 'storiesCreator'])->name('stories.create');
+        Route::get('/stories/viewer', [UtilitiesPortalController::class, 'storiesViewer'])->name('stories.viewer');
+        Route::get('/posts/polls', [UtilitiesPortalController::class, 'postPoll'])->name('posts.poll');
+        Route::get('/posts/threads', [UtilitiesPortalController::class, 'postThread'])->name('posts.thread');
+        Route::get('/posts/celebrate', [UtilitiesPortalController::class, 'postCelebrate'])->name('posts.celebrate');
+        Route::get('/hashtags/explore', [UtilitiesPortalController::class, 'hashtags'])->name('hashtags');
+        Route::get('/analytics', [UtilitiesPortalController::class, 'analytics'])->name('analytics');
+        Route::get('/security-log', [UtilitiesPortalController::class, 'securityLog'])->name('security');
+        Route::get('/moderation', [UtilitiesPortalController::class, 'moderation'])->name('moderation');
+        Route::get('/notifications', [UtilitiesExperienceController::class, 'notifications'])->name('notifications.index');
+        Route::post('/notifications/{notification}/read', [UtilitiesNotificationActionController::class, 'markAsRead'])->name('notifications.read');
+        Route::get('/saved', [UtilitiesExperienceController::class, 'saved'])->name('saved.index');
+        Route::get('/calendar', [UtilitiesExperienceController::class, 'calendar'])->name('calendar.index');
+        Route::post('/alerts/header', [UtilitiesExperienceController::class, 'acknowledgeHeaderAlert'])->name('header-alerts.ack');
+    });
+
+Route::middleware(['auth', 'verified', 'user', 'activity', 'prevent-back-history'])
+    ->prefix('live-center')
+    ->name('liveCenter.')
+    ->group(function () {
+        Route::get('/hub', [\App\Http\Controllers\LiveEventsPortalController::class, 'hub'])->name('hub');
+        Route::get('/webinars', [\App\Http\Controllers\LiveEventsPortalController::class, 'webinars'])->name('webinars');
+        Route::get('/recordings', [\App\Http\Controllers\LiveEventsPortalController::class, 'recordings'])->name('recordings');
+    });
+
 //Updater routes are here
 Route::controller(Updater::class)->middleware('auth', 'verified', 'activity')->group(function () {
 
@@ -246,3 +284,12 @@ Route::controller(InstallController::class)->group(function () {
     Route::get('install/success', 'success')->name('success');
 });
 //Installation routes
+
+Route::prefix('live-engagement')
+    ->name('live.engagement.')
+    ->group(function () {
+        Route::get('/{post}', [LiveEngagementController::class, 'summary'])->name('summary');
+        Route::post('/{post}/donate', [LiveEngagementController::class, 'donate'])->name('donate');
+        Route::post('/{post}/react', [LiveEngagementController::class, 'react'])->name('react');
+        Route::post('/{post}/question', [LiveEngagementController::class, 'question'])->name('question');
+    });

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('advertisement::layouts.app')
 
 @section('title', 'Creatives')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h4 mb-1">Creatives</h1>

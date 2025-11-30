@@ -1,88 +1,32 @@
-<div class="row rightSideBarToggler d-hidden">
-    <div class="col-md-12">
-        <div class="card mb-3">
-            <div class="card-body text-end">
-                <button class="btn" onclick="toggleRightSideBar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
+@php
+    $primarySidebarRoutes = [
+        'timeline', 'pages', 'allproducts', 'filter.product', 'userproduct', 'single.product',
+        'videos', 'shorts', 'save.all.view', 'event', 'userevent', 'blogs', 'category.blog', 'myblog',
+        'notifications', 'general.timeline', 'page.view', 'memories', 'badge', 'badge.info',
+        'fundraiser.index', 'fundraiser.category', 'fundraiser.myactivity', 'fundraiser.donor',
+        'fundraiser.payment', 'fundraiser.create', 'fundraiser.edit', 'fundraiser.search', 'creator.payout',
+        'jobs', 'job.myjob', 'job.save.view', 'job.apply.all.list', 'job.my.apply.list', 'job.single.details',
+        'job.payment.history', 'create.job', 'job.edit', 'about.view', 'policy.view', 'single.post',
+        'album.details.list', 'create.blog', 'search', 'search.people', 'search.post', 'search.video',
+        'search.product', 'search.group.specific', 'search.page', 'search.event', 'job.apply.form',
+        'search.type', 'product.saved', 'ai_image.image_generator'
+    ];
+    $showPrimarySidebar = in_array(Route::currentRouteName(), $primarySidebarRoutes);
+    $feedRecommendations = app(\App\Services\FeedRecommendationService::class)->forUser(auth()->user());
+@endphp
+
+<div class="rightSideBarToggler d-hidden mb-3">
+    <div class="gv-card text-end">
+        <button class="gv-btn gv-btn-ghost" onclick="toggleRightSideBar()" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
 </div>
-{{-- @php
-    
-    $media_files = \App\Models\Media_files::where('user_id', Auth()->user()->id)
-        ->whereNull('story_id')
-        ->whereNull('product_id')
-        ->whereNull('page_id')
-        ->whereNull('group_id')
-        ->whereNull('chat_id')
-        ->take(9)
-        ->orderBy('id', 'desc')
-        ->get();
 
-@endphp --}}
 <aside class="sidebar mt-0 sidebarToggle d-hidden" id="sidebarToggle">
-    @if (Route::currentRouteName() == 'timeline' ||
-            Route::currentRouteName() == 'pages' ||
-            Route::currentRouteName() == 'allproducts' ||
-            Route::currentRouteName() == 'filter.product' ||
-            Route::currentRouteName() == 'userproduct' ||
-            Route::currentRouteName() == 'single.product' ||
-            Route::currentRouteName() == 'videos' ||
-            Route::currentRouteName() == 'shorts' ||
-            Route::currentRouteName() == 'save.all.view' ||
-            Route::currentRouteName() == 'event' ||
-            Route::currentRouteName() == 'userevent' ||
-            Route::currentRouteName() == 'event' ||
-            Route::currentRouteName() == 'blogs' ||
-            Route::currentRouteName() == 'category.blog' ||
-            Route::currentRouteName() == 'myblog' ||
-            Route::currentRouteName() == 'notifications' ||
-            Route::currentRouteName() == 'general.timeline' ||
-            Route::currentRouteName() == 'page.view' ||
-            Route::currentRouteName() == 'memories' ||
-            Route::currentRouteName() == 'badge' || 
-            Route::currentRouteName() == 'badge.info' ||
-            Route::currentRouteName() == 'fundraiser.index' ||
-            Route::currentRouteName() == 'fundraiser.category' ||
-            Route::currentRouteName() == 'fundraiser.myactivity' ||
-            Route::currentRouteName() == 'fundraiser.donor' ||
-            Route::currentRouteName() == 'fundraiser.payment' ||
-            Route::currentRouteName() == 'fundraiser.create'||
-            Route::currentRouteName() == 'fundraiser.edit' || 
-            Route::currentRouteName() == 'fundraiser.search' ||
-            Route::currentRouteName() == 'creator.payout'||
-            Route::currentRouteName() == 'jobs' || 
-            Route::currentRouteName() == 'job.myjob' || 
-            Route::currentRouteName() == 'job.save.view' || 
-            Route::currentRouteName() == 'job.apply.all.list' || 
-            Route::currentRouteName() == 'job.my.apply.list' || 
-            Route::currentRouteName() == 'job.single.details' ||
-            Route::currentRouteName() == 'job.payment.history' ||
-            Route::currentRouteName() == 'create.job' || 
-            Route::currentRouteName() == 'job.edit'|| 
-            Route::currentRouteName() == 'about.view'|| 
-            Route::currentRouteName() == 'policy.view'||
-            Route::currentRouteName() == 'single.post' ||
-            Route::currentRouteName() == 'album.details.list'||
-            Route::currentRouteName() == 'create.blog'||
-            Route::currentRouteName() == 'search' ||
-            Route::currentRouteName() == 'search.people' ||
-            Route::currentRouteName() == 'search.post' ||
-            Route::currentRouteName() == 'search.video' || 
-            Route::currentRouteName() == 'search.product' ||
-            Route::currentRouteName() == 'search.group.specific' ||
-            Route::currentRouteName() == 'search.page' ||
-            Route::currentRouteName() == 'search.event' ||
-            Route::currentRouteName() == 'job.apply.form'||
-            Route::currentRouteName() == 'search.type'||
-            Route::currentRouteName() == 'product.saved'||
-            Route::currentRouteName() == 'ai_image.image_generator'
-              
-            )
-        <div class="widget">
-            <div class="d-flex align-items-center">
+    @if ($showPrimarySidebar)
+        <div class="gv-card widget space-y-3">
+            <div class="d-flex align-items-center gap-3">
                 @php
 
                     $tz = auth()->user()->timezone;
@@ -106,132 +50,180 @@
                   <img class="img-fluid" src="{{ asset('assets/frontend/images/moon2.png') }}" height="30px"
                 width="30px" alt="">
                 @endif
-                <h3 class="h6 ms-2">{{ get_phrase('Hi') }}, {{ Auth()->user()->name }}
+                <div>
+                <h3 class="text-base font-semibold text-[var(--gv-color-neutral-800)] mb-1">{{ get_phrase('Hi') }}, {{ Auth()->user()->name }}
                     @if ($current_hour >= 5 && $current_hour < 12)
-                        <span class="d-block text-primary">{{ get_phrase('Good Morning') }}!</span>
+                        <span class="d-block gv-muted text-sm">{{ get_phrase('Good Morning') }}!</span>
                     @elseif($current_hour >= 12 && $current_hour < 17)
-                        <span class="d-block text-primary">{{ get_phrase('Good Afternoon') }}!</span>
+                        <span class="d-block gv-muted text-sm">{{ get_phrase('Good Afternoon') }}!</span>
                     @else
-                        <span class="d-block text-primary">{{ get_phrase('Good Evening') }}!</span>
+                        <span class="d-block gv-muted text-sm">{{ get_phrase('Good Evening') }}!</span>
                     @endif
                 </h3>
+                </div>
             </div>
         </div> <!-- Widget End -->
-        <div class="widget sponser_widget">
+        <div class="gv-card widget space-y-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h3 class="widget-title">{{ get_phrase('Sponsored') }} </h3>
-
+                <h3 class="widget-title mb-0">{{ get_phrase('Sponsored') }}</h3>
             </div>
-            <div class="sponsors">
+            <div class="sponsors space-y-3">
                 @php
-
                     $sponsorPost = \App\Models\Sponsor::orderBy('id', 'desc')
-
                         ->where(function ($query) {
-                            $query->where('start_date', '<', date('Y-m-d H:i:s'))->orWhere(function ($query) {
-                                $query->where('start_date', '=', date('Y-m-d H:i:s'))->whereTime('start_date', '<=', date('Y-m-d H:i:s'));
+                            $query->where('start_date', '<', now())->orWhere(function ($query) {
+                                $query->where('start_date', '=', now())->whereTime('start_date', '<=', now());
                             });
                         })
                         ->where(function ($query) {
-                            $query->where('end_date', '>', date('Y-m-d H:i:s'))->orWhere(function ($query) {
-                                $query->where('end_date', '=', date('Y-m-d H:i:s'))->whereTime('end_date', '>=', date('Y-m-d H:i:s'));
+                            $query->where('end_date', '>', now())->orWhere(function ($query) {
+                                $query->where('end_date', '=', now())->whereTime('end_date', '>=', now());
                             });
                         })
                         ->where('status', 1)
-                        ->limit('6')
+                        ->limit(6)
                         ->get();
                 @endphp
-                @foreach ($sponsorPost as $sponsor)
-                    <a target="_blank" href="{{ $sponsor->ext_url }}">
-                        <div class="sponsor d-flex d-md-block d-xl-flex  mb-1 text-lg-center text-xl-start">
-                            <img src="{{ get_sponsor_image($sponsor->image, 'thumbnail') }}"
-                                class="sponsor_post_image_size " alt="">
-                            <div class="sponsor-txt ms-2 ">
-                                <h6>{{ ellipsis($sponsor->name, 30) }}</h6>
-                                <p class="ellipsis-line-3 pe-2 text-dark">
-                                    {{ ellipsis(strip_tags($sponsor->description, 100)) }}</p>
+                @forelse ($sponsorPost as $sponsor)
+                    <a target="_blank" href="{{ $sponsor->ext_url }}" class="text-decoration-none text-reset">
+                        <div class="sponsor d-flex align-items-center gap-3 p-3">
+                            <img src="{{ get_sponsor_image($sponsor->image, 'thumbnail') }}" alt="{{ $sponsor->name }}">
+                            <div class="flex-1">
+                                <h6 class="text-sm font-semibold mb-1">{{ ellipsis($sponsor->name, 30) }}</h6>
+                                <p class="text-xs gv-muted mb-0">
+                                    {{ ellipsis(strip_tags($sponsor->description, 100)) }}
+                                </p>
                             </div>
                         </div>
                     </a>
-                @endforeach
+                @empty
+                    <p class="text-sm gv-muted mb-0">{{ get_phrase('No sponsored content right now.') }}</p>
+                @endforelse
             </div>
         </div> <!-- Widget End -->
-        <div class="widget">
+        <div class="gv-card widget space-y-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h3 class="widget-title">{{ get_phrase('Active users') }} </h3>
-                <div class="d-flex align-items-center widget-controls">
-
-                </div>
+                <h3 class="widget-title mb-0">{{ get_phrase('Active users') }}</h3>
             </div>
-            <div class="contact-lists side_contact mt-3">
+            <div class="contact-lists side_contact mt-2">
                 @php
                     $friends = \App\Models\Friendships::where(function ($query) {
                         $query->where('accepter', auth()->user()->id)->orWhere('requester', auth()->user()->id);
                     })
                         ->where('is_accepted', 1)
                         ->get();
-                 // Block User Each Other
-                $blockedByUser = DB::table('block_users')->where('user_id', auth()->user()->id)->pluck('block_user')->toArray();
-                $blockedByOthers = DB::table('block_users')->where('block_user', auth()->user()->id)->pluck('user_id')->toArray();
+                    $blockedByUser = DB::table('block_users')->where('user_id', auth()->user()->id)->pluck('block_user')->toArray();
+                    $blockedByOthers = DB::table('block_users')->where('block_user', auth()->user()->id)->pluck('user_id')->toArray();
                 @endphp
-                @foreach ($friends as $friend)
-                @php 
-                //  User Block
-                if (in_array($friend->accepter, $blockedByUser)) {
-                        continue;
-                    }
-                    if (in_array($friend->requester, $blockedByOthers)) {
-                        continue;
-                    }
-                
-                @endphp
-                    @if ($friend->requester == auth()->user()->id)
-                        {{-- @if ($friend->getFriendAccepter->isOnline()) --}}
-                        @if (!empty($friend->getFriendAccepter) && $friend->getFriendAccepter->isOnline())
-                            @if ($friend->getFriendAccepter->id != auth()->user()->id)
-                                <div class="single-contact d-flex align-items-center justify-content-between">
-                                    <div class="avatar d-flex">
-                                        <a href="{{ route('chat', $friend->getFriendAccepter->id) }}"
-                                            class="d-flex align-items-center">
-                                            <div class="avatar me-2">
-                                                <img src="{{ get_user_image($friend->getFriendAccepter->photo, 'optimized') }}"
-                                                    class="rounded-circle w-45px" alt="">
-                                                <span class="online-status active"></span>
-                                            </div>
-                                            <h4>{{ $friend->getFriendAccepter->name }}</h4>
-                                        </a>
-                                    </div>
-                                    <div class="login-time">
-
-                                    </div>
+                @forelse ($friends as $friend)
+                    @php
+                        if (in_array($friend->accepter, $blockedByUser) || in_array($friend->requester, $blockedByOthers)) {
+                            continue;
+                        }
+                        $contact = $friend->requester == auth()->user()->id ? $friend->getFriendAccepter : $friend->getFriend;
+                    @endphp
+                    @if (!empty($contact) && $contact->id !== auth()->user()->id && $contact->isOnline())
+                        <div class="single-contact d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="position-relative">
+                                    <img src="{{ get_user_image($contact->photo, 'optimized') }}" alt="{{ $contact->name }}">
+                                    <span class="online-status active"></span>
                                 </div>
-                            @endif
-                        @endif
-                    @else
-                        @if ($friend->getFriend->isOnline())
-                            @if ($friend->getFriend->id != auth()->user()->id)
-                                <div class="single-contact d-flex align-items-center justify-content-between">
-                                    <div class="avatar d-flex">
-                                        <a href="{{ route('chat', $friend->getFriend->id) }}"
-                                            class="d-flex align-items-center">
-                                            <div class="avatar me-2">
-                                                <img src="{{ get_user_image($friend->getFriend->photo, 'optimized') }}"
-                                                    class="rounded-circle w-45px h-45" alt="">
-                                                <span class="online-status active"></span>
-                                            </div>
-                                            <h4>{{ $friend->getFriend->name }}</h4>
-                                        </a>
-                                    </div>
-                                    <div class="login-time">
-
-                                    </div>
-                                </div>
-                            @endif
-                        @endif
+                                <a href="{{ route('chat', $contact->id) }}" class="text-sm fw-semibold text-decoration-none">
+                                    {{ $contact->name }}
+                                </a>
+                            </div>
+                            <span class="text-xs gv-muted">{{ get_phrase('Online') }}</span>
+                        </div>
                     @endif
-                @endforeach
+                @empty
+                    <p class="text-sm gv-muted mb-0">{{ get_phrase('No friends online right now.') }}</p>
+                @endforelse
             </div>
         </div> <!-- Widget End -->
+        @if(!empty($feedRecommendations['people']))
+            <div class="gv-card widget space-y-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h3 class="widget-title mb-0">{{ get_phrase('People you may collaborate with') }}</h3>
+                </div>
+                <div class="space-y-3">
+                    @foreach($feedRecommendations['people'] as $person)
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="{{ $person['photo'] }}" class="rounded-circle w-45px h-45" alt="{{ $person['name'] }}">
+                                <div>
+                                    <a href="{{ $person['profile_url'] }}" class="fw-semibold text-reset d-block">{{ $person['name'] }}</a>
+                                    <p class="text-sm gv-muted mb-0">{{ $person['about'] }}</p>
+                                </div>
+                            </div>
+                            <button class="gv-btn gv-btn-primary gv-btn-sm"
+                                onclick="ajaxAction('{{ route('user.friend', $person['id']) }}')">
+                                <i class="fa-solid fa-user-plus me-1"></i>{{ get_phrase('Connect') }}
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+        @if(!empty($feedRecommendations['jobs']))
+            <div class="gv-card widget space-y-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h3 class="widget-title mb-0">{{ get_phrase('Recommended roles') }}</h3>
+                    <a href="{{ route('jobs') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('See all') }}</a>
+                </div>
+                <div class="space-y-3">
+                    @foreach($feedRecommendations['jobs'] as $job)
+                        <div class="space-y-1">
+                            <p class="text-sm gv-muted mb-0">{{ $job['company'] }}</p>
+                            <a href="{{ $job['link'] }}" class="fw-semibold text-reset d-block">{{ $job['title'] }}</a>
+                            @if(!empty($job['posted_at']))
+                                <span class="text-xs gv-muted">{{ $job['posted_at'] }}</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+        @if(!empty($feedRecommendations['utilities']))
+            <div class="gv-card widget space-y-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h3 class="widget-title mb-0">{{ get_phrase('Utilities & tools') }}</h3>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach($feedRecommendations['utilities'] as $utility)
+                        <a href="{{ $utility['url'] }}" class="gv-pill d-inline-flex align-items-center gap-2">
+                            <i class="{{ $utility['icon'] }}"></i>
+                            <span>{{ $utility['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+        @if(!empty($feedRecommendations['talent_ai']))
+            <div class="gv-card widget space-y-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h3 class="widget-title mb-0">{{ get_phrase('Talent & AI picks') }}</h3>
+                    <a href="{{ route('addons.talent_ai.headhunters.dashboard') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Open hub') }}</a>
+                </div>
+                <div class="space-y-3">
+                    @foreach($feedRecommendations['talent_ai'] as $section)
+                        @foreach($section['items'] as $item)
+                            <div class="space-y-1">
+                                <p class="text-sm gv-muted mb-0">{{ $section['label'] ?? get_phrase('Talent & AI') }}</p>
+                                <a href="{{ $item['link'] ?? route('addons.talent_ai.headhunters.dashboard') }}" class="fw-semibold text-reset d-block">
+                                    {{ $item['title'] }}
+                                </a>
+                                @if (!empty($item['subtitle']) || !empty($item['meta']))
+                                    <p class="text-xs gv-muted mb-0">
+                                        {{ $item['subtitle'] ?? '' }} @if(!empty($item['meta'])) · {{ $item['meta'] }} @endif
+                                    </p>
+                                @endif
+                            </div>
+                        @endforeach
+                    @endforeach
+                </div>
+            </div>
+        @endif
     @endif
     @if (Route::currentRouteName() == 'profile' ||
             Route::currentRouteName() == 'profile.photos' ||

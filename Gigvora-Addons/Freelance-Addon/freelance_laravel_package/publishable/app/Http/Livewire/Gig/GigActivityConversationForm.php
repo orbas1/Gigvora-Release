@@ -156,7 +156,7 @@ class GigActivityConversationForm extends Component
                     'user_name'             => $order_author_name,
                     'seller_name'           => $gig_author_name,
                     'order_id'              => $this->order_id,
-                    'activity_link'         => route('gig-activity',['slug' => $gig_slug, 'order_id' => $this->order_id]),
+                    'activity_link'         => route('freelance.gigs.activity',['slug' => $gig_slug, 'order_id' => $this->order_id]),
                 ];
             }else{
                 $email_params = [

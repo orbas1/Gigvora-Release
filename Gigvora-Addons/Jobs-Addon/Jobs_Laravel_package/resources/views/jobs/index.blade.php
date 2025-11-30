@@ -1,8 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">{{ __('jobs::jobs.title') }}</h1>
+@php($jobsAd = config('advertisement.enabled') ? app(\App\Services\AdvertisementSurfaceService::class)->forSlot('jobs') : null)
+<div class="container space-y-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <p class="gv-eyebrow mb-1">{{ __('Jobs') }}</p>
+            <h1 class="mb-0 gv-heading text-2xl">{{ __('jobs::jobs.title') }}</h1>
+        </div>
+    </div>
+
+    @includeWhen($jobsAd, 'advertisement::components.ad_banner', ['ad' => $jobsAd])
+
     <div class="row">
         @foreach($jobs as $job)
             <div class="col-md-4 mb-3">

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Query\JoinClause;
 
 use App\Models\{Stories, Posts, Comments, Feeling_and_activities, CommonModels, Live_streamings, Users, Friendships, Media_files, Albums, Notification, User, FileUploader, Album_image, Follower};
+use App\Services\ProfileInsightsService;
 
 use Session, Image;
 
@@ -41,21 +42,21 @@ class Profile extends Controller
             ->select('posts.*', 'users.name', 'users.photo', 'users.friends', 'posts.created_at as created_at')
             ->take(5)->orderBy('posts.post_id', 'DESC')->get();
 
-         // New
-         $friendships = Friendships::where(function ($query) {
+        // New
+        $friendships = Friendships::where(function ($query) {
             $query->where('accepter', auth()->user()->id)
                 ->orWhere('requester', auth()->user()->id);
         })
             ->where('is_accepted', 1)
             ->orderBy('friendships.importance', 'desc')->get();
         $page_data['friendships'] = $friendships;
-      //new
+        //new
 
-
+        $page_data['profileInsights'] = app(ProfileInsightsService::class)->forUser($this->user);
         $page_data['posts'] = $posts;
-        $page_data['user'] = $this->user;
+        $page_data['user_info'] = $this->user;
         $page_data['view_path'] = 'frontend.profile.index';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
     function load_post_by_scrolling(Request $request)
@@ -118,14 +119,14 @@ class Profile extends Controller
 
         $page_data['user_info'] = $this->user;
         $page_data['view_path'] = 'frontend.profile.index';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
     function photos()
     {
 
         $all_photos = Media_files::where('user_id', $this->user->id)
-            ->where('file_type', 'image')
+            ->photosAndReels()
             ->whereNull('story_id')
             ->whereNull('product_id')
             ->whereNull('page_id')
@@ -140,18 +141,16 @@ class Profile extends Controller
 
         $page_data['all_photos'] = $all_photos;
         $page_data['all_albums'] = $all_albums;
-        $page_data['user_info'] = $this->user;
-
         $page_data['page_identifire'] = 'profile';
 
         $page_data['view_path'] = 'frontend.profile.index';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
     function load_photos(Request $request)
     {
         $all_photos = Media_files::where('user_id', $this->user->id)
-            ->where('file_type', 'image')
+            ->photosAndReels()
             ->whereNull('story_id')
             ->whereNull('product_id')
             ->whereNull('page_id')
@@ -241,24 +240,79 @@ class Profile extends Controller
     {
 
         $all_videos = Media_files::where('user_id', $this->user->id)
-            ->where('file_type', 'video')
+            ->longVideos()
             ->take(24)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = $all_videos;
-        $page_data['user_info'] = $this->user;
+        $page_data['live_posts'] = Posts::where('user_id', $this->user->id)
+            ->whereIn('post_type', ['live_streaming', 'event', 'podcast'])
+            ->latest('post_id')
+            ->take(6)
+            ->get();
         $page_data['view_path'] = 'frontend.profile.index';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
     function load_videos(Request $request)
     {
         $all_videos = Media_files::where('user_id', $this->user->id)
-            ->where('file_type', 'video')
+            ->longVideos()
             ->skip($request->offset)->take(12)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = $all_videos;
         $page_data['user_info'] = $this->user;
         return view('frontend.profile.video_single', $page_data);
+    }
+
+    function mediaHub()
+    {
+        $reels = Media_files::where('user_id', $this->user->id)
+            ->photosAndReels()
+            ->where('file_type', 'video')
+            ->whereNull('story_id')
+            ->latest('id')
+            ->take(12)
+            ->get();
+
+        $photos = Media_files::where('user_id', $this->user->id)
+            ->where('file_type', 'image')
+            ->whereNull('story_id')
+            ->whereNull('product_id')
+            ->whereNull('page_id')
+            ->whereNull('group_id')
+            ->whereNull('chat_id')
+            ->latest('id')
+            ->take(18)
+            ->get();
+
+        $longVideos = Media_files::where('user_id', $this->user->id)
+            ->longVideos()
+            ->latest('id')
+            ->take(12)
+            ->get();
+
+        $liveMoments = Posts::where('user_id', $this->user->id)
+            ->whereIn('post_type', ['live_streaming'])
+            ->latest('post_id')
+            ->take(8)
+            ->get();
+
+        $interactiveMoments = Posts::where('user_id', $this->user->id)
+            ->whereIn('post_type', ['event', 'podcast'])
+            ->latest('post_id')
+            ->take(8)
+            ->get();
+
+        $page_data['media_collections'] = [
+            'reels' => $reels,
+            'photos' => $photos,
+            'videos' => $longVideos,
+            'live' => $liveMoments,
+            'interactive' => $interactiveMoments,
+        ];
+
+        $page_data['view_path'] = 'frontend.profile.index';
+        return $this->renderProfileView($page_data);
     }
 
     function load_my_friends(Request $request)
@@ -526,7 +580,7 @@ class Profile extends Controller
         $page_data['album_image'] = $album_image;
     
         $page_data['view_path'] = 'frontend.profile.test';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
 
@@ -559,7 +613,7 @@ class Profile extends Controller
         $page_data['type'] = 'user_post';
         $page_data['view_path'] = 'frontend.profile.index';
         
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
     public function profileLock()
@@ -614,7 +668,14 @@ class Profile extends Controller
         $page_data['posts'] = $posts;
         $page_data['type'] = 'user_post';
         $page_data['view_path'] = 'frontend.profile.index';
-        return view('frontend.index', $page_data);
+        return $this->renderProfileView($page_data);
     }
 
+    protected function renderProfileView(array $page_data)
+    {
+        $page_data['user_info'] = $page_data['user_info'] ?? $this->user;
+        $page_data['profileInsights'] = $page_data['profileInsights'] ?? app(ProfileInsightsService::class)->forUser($this->user);
+
+        return view('frontend.index', $page_data);
+    }
 }

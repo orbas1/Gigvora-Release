@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Client Dashboard')
 
@@ -11,69 +11,88 @@
 </nav>
 @endsection
 
-@section('content')
-<div class="container py-4" id="client-dashboard">
-    @component('vendor.freelance.components.dashboard_kpi_cards', ['kpis' => $kpis ?? []])
-    @endcomponent
+@section('freelance-content')
+<div class="space-y-4" id="client-dashboard">
+    @component('vendor.freelance.components.dashboard_kpi_cards', ['kpis' => $kpis ?? []])@endcomponent
 
-    <div class="row mt-4 g-4">
+    <div class="row g-3">
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Active Contracts</span>
-                    <a href="/freelance/client/contracts" class="small">View all</a>
+            <article class="gv-card space-y-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="gv-eyebrow mb-1">{{ get_phrase('Active contracts') }}</p>
+                        <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Work in progress') }}</h3>
+                    </div>
+                    <a href="{{ route('freelance.client.contracts') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('View all') }}</a>
                 </div>
-                <div class="card-body">
-                    @forelse($contracts ?? [] as $contract)
-                        <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="space-y-3">
+                    @forelse(($contracts ?? []) as $contract)
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <div class="fw-semibold">{{ $contract['title'] }}</div>
-                                <small class="text-muted">{{ $contract['freelancer'] }}</small>
+                                <p class="mb-0 fw-semibold">{{ $contract['title'] }}</p>
                             </div>
-                            <span class="badge bg-light text-dark">{{ $contract['status'] }}</span>
+                            <span class="gv-pill">{{ $contract['status'] }}</span>
                         </div>
                     @empty
-                        <p class="text-muted">No active contracts.</p>
+                        <p class="gv-muted mb-0">{{ get_phrase('No active contracts yet.') }}</p>
                     @endforelse
                 </div>
-            </div>
+            </article>
         </div>
         <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Open disputes</span>
-                    <a href="/freelance/disputes" class="small">Open centre</a>
+            <article class="gv-card space-y-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="gv-eyebrow mb-1">{{ get_phrase('Open disputes') }}</p>
+                        <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Resolution centre') }}</h3>
+                    </div>
+                    <a href="{{ route('freelance.disputes.index') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Open centre') }}</a>
                 </div>
-                <div class="card-body">
-                    @forelse($disputes ?? [] as $dispute)
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="space-y-3">
+                    @forelse(($disputes ?? []) as $dispute)
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="fw-semibold">{{ $dispute['contract'] }}</div>
-                                <small class="text-muted">{{ $dispute['counterpart'] }}</small>
+                                <p class="mb-0 fw-semibold">{{ $dispute['contract'] }}</p>
+                                <span class="gv-muted text-sm">{{ $dispute['counterpart'] }}</span>
                             </div>
-                            <span class="badge bg-warning text-dark">{{ $dispute['status'] }}</span>
+                            <span class="gv-pill gv-pill--warning">{{ $dispute['status'] }}</span>
                         </div>
                     @empty
-                        <p class="text-muted">No disputes.</p>
+                        <p class="gv-muted mb-0">{{ get_phrase('No disputes at the moment.') }}</p>
                     @endforelse
                 </div>
-            </div>
+            </article>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Recommended Freelancers</span>
-            <a href="/search/freelancers" class="small">Search</a>
+    <article class="gv-card space-y-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <p class="gv-eyebrow mb-1">{{ get_phrase('Freelancer suggestions') }}</p>
+                <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Talent you may like') }}</h3>
+            </div>
+            <a href="{{ route('freelance.dashboard') }}" class="gv-btn gv-btn-ghost gv-btn-sm">{{ get_phrase('Open workspace') }}</a>
         </div>
-        <div class="card-body">
-            @forelse($freelancers ?? [] as $user)
-                @component('vendor.freelance.components.user_badge', ['user' => $user])@endcomponent
-                <hr>
+        <div class="space-y-3">
+            @forelse(($freelancers ?? []) as $user)
+                <div class="gv-freelance-card gv-freelance-card--compact">
+                    <div>
+                        <p class="mb-0 fw-semibold">{{ $user['name'] }}</p>
+                        <span class="gv-muted text-sm">{{ $user['tagline'] }}</span>
+                    </div>
+                    <a href="{{ $user['link'] }}" class="gv-btn gv-btn-outline">{{ get_phrase('View profile') }}</a>
+                </div>
             @empty
-                <p class="text-muted">No recommendations yet.</p>
+                <p class="gv-muted mb-0">{{ get_phrase('No recommendations yet. Continue exploring projects.') }}</p>
             @endforelse
         </div>
-    </div>
+    </article>
+
+    @if(!empty($ads))
+        <article class="gv-card">
+            <p class="gv-eyebrow mb-2">{{ get_phrase('Sponsored') }}</p>
+            @include('advertisement::components.ad_banner', ['ad' => $ads])
+        </article>
+    @endif
 </div>
 @endsection

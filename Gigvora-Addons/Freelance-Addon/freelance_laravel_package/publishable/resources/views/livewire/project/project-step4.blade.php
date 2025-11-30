@@ -28,7 +28,7 @@
                                 <img src="{{ asset($seller_image) }}" alt="{{ $single->full_name }}">
                             </figure>
                             <div class="tk-freelancer-user">
-                                <a target="_blank" href="{{ route('seller-profile', ['slug' => $single->slug] ) }}">{{$single->full_name }}</a>
+                                <a target="_blank" href="{{ route('freelance.sellers.profile', ['slug' => $single->slug] ) }}">{{$single->full_name }}</a>
                                 <h5> {!! $single->tagline  !!} </h5>
                                 <ul class="tk-blogviewdatessm">
                                     <li>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <div class="tk-bidbtn">
-                            <a target="_blank" href="{{ route('seller-profile', ['slug' => $single->slug] ) }}">{{__('project.view_profile')}}</a>
+                            <a target="_blank" href="{{ route('freelance.sellers.profile', ['slug' => $single->slug] ) }}">{{__('project.view_profile')}}</a>
                             @if( in_array($single->id, $invited_sellers) )
                                 <a href="javascript:void(0)" disabled class="tk-invite-bidbtn">{{__('project.invited')}}</a>
                             @else 

@@ -117,11 +117,11 @@ return [
     ],
 
     'models' => [
-        'user' => env('PRO_NETWORK_USER_MODEL', \\App\\Models\\User::class),
-        'post' => env('PRO_NETWORK_POST_MODEL', \\App\\Models\\Post::class),
-        'page' => env('PRO_NETWORK_PAGE_MODEL', \\App\\Models\\Page::class),
-        'group' => env('PRO_NETWORK_GROUP_MODEL', \\App\\Models\\Group::class),
-        'story' => env('PRO_NETWORK_STORY_MODEL', \\App\\Models\\Story::class),
-        'marketplace_order' => env('PRO_NETWORK_MARKETPLACE_ORDER_MODEL', \\App\\Models\\MarketplaceOrder::class),
+        'user' => env('PRO_NETWORK_USER_MODEL', \App\Models\User::class),
+        'post' => env('PRO_NETWORK_POST_MODEL', \App\Models\Post::class),
+        'page' => env('PRO_NETWORK_PAGE_MODEL', \App\Models\Page::class),
+        'group' => env('PRO_NETWORK_GROUP_MODEL', \App\Models\Group::class),
+        'story' => env('PRO_NETWORK_STORY_MODEL', \App\Models\Story::class),
+        'marketplace_order' => env('PRO_NETWORK_MARKETPLACE_ORDER_MODEL', \App\Models\MarketplaceOrder::class),
     ],
 ];

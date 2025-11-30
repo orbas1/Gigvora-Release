@@ -9,7 +9,9 @@ use Gigvora\TalentAi\Domain\AiWorkspace\Models\AiByokCredential;
 use Gigvora\TalentAi\Domain\AiWorkspace\Models\AiSession;
 use Gigvora\TalentAi\Domain\Shared\Enums\AiSessionStatus;
 use Gigvora\TalentAi\Domain\Shared\Events\AiSessionCompleted;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class AiWorkspaceService
 {
@@ -33,12 +35,35 @@ class AiWorkspaceService
         ]);
 
         $credential = $this->resolveCredential($user);
-        $output = $this->provider->callProvider($tool, $payload, $user, $credential);
+
+        try {
+            $result = $this->provider->callProvider($tool, $payload, $user, $credential);
+        } catch (Throwable $exception) {
+            $session->status = AiSessionStatus::Failed;
+            $session->output = [
+                'error' => $exception->getMessage(),
+            ];
+            $session->save();
+
+            Log::channel(config('gigvora_talent_ai.analytics.log_channels.ai_errors', 'stack'))
+                ->error('AI workspace provider failed', [
+                    'tool' => $tool,
+                    'user_id' => $user->id,
+                    'message' => $exception->getMessage(),
+                ]);
+
+            throw $exception;
+        }
 
         $session->status = AiSessionStatus::Completed;
-        $session->output = $output;
-        $session->prompt_tokens = $payload['prompt_tokens'] ?? 0;
-        $session->completion_tokens = $output['tokens'] ?? 0;
+        $session->output = [
+            'message' => $result['message'] ?? null,
+            'variants' => $result['variants'] ?? [],
+            'provider' => $result['provider'] ?? 'stub',
+            'model' => $result['model'] ?? null,
+        ];
+        $session->prompt_tokens = $result['prompt_tokens'] ?? 0;
+        $session->completion_tokens = $result['completion_tokens'] ?? max(0, ($result['tokens'] ?? 0) - $session->prompt_tokens);
         $session->credit_cost = $this->calculateCost($session);
         $session->save();
 

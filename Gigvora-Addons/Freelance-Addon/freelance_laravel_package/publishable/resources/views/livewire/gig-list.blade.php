@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section>
         <div class="container">
@@ -47,7 +50,7 @@
                                                             <ul class="tk-desclinks">
                                                                 @foreach($gig->categories as $category)
                                                                     <li>
-                                                                        <h5><a href="{{route('search-gigs',[ 'category_id' => $category->id ])}}" rel="tag">{{$category->name}}</a></h5>
+                                                                        <h5><a href="{{route('freelance.search.gigs',[ 'category_id' => $category->id ])}}" rel="tag">{{$category->name}}</a></h5>
                                                                     </li>
                                                                 @endforeach
                                                             </ul>
@@ -74,7 +77,7 @@
                                                             }
 
                                                         @endphp
-                                                        <h6><a href="{{route('gig-detail',['slug' => $gig->slug])}}">{!! $gig->title !!}</a></h6>
+                                                        <h6><a href="{{route('freelance.gigs.detail',['slug' => $gig->slug])}}">{!! $gig->title !!}</a></h6>
                                                         <ul class="tk-rateviews tk-rateviews2">
                                                             <li>
                                                                 <i class="fa fa-star tk-yellow"></i> 
@@ -155,7 +158,7 @@
                                                             </li>
                                                         @endif
                                                         <li>
-                                                            <a href="{{route('gig-detail',['slug' => $gig->slug])}}">
+                                                            <a href="{{route('freelance.gigs.detail',['slug' => $gig->slug])}}">
                                                                 <span class="icon-external-link bg-gray"></span>
                                                             </a>
                                                         </li>
@@ -180,6 +183,7 @@
         </div>
     </section>
 </main>
+@endsection
 
 @push('scripts')
     <script defer src="{{ asset('common/js/select2.min.js') }} "></script>  

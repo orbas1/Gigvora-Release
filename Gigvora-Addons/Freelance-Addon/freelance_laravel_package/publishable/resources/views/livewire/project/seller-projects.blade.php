@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section wire:loading.class="tk-section-preloader" >
         <div class="preloader-outer" wire:loading>
@@ -114,7 +117,7 @@
                                             <span> {{ __('project.project_budget') }}</span>
                                             <h4>{{ getProjectPriceFormat($single->project->project_type, $currency_symbol, $single->project->project_min_price, $single->project->project_max_price) }}</h4>
                                             @if( $single->status == "hired" || $single->status == "completed" || $single->status == "refunded" || $single->status == "disputed")
-                                            <a href="{{route('project-activity',['slug' => $single->project->slug,'id' => $single->id ])}}" class="tk-invite-bidbtn">{{ __('project.project_activity') }}</a>
+                                            <a href="{{route('freelance.projects.activity',['slug' => $single->project->slug,'id' => $single->id ])}}" class="tk-invite-bidbtn">{{ __('project.project_activity') }}</a>
                                             @endif
                                         </div>
 
@@ -135,7 +138,7 @@
                                                     </li>
                                                 @endif
                                                 <li>
-                                                    <a href="{{ route('project-detail', ['slug'=> $single->project->slug] ) }}" >{{ __('project.view_project') }} </a>
+                                                    <a href="{{ route('freelance.projects.detail', ['slug'=> $single->project->slug] ) }}" >{{ __('project.view_project') }} </a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -197,6 +200,7 @@
         </div>
     </div>
 </main>
+@endsection
 
 @push('scripts')
     <script defer src="{{ asset('common/js/select2.min.js')}}"></script>

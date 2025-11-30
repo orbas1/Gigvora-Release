@@ -1,78 +1,51 @@
 @php(
     $user = auth()->user();
-    $roles = config('freelance.default_roles');
-    $freelancerRole = $roles['freelancer'] ?? 'freelancer';
-    $clientRole = $roles['client'] ?? 'client';
-    $isFreelancer = $user && method_exists($user, 'hasRole') ? $user->hasRole($freelancerRole) : false;
-    $isClient = $user && method_exists($user, 'hasRole') ? $user->hasRole($clientRole) : false;
+    $roles = config('freelance.roles');
+    $freelancerRole = $roles['seller'] ?? 'seller';
+    $clientRole = $roles['buyer'] ?? 'buyer';
+    $isFreelancer = $user && method_exists($user, 'hasRole') ? $user->hasRole($freelancerRole) : true;
+    $isClient = $user && method_exists($user, 'hasRole') ? $user->hasRole($clientRole) : true;
 )
 
-@once
-    @push('styles')
-        @vite('resources/css/freelance/navigation.css')
-    @endpush
-@endonce
-
-<nav class="freelance-nav" aria-label="Freelance navigation">
+<nav class="freelance-nav" aria-label="{{ __('Freelance navigation') }}">
     <div class="freelance-nav__header">
-        <span class="freelance-nav__title">{{ __('Freelance') }}</span>
-        <p class="freelance-nav__summary">{{ __('Access Gigvora freelance dashboards, projects, and contracts without leaving the main experience.') }}</p>
+        <span class="freelance-nav__title">{{ __('Workspace links') }}</span>
+        <p class="freelance-nav__summary">{{ __('Jump between gigs, projects, escrow, disputes and utilities from one spot.') }}</p>
     </div>
 
     <div class="freelance-nav__columns">
         @if($isFreelancer)
-            <div class="freelance-nav__column" aria-label="Freelancer links">
+            <div class="freelance-nav__column" aria-label="{{ __('Freelancer links') }}">
                 <h6 class="freelance-nav__column-title">{{ __('Freelancer') }}</h6>
                 <ul class="freelance-nav__list">
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('dashboard') }}">{{ __('Freelance Dashboard') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('gig-list') }}">{{ __('My Gigs') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('project-listing') }}">{{ __('Browse Projects') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('gig-orders') }}">{{ __('Contracts') }}</a>
-                    </li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.dashboard') }}">{{ __('Dashboard') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.gigs.orders') }}">{{ __('Gig orders') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.seller.gigs.list') }}">{{ __('My gigs') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.projects.index') }}">{{ __('Browse projects') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.gigs.activity', ['slug' => '']) }}" onclick="return false;">{{ __('Contracts & milestones') }}</a></li>
                 </ul>
             </div>
         @endif
 
         @if($isClient)
-            <div class="freelance-nav__column" aria-label="Client links">
+            <div class="freelance-nav__column" aria-label="{{ __('Client links') }}">
                 <h6 class="freelance-nav__column-title">{{ __('Client') }}</h6>
                 <ul class="freelance-nav__list">
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('dashboard') }}">{{ __('Client Dashboard') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('project-listing') }}">{{ __('My Projects') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('invoices') }}">{{ __('Contracts & Escrow') }}</a>
-                    </li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.dashboard') }}">{{ __('Client dashboard') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.buyer.projects.create') }}">{{ __('Post project') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.disputes.index') }}">{{ __('Dispute centre') }}</a></li>
+                    <li><a class="gv-side-link" href="{{ route('freelance.invoices.index') }}">{{ __('Invoices & escrow') }}</a></li>
                 </ul>
             </div>
         @endif
 
-        @if($isFreelancer || $isClient)
-            <div class="freelance-nav__column" aria-label="Shared links">
-                <h6 class="freelance-nav__column-title">{{ __('Shared') }}</h6>
-                <ul class="freelance-nav__list">
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('settings') }}">{{ __('Profile & Settings') }}</a>
-                    </li>
-                    <li class="freelance-nav__item">
-                        <a class="freelance-nav__link" href="{{ route('favourite-items') }}">{{ __('Saved Items') }}</a>
-                    </li>
-                </ul>
-            </div>
-        @else
-            <div class="freelance-nav__column" aria-label="Freelance access">
-                <p class="freelance-nav__empty">{{ __('Sign in with your Gigvora account to see freelance dashboards tied to your role.') }}</p>
-            </div>
-        @endif
+        <div class="freelance-nav__column" aria-label="{{ __('Shared tools') }}">
+            <h6 class="freelance-nav__column-title">{{ __('Shared') }}</h6>
+            <ul class="freelance-nav__list">
+                <li><a class="gv-side-link" href="{{ route('freelance.settings') }}">{{ __('Profile & billing') }}</a></li>
+                <li><a class="gv-side-link" href="{{ route('freelance.favorites.index') }}">{{ __('Saved items') }}</a></li>
+                <li><a class="gv-side-link" href="{{ route('freelance.packages.index') }}">{{ __('Packages & credits') }}</a></li>
+            </ul>
+        </div>
     </div>
 </nav>

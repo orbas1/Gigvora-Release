@@ -2,7 +2,7 @@
 
 @section('title', 'Fees & Commission')
 
-@section('content')
+@section('freelance-content')
 <div class="container-fluid py-4" id="admin-fees" data-preview-url="{{ $previewUrl ?? '' }}">
     <h1 class="mb-3">Commission Settings</h1>
     <div class="row g-4">

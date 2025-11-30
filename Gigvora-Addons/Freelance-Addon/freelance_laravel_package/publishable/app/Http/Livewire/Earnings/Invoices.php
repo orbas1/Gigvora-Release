@@ -61,7 +61,9 @@ class Invoices extends Component
         $siteTitle  = $sitInfo['site_name'];
         $title      = $siteTitle . ' | ' . __('general.invoices');
 
-        return view('livewire.earnings.invoices', compact('invoices'))->extends('layouts.app', compact('title'));
+        return view('livewire.earnings.invoices', compact('invoices'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function deleteInvoice( $params ){
@@ -158,14 +160,14 @@ class Invoices extends Component
                     'ipn_url'       => !empty($ipnUrl) ? route($ipnUrl , ['payment_method' => $transaction->payment_method]) : url('/'),
                     'order_id'      => $transaction->id,
                     'track'         => Str::random(36),
-                    'cancel_url'    => route('invoice.cancel'),
-                    'success_url'   => route('dashboard'),
+                    'cancel_url'    => route('freelance.invoices.cancel'),
+                    'success_url'   => route('freelance.dashboard'),
                     'email'         => $transaction->transactionDetail->payer_email,
                     'name'          => $transaction->transactionDetail->payer_first_name,
                     'payment_type'  => 'package',
                 ]
             ]);
-            return redirect()->route('payment.process', ['gateway' => $transaction->payment_method]);
+            return redirect()->route('freelance.payments.process', ['gateway' => $transaction->payment_method]);
         }
     }
 }

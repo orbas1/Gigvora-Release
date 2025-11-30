@@ -11,7 +11,9 @@ use App\Models\Posts;
 use App\Models\User;
 use App\Models\Video;
 use App\Models\Friendships;
+use App\Services\FreelanceSearchService;
 use Illuminate\Http\Request;
+use Jobs\Support\Search\JobSearchService;
 
 class SearchController extends Controller
 {
@@ -53,6 +55,20 @@ class SearchController extends Controller
         $page_data['events'] = Event::where('title','like',"%".$search_param."%")->where('privacy','public')->limit(50)->get();
         $page_data['videos'] = Video::where('title','like',"%".$search_param."%")->where('privacy','public')->limit(50)->get();
         $page_data['view_path'] = 'frontend.search.searchview';
+
+        if (config('jobs.features.enabled')) {
+            $page_data['jobs'] = app(JobSearchService::class)->search([
+                'search' => $search_param,
+                'per_page' => 6,
+            ]);
+        } else {
+            $page_data['jobs'] = collect();
+        }
+
+        $freelanceSearch = app(FreelanceSearchService::class);
+        $page_data['freelance_projects'] = $freelanceSearch->highlightedProjects($search_param, 4);
+        $page_data['freelance_gigs'] = $freelanceSearch->highlightedGigs($search_param, 4);
+        $page_data['freelance_talent'] = $freelanceSearch->highlightedTalent($search_param, 4);
         return view('frontend.index', $page_data);
     }
   

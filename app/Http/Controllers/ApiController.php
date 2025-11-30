@@ -4,10 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Comments;
-use App\Models\Job;
-use App\Models\JobCategory;
-use App\Models\JobApply;
-use App\Models\JobWishlist;
 use App\Models\Media_files;
 use App\Models\Posts;
 use App\Models\Stories;
@@ -2383,7 +2379,7 @@ class ApiController extends Controller
         if (isset($token) && $token != '') {
             $user_id = auth('sanctum')->user()->id;
             $all_photos = Media_files::where('user_id', $user_id)
-                ->where('file_type', 'image')
+                ->photosAndReels()
                 ->whereNull('page_id')
                 ->whereNull('story_id')
                 ->whereNull('product_id')
@@ -2417,7 +2413,7 @@ class ApiController extends Controller
             $page_data['all_albums'] = $albumArray;
 
             $all_videos = Media_files::where('user_id', $user_id)
-                ->where('file_type', 'video')
+                ->longVideos()
                 ->whereNull('story_id')
                 ->whereNull('page_id')
                 ->whereNull('album_id')
@@ -2446,7 +2442,7 @@ class ApiController extends Controller
             // $user_id = auth('sanctum')->user()->id;
             $user_id = $id;
             $all_photos = Media_files::where('user_id', $user_id)
-                ->where('file_type', 'image')
+                ->photosAndReels()
                 ->whereNull('page_id')
                 ->whereNull('story_id')
                 ->whereNull('product_id')
@@ -2480,7 +2476,7 @@ class ApiController extends Controller
             $page_data['all_albums'] = $albumArray;
 
             $all_videos = Media_files::where('user_id', $user_id)
-                ->where('file_type', 'video')
+                ->longVideos()
                 ->whereNull('story_id')
                 ->whereNull('page_id')
                 ->whereNull('album_id')
@@ -3682,7 +3678,7 @@ class ApiController extends Controller
 
         if (isset($token) && $token != '') {
             $user_id = auth('sanctum')->user()->id;
-            $all_photos = Media_files::where('group_id', $group_id)->where('file_type', 'image')->orderBy('id', 'DESC')->get();
+            $all_photos = Media_files::where('group_id', $group_id)->photosAndReels()->orderBy('id', 'DESC')->get();
             $photoArray = [];
             foreach ($all_photos as $photo) {
                 $photoArray[] = [
@@ -3693,7 +3689,7 @@ class ApiController extends Controller
             $page_data['all_photos'] = $photoArray;
             // $page_data['all_photos'] = $all_photos;
 
-            $all_videos = Media_files::where('group_id', $group_id)->where('file_type', 'video')->orderBy('id', 'DESC')->get();
+            $all_videos = Media_files::where('group_id', $group_id)->longVideos()->orderBy('id', 'DESC')->get();
             $videoArray = [];
             foreach ($all_videos as $video) {
                 $videoArray[] = [
@@ -4260,7 +4256,7 @@ class ApiController extends Controller
             $user_id = auth('sanctum')->user()->id;
 
             $all_photos = Media_files::where('page_id', $id)
-                ->where('file_type', 'image')
+                ->photosAndReels()
                 ->orderBy('id', 'DESC')->get();
             $photoArray = [];
             foreach ($all_photos as $photo) {
@@ -4286,7 +4282,7 @@ class ApiController extends Controller
             $page_data['all_albums'] = $albumArray;
 
             $all_videos = Media_files::where('page_id', $id)
-                ->where('file_type', 'video')
+                ->longVideos()
                 ->orderBy('id', 'DESC')->get();
             $videoArray = [];
             foreach ($all_videos as $video) {
@@ -6474,265 +6470,6 @@ class ApiController extends Controller
 
         return response()->json($response);
     }
-    public function jobs(Request $request)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $user_id1 = auth('sanctum')->user()->id;
-
-            $blogs = Job::orderBy('id', 'desc')->where('status', 1)->get();
-
-            if ($blogs->isEmpty()) {
-                $response['success'] = false;
-                $response['message'] = 'No blog found';
-            } else {
-                $blogArray = [];
-
-                foreach ($blogs as $blog) {
-                    $user = User::where('id', $blog->user_id)->first();
-                    $category = JobCategory::where('id', $blog->category_id)->first();
-                    $wishlist = JobWishlist::where('job_id', $blog->id)->where('user_id', $user_id)->first();
-
-                    // Compare the end date with the current date
-                    $endDate = Carbon::parse($blog->end_date); // Parse end date from database
-                    $isExpired = $endDate->isPast(); // Check if the end date is in the past
-
-
-                    $blogArray[] = [
-                        'id' => $blog->id,
-                        'user_id' => $blog->user_id,
-                        'user' => $user->name,
-                        'user_image' => get_user_images($user->id),
-                        'company' => $blog->company,
-                        'title' => $blog->title,
-                        'category_id' => $blog->category_id,
-                        'category' => $category->name,
-                        'starting_salary_range' => $blog->starting_salary_range,
-                        'ending_salary_range' => $blog->ending_salary_range,
-                        'type' => $blog->type,
-                        'location' => $blog->location,
-                        'status' => $blog->status,
-                        'is_published' => $blog->is_published,
-                        'my_blog' => $blog->user_id == $user_id ? "my_job" : "not_my_job",
-                        'wishlist' => $wishlist ? "wishlist" : "not_wishlist",
-                        'description' => $blog->description,
-                        'thumbnail' => get_group_event_photos($blog->thumbnail, "thumbnail", "job"),
-                        // 'created_at' => date('d-m-Y', strtotime($blog->created_at)),
-                        'start_date' => $blog->start_date,
-                        'end_date' => $blog->end_date,
-                        'is_expired' => $isExpired ? 'expired' : 'active', // Add field indicating if the job is expired
-
-
-
-                    ];
-                }
-                $response = $blogArray;
-            }
-        }
-
-        return response()->json($response);
-    }
-
-    public function create_jobs(Request $request)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $request->validate([
-                'title' => 'required|max:255',
-                'category' => 'required',
-            ]);
-
-            $job = new Job();
-            $job->user_id = $user_id;
-            $job->title = $request->title;
-            $job->category_id = $request->category;
-            $job->company = $request->company;
-            $job->starting_salary_range = $request->starting_salary_range;
-            $job->ending_salary_range = $request->ending_salary_range;
-            $job->type = $request->type;
-            $job->status = 0;
-            $job->is_published = 0;
-            $job->location = $request->location;
-            $job->description = $request->description;
-            // if($request->image && !empty($request->image)){
-            //     $job->thumbnail = $file_name;
-            // }
-            $job_create = $job->save();
-            // $jobId = $job->id;
-            if ($job_create) {
-                $response['success'] = true;
-                $response['message'] = 'job created successfully';
-            } else {
-                $response['success'] = false;
-                $response['message'] = 'job not created';
-            }
-
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'Unauthorized access';
-        }
-        return $response;
-
-    }
-    public function update_jobs(Request $request, $id)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $request->validate([
-                'title' => 'required|max:255',
-                'category' => 'required',
-            ]);
-
-            $job = Job::find($id);
-            //    $job->thumbnail = $new_thumbnail;
-            $job->title = $request->title;
-            $job->category_id = $request->category;
-            $job->company = $request->company;
-            $job->starting_salary_range = $request->starting_salary_range;
-            $job->ending_salary_range = $request->ending_salary_range;
-            $job->type = $request->type;
-            $job->location = $request->location;
-
-            if ($job['status'] == '1') {
-                $job->status = 1;
-            } else if ($job['status'] == '0') {
-                $job->status = 0;
-            }
-            $job->description = $request->description;
-            $done = $job->save();
-            if ($done) {
-
-                $response['success'] = true;
-                $response['message'] = 'jobs updated';
-            } else {
-                $response['success'] = false;
-                $response['message'] = 'jobs not updated';
-            }
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'Unauthorized access';
-        }
-        return $response;
-    }
-
-    public function job_delete(Request $request, $id)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $job = Job::find($id);
-            // $imagename = $job->thumbnail;
-            $job_history = DB::table('payment_histories')->where('item_id', $job->id)->delete();
-            $job_wishlist = JobWishlist::where('job_id', $job->id)->delete();
-            $job_apply = JobApply::where('job_id', $job->id)->delete();
-
-            // $thumbnailPathName = public_path('storage/job/thumbnail/') . $job->thumbnail;
-
-            // if (file_exists($thumbnailPathName)) {
-            //     unlink($thumbnailPathName);
-            // }
-
-            $done = $job->delete();
-
-            if ($done) {
-
-                $response['success'] = true;
-                $response['message'] = 'Job Deleted Successfully';
-            } else {
-                $response['success'] = false;
-                $response['message'] = 'Job not Deleted Successfully';
-            }
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'Unauthorized access';
-        }
-        return $response;
-    }
-
-    // Job Wishlist
-    public function job_add_wishlist(Request $request, $id)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $data['user_id'] = $user_id;
-            $data['job_id'] = $id;
-            $data['created_at'] = Carbon::now();
-            $data['updated_at'] = Carbon::now();
-            $wishlist = JobWishlist::where('user_id', $user_id)->where('job_id', $id)->first();
-            if ($wishlist) {
-                JobWishlist::where('user_id', $user_id)->where('job_id', $id)->delete();
-                $response['success'] = false;
-                $response['message'] = 'Job delete from wishlist successfully';
-            } else {
-                JobWishlist::insert($data);
-                $response['success'] = true;
-                $response['message'] = 'job added wishlist successfully';
-            }
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'Unauthorized access';
-        }
-        return $response;
-    }
-
-    public function JobApply(Request $request, $id)
-    {
-        $token = $request->bearerToken();
-        $response = array();
-
-        if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
-            $request->validate([
-                'email' => 'required',
-                'phone' => 'required',
-                'image' => 'file|mimes:pdf|max:10240'
-            ]);
-
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $file = $request->file('image');
-                $file_extension = $file->getClientOriginalExtension();
-                $file_name = Str::random(40) . '.' . $file_extension;
-                move_uploaded_file($file->getPathname(), 'public/storage/job/cv/' . $file_name);
-            }
-
-            $owner_id = Job::where('id', $id)->first()->user_id;
-            $apply = new JobApply();
-            $apply->job_id = $request->id;
-            $apply->owner_id = $owner_id;
-            $apply->user_id = $user_id;
-            $apply->email = $request->email;
-            $apply->phone = $request->phone;
-            if ($request->image && !empty($request->image)) {
-                $apply->attachment = $file_name;
-            }
-            $applies = $apply->save();
-            if ($applies) {
-                $response['success'] = true;
-                $response['message'] = 'job apply successfully submited';
-            } else {
-                $response['success'] = false;
-                $response['message'] = 'job apply is not submited';
-            }
-        } else {
-            $response['success'] = false;
-            $response['message'] = 'Unauthorized access';
-        }
-        return $response;
-    }
     public function fundraisers(Request $request)
     {
         $token = $request->bearerToken();
@@ -6955,13 +6692,16 @@ class ApiController extends Controller
         $response = array();
 
         if (isset($token) && $token != '') {
-            $user_id = auth('sanctum')->user()->id;
+            $user = auth('sanctum')->user();
+            $user_id = $user->id;
             $date = Carbon::today();
             $new_notification = Notification::where('reciver_user_id', $user_id)->where('status', '0')
                 ->orderBy('id', 'DESC')->get();
             $newnoti = [];
             foreach ($new_notification as $post) {
                 $user = User::find($post->sender_user_id);
+                $senderName = $user->name ?? 'Gigvora member';
+                $senderPhoto = $user ? get_user_images($user->id) : get_user_images($user_id);
 
 
                 // Convert the Unix timestamp to a "time ago" format using Carbon
@@ -7001,8 +6741,8 @@ class ApiController extends Controller
                     'id' => $post->id,
                     'sender_user_id' => $post->sender_user_id,
                     'reciver_user_id' => $post->reciver_user_id,
-                    'name' => $user->name,
-                    'photo' => get_user_images($user->id),
+                    'name' => $senderName,
+                    'photo' => $senderPhoto,
                     'type' => $post->type,
                     'event_id' => $post->event_id,
                     'event_name' => $eventName,
@@ -7010,19 +6750,23 @@ class ApiController extends Controller
                     'pageName' => $pageName,
                     'group_id' => $post->group_id,
                     'groupName' => $groupName,
+                    'resource_type' => $post->resource_type,
+                    'resource_id' => $post->resource_id,
+                    'title' => $post->title,
+                    'message' => $post->message,
+                    'action_url' => $post->action_url,
+                    'data' => $post->data,
                     'status' => $post->status,
                     'view' => $post->view,
-                    // 'created_at' => $post->created_at,
-                    // 'updated_at' => $post->updated_at,
-                    // 'fundraiser_id' => $post->fundraiser_id,
-                    'created_at' => $formattedDate, // Use the formatted date string
-                    // Add other fields as needed
+                    'created_at' => $formattedDate,
                 ];
             }
             $older_notification = Notification::where('reciver_user_id', $user_id)->where('created_at', '<', $date)->orderBy('id', 'DESC')->get();
             $oldnoti = [];
             foreach ($older_notification as $post) {
                 $user = User::find($post->sender_user_id);
+                $senderName = $user->name ?? 'Gigvora member';
+                $senderPhoto = $user ? get_user_images($user->id) : get_user_images($user_id);
 
                 // Convert the Unix timestamp to a "time ago" format using Carbon
                 $createdDate = Carbon::createFromTimestamp(strtotime($post->created_at));
@@ -7064,8 +6808,8 @@ class ApiController extends Controller
                     'id' => $post->id,
                     'sender_user_id' => $post->sender_user_id,
                     'reciver_user_id' => $post->reciver_user_id,
-                    'name' => $user->name,
-                    'photo' => get_user_images($user->id),
+                    'name' => $senderName,
+                    'photo' => $senderPhoto,
                     'type' => $post->type,
                     'event_id' => $post->event_id,
                     'event_name' => $eventName,
@@ -7073,16 +6817,37 @@ class ApiController extends Controller
                     'pageName' => $pageName,
                     'group_id' => $post->group_id,
                     'groupName' => $groupName,
+                    'resource_type' => $post->resource_type,
+                    'resource_id' => $post->resource_id,
+                    'title' => $post->title,
+                    'message' => $post->message,
+                    'action_url' => $post->action_url,
+                    'data' => $post->data,
                     'status' => $post->status,
                     'view' => $post->view,
-                    'created_at' => $formattedDate, // Use the formatted date string
-                    // Add other fields as needed
+                    'created_at' => $formattedDate,
                 ];
             }
 
             // Construct the response
             $response['new_notifications'] = $newnoti;
             $response['older_notifications'] = $oldnoti;
+            if (config('pro_network_utilities_security_analytics.features.utilities_reminders')) {
+                $reminderService = app(\App\Services\InterviewReminderService::class);
+                $reminders = $reminderService->remindersFor($user)->map(function (array $reminder) {
+                    return [
+                        'title' => $reminder['title'],
+                        'lead_time' => $reminder['lead_time'],
+                        'status' => $reminder['status'],
+                        'remind_at' => $reminder['remind_at']->toIso8601String(),
+                        'starts_at' => $reminder['starts_at']->toIso8601String(),
+                        'cta_url' => $reminder['cta_url'],
+                        'source' => $reminder['source'],
+                    ];
+                });
+                $response['interview_reminders'] = $reminders;
+                $response['interview_digest'] = $reminderService->digest($user);
+            }
         } else {
             $response['success'] = false;
             $response['message'] = 'Unauthorized access';

@@ -154,7 +154,9 @@ class GigCreation extends Component
             break;    
         }
         $title = __('general.create_gig');
-        return view('livewire.gig.gig-creation', $data)->extends('layouts.app', compact('title'));
+        return view('livewire.gig.gig-creation', $data)
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function addnewFaq(){
@@ -678,7 +680,7 @@ class GigCreation extends Component
         $eventData['title']         =  __('general.success_title');
         $eventData['type']          = 'success';
         $eventData['message']       = __('general.success_message');
-        $eventData['redirectUrl']   = route('gig-list');
+        $eventData['redirectUrl']   = route('freelance.seller.gigs.list');
         $eventData['autoClose']     = 3000;
         $this->dispatchBrowserEvent('showAlertMessage', $eventData);
         

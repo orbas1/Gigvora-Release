@@ -139,7 +139,7 @@ class Projects extends Component
             $params['email_params']     = array(
                 'user_name'             => $data['user_name'],
                 'project_title'         => $data['project_title'],
-                'project_link'          => route('project-detail',[ 'slug' => $data['project_slug']]),
+                'project_link'          => route('freelance.projects.detail',[ 'slug' => $data['project_slug']]),
                 'email_subject'         => !empty($template_data['subject'])    ? $template_data['subject'] : '',     
                 'email_greeting'        => !empty($template_data['greeting'])   ? $template_data['greeting'] : '',     
                 'email_content'         => !empty($template_data['content'])    ? $template_data['content'] : '',     

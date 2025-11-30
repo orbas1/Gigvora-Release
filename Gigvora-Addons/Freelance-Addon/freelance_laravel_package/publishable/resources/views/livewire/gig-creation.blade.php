@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section>
         <div class="preloader-outer" wire:loading wire:target="updateStep,update">
@@ -10,6 +13,7 @@
         </div>
     </section>
 </main>
+@endsection
 
 @push('styles')
     @vite([

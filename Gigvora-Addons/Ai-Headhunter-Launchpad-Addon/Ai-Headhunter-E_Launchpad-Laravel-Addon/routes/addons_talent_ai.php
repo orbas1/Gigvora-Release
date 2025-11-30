@@ -47,7 +47,7 @@ Route::group([
         $suggestions = [];
 
         return view('talent_ai::headhunters.dashboard', compact('mandates', 'pipelineSummary', 'candidates', 'suggestions'));
-    })->name('addons.talent_ai.headhunters.dashboard');
+    })->name('headhunters.dashboard');
 
     Route::get('launchpad/programmes', function () {
         abort_unless(config('gigvora_talent_ai.modules.launchpad.enabled'), 403);
@@ -55,13 +55,13 @@ Route::group([
         $programmes = LaunchpadProgramme::query()->latest()->paginate(12);
 
         return view('talent_ai::launchpad.programmes.index', compact('programmes'));
-    })->name('addons.talent_ai.launchpad.programmes.index');
+    })->name('launchpad.programmes.index');
 
     Route::get('ai-workspace', function () {
         abort_unless(config('gigvora_talent_ai.modules.ai_workspace.enabled'), 403);
 
         return view('talent_ai::ai_workspace.index');
-    })->name('addons.talent_ai.ai_workspace.index');
+    })->name('ai_workspace.index');
 
     Route::get('volunteering/opportunities', function () {
         abort_unless(config('gigvora_talent_ai.modules.volunteering.enabled'), 403);
@@ -70,7 +70,7 @@ Route::group([
         $sectors = config('gigvora_talent_ai.volunteering.default_categories', []);
 
         return view('talent_ai::volunteering.opportunities.index', compact('opportunities', 'sectors'));
-    })->name('addons.talent_ai.volunteering.opportunities.index');
+    })->name('volunteering.opportunities.index');
 
     if (config('gigvora_talent_ai.modules.headhunters.enabled')) {
         Route::post('headhunter/profile', [HeadhunterProfileController::class, 'store'])->name('headhunter.profile.store');

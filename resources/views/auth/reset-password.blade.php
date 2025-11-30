@@ -1,66 +1,46 @@
-@include('auth.layout.header')
-
-
-<!-- Main Start -->
-<main class="main my-4 p-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="login-img">
-                    <img class="img-fluid" src="{{ asset('assets/frontend/images/login.png') }} " alt="">
+<x-guest-layout>
+    <div class="min-h-screen bg-[var(--gv-color-neutral-50)]">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="gv-card space-y-6">
+                <div class="space-y-2">
+                    <p class="gv-eyebrow">{{ get_phrase('Reset password') }}</p>
+                    <h1 class="gv-heading text-2xl">{{ get_phrase('Choose a new password') }}</h1>
+                    <p class="gv-muted">{{ get_phrase('Create a secure password to keep your Gigvora account protected.') }}</p>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="mb-4 text-sm text-gray-600">
-                    {{ get_phrase('Reset Password Now') }}
-                </div>
-        
-                <!-- Session Status -->
+
                 <x-auth-session-status class="mb-4" :status="session('status')" />
-        
-                <!-- Validation Errors -->
                 <x-auth-validation-errors class="mb-4" :errors="$errors" />
-        
-                <form method="POST" action="{{ route('password.update') }}">
+
+                <form method="POST" action="{{ route('password.update') }}" class="space-y-5">
                     @csrf
-        
-                    <!-- Password Reset Token -->
+
                     <input type="hidden" name="token" value="{{ $request->route('token') }}">
-        
-                    <!-- Email Address -->
+
                     <div>
                         <x-label for="email" :value="get_phrase('Email')" />
-        
-                        <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus />
+                        <x-input id="email" class="mt-1" type="email" name="email" :value="old('email', $request->email)" required autofocus />
                     </div>
-        
-                    <!-- Password -->
-                    <div class="mt-4">
+
+                    <div>
                         <x-label for="password" :value="get_phrase('Password')" />
-        
-                        <x-input id="password" class="block mt-1 w-full" type="password" name="password" required />
+                        <x-input id="password" class="mt-1" type="password" name="password" required placeholder="{{ get_phrase('Create a new password') }}" />
                     </div>
-        
-                    <!-- Confirm Password -->
-                    <div class="mt-4">
-                        <x-label for="password_confirmation" :value="get_phrase('Confirm Password')" />
-        
-                        <x-input id="password_confirmation" class="block mt-1 w-full"
-                                            type="password"
-                                            name="password_confirmation" required />
+
+                    <div>
+                        <x-label for="password_confirmation" :value="get_phrase('Confirm password')" />
+                        <x-input id="password_confirmation" class="mt-1" type="password" name="password_confirmation" required placeholder="{{ get_phrase('Re-enter password') }}" />
                     </div>
-        
-                    <div class="flex items-center justify-end mt-4">
-                        <button class="btn btn-primary">{{ get_phrase('Reset Password') }}</button>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <x-button class="justify-center w-full sm:w-auto">
+                            {{ get_phrase('Reset password') }}
+                        </x-button>
+                        <a class="gv-btn gv-btn-ghost justify-center w-full sm:w-auto" href="{{ route('login') }}">
+                            {{ get_phrase('Back to login') }}
+                        </a>
                     </div>
                 </form>
             </div>
         </div>
-
-    </div> <!-- container end -->
-</main>
-<!-- Main End -->
-
-
-
-@include('auth.layout.footer')
+    </div>
+</x-guest-layout>

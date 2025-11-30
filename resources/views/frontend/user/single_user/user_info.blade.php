@@ -142,7 +142,7 @@ $media_files = DB::table('media_files')->where('user_id', $user_data->id)
         </ul>
     </div>
     <div class="widget">
-        <h4 class="widget-title">{{get_phrase('Photo')}}/{{get_phrase('Video')}}</h4>
+        <h4 class="widget-title">{{get_phrase('Photos & Reels')}}/{{get_phrase('Videos')}}</h4>
         <div id="sidebarPhotoAndVideos" class="row row-cols-3 g-1 mt-3">
             @foreach($media_files as $media_file)
                 @if($media_file->file_type == 'video')

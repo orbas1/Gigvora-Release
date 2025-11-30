@@ -1,26 +1,26 @@
-<aside class="sidebar">
-    <div class="widget">
-        <div class="chat-header mb-4">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h3 class="widget-title">{{ get_phrase('Chats') }} </h3>
-                <div class="alter-link">
-                    <a href="#"><i class="fas fa-message"></i></a>
-                </div>
-            </div>
-            <form action="" class="search-form mb-8">
-                <input class="bg-secondary rounded" type="search" id="chatSearch" placeholder="Search">
-                <span><i class="fa fa-search"></i></span>
-            </form>
+<div class="space-y-4">
+    <div class="gv-chat-sidebar__header">
+        <div>
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Conversations') }}</p>
+            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)]">
+                {{ get_phrase('Inbox') }}
+            </h2>
         </div>
-        <div class="contact-lists" id="chatFriendList">
-            @if(!empty($reciver_data))
-            @include('frontend.chat.single-chated')
-            @else
-            <div style="height:400px"></div>
-            @endif
-        </div>
+        <span class="gv-chip gv-chip-muted">
+            {{ number_format($previousChatList->count()) }}
+        </span>
     </div>
-</aside>
-
-
-
+    <div class="gv-chat-sidebar__search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="chatSearch" placeholder="{{ get_phrase('Search conversations') }}">
+    </div>
+    <div class="gv-chat-sidebar__list" id="chatFriendList">
+        @if(!empty($reciver_data))
+            @include('frontend.chat.single-chated')
+        @else
+            <div class="gv-empty">
+                <p class="mb-0">{{ get_phrase('Select a conversation to get started.') }}</p>
+            </div>
+        @endif
+    </div>
+</div>

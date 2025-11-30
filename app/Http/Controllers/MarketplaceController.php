@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Marketplace;
 use App\Models\Media_files;
 use App\Models\SavedProduct;
+use App\Services\AdvertisementSurfaceService;
+use App\Services\CommunitySurfaceService;
 use App\Models\FileUploader;
 use Illuminate\Http\Request;
 use Image;
@@ -16,6 +18,8 @@ class MarketplaceController extends Controller
 {
     public function allproducts(){
         $page_data['products'] = Marketplace::orderBy('id','DESC')->limit('10')->get();
+        $page_data['marketplacePanels'] = app(CommunitySurfaceService::class)->marketplacePanels();
+        $page_data['marketplaceAd'] = app(AdvertisementSurfaceService::class)->forSlot('marketplace');
         $page_data['view_path'] = 'frontend.marketplace.products';
         return view('frontend.index', $page_data);
     }
@@ -23,6 +27,8 @@ class MarketplaceController extends Controller
     public function userproduct(){
         $products = Marketplace::where('user_id',auth()->user()->id)->orderBy('id','DESC')->get();
         $page_data['products'] = $products;
+        $page_data['marketplacePanels'] = app(CommunitySurfaceService::class)->marketplacePanels(auth()->user()->id);
+        $page_data['marketplaceAd'] = app(AdvertisementSurfaceService::class)->forSlot('marketplace_manager');
         $page_data['view_path'] = 'frontend.marketplace.user_products';
         return view('frontend.index', $page_data);
     }

@@ -246,7 +246,7 @@ class CustomUserController extends Controller
     {
 
         $all_photos = Media_files::where('user_id', $id)
-            ->where('file_type', 'image')
+            ->photosAndReels()
             ->whereNull('page_id')
             ->whereNull('story_id')
             ->whereNull('product_id')
@@ -273,7 +273,7 @@ class CustomUserController extends Controller
     {
 
         $all_videos = Media_files::where('user_id', $id)
-            ->where('file_type', 'video')
+            ->longVideos()
             ->whereNull('story_id')
             ->whereNull('page_id')
             ->whereNull('album_id')

@@ -10,6 +10,8 @@ use App\Models\Media_files;
 use App\Models\Albums;
 use App\Models\Pagecategory;
 use App\Models\FileUploader;
+use App\Services\AdvertisementSurfaceService;
+use App\Services\CommunitySurfaceService;
 use Illuminate\Http\Request;
 use Session;
 use Image;
@@ -172,7 +174,7 @@ class PageController extends Controller
         }
 
         $all_videos = Media_files::where('page_id', $id)
-        ->where('file_type', 'video')
+        ->longVideos()
         ->take(20)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = $all_videos;
@@ -190,8 +192,9 @@ class PageController extends Controller
                         ->orderBy('posts.post_id', 'DESC')->get();
 
         $page_data['posts'] = $posts;
+        $page = Page::find($id);
         $page_data['suggestedpages'] = Page_like::whereIn('user_id',$friendsid)->where('user_id','!=',auth()->user()->id)->limit('1')->get();
-        $page_data['page'] =  Page::find($id);
+        $page_data['page'] =  $page;
 
 
          // New
@@ -205,6 +208,11 @@ class PageController extends Controller
 
         $page_data['friendships'] = $friendships;
       //new
+
+        $page_data['pagePanels'] = app(CommunitySurfaceService::class)->pagePanels($page);
+        $page_data['activeSection'] = request()->query('section', 'feed');
+        $page_data['pageAd'] = app(AdvertisementSurfaceService::class)->forSlot('pages');
+        $page_data['hasLikedPage'] = Page_like::where('page_id', $id)->where('user_id', auth()->user()->id)->exists();
 
         $page_data['view_path'] = 'frontend.pages.page-timeline';
         return view('frontend.index', $page_data);
@@ -224,14 +232,14 @@ class PageController extends Controller
 
         
         $all_photos = Media_files::where('page_id', $id)
-        ->where('file_type', 'image')
+        ->photosAndReels()
         ->take(20)->orderBy('id', 'DESC')->get();
 
         $all_albums = Albums::where('page_id', $id)
         ->take(6)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = Media_files::where('page_id', $id)
-        ->where('file_type', 'video')
+        ->longVideos()
         ->take(20)->orderBy('id', 'DESC')->get();
 
         $page_data['all_photos'] = $all_photos;
@@ -255,14 +263,14 @@ class PageController extends Controller
         }
 
         $all_videos = Media_files::where('page_id', $id)
-        ->where('file_type', 'video')
+        ->longVideos()
         ->take(20)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = $all_videos;
         
         $page_data['page'] = Page::find($id);
         $all_photos = Media_files::where('page_id', $id)
-        ->where('file_type', 'image')
+        ->photosAndReels()
         ->take(20)->orderBy('id', 'DESC')->get();
         $page_data['all_photos'] = $all_photos;
 
@@ -273,7 +281,7 @@ class PageController extends Controller
 
     function load_videos(Request $request){
         $all_videos = Media_files::where('user_id', $this->user->id)
-        ->where('file_type', 'video')
+        ->longVideos()
         ->skip($request->offset)->take(12)->orderBy('id', 'DESC')->get();
 
         $page_data['all_videos'] = $all_videos;

@@ -1,12 +1,28 @@
 # Advertisement Backend Functions & Endpoints
 
 ## Web
+
+All web routes share the `advertisement.*` name prefix (e.g., `advertisement.dashboard`) and live under `/addons/advertisement/*`, so Sociopro’s navigation checks using `Route::has('advertisement.*')` resolve correctly.
+
+### UI shell & assets
+- Stylesheet: `mix('css/advertisement/addon.css')` scopes cards, metrics, pills, and shared ad placements behind the `.ads-shell` namespace to match Sociopro spacing, typography, and button gradients without global overrides.
+- Navigation: primary menu is exposed as an **Ads Manager** dropdown (guarded by the `manage_advertisement` gate) with entries for Ads Overview (`advertisement.dashboard`), Campaigns (`advertisement.campaigns.index`), and Ads Reports (`advertisement.reports.index`).
+- Feed/Profile/Search placements are rendered through `AdvertisementSurfaceService::forSlot()` and the `advertisement::components.ad_*` partials so that surfaces reuse the same ARIA labels and CTA styles.
 - `GET /addons/advertisement/dashboard` → `view('advertisement::dashboard')`
   - Shows the Gigvora Ads Manager dashboard; requires `web` + `auth` middleware and `advertisement.enabled` flag.
   - UI assets: `mix('js/advertisement/dashboard.js')` with shared Gigvora layout (`layouts.app`).
   - Layout now exposes `<meta name="gigvora-ads-api-base" content="/api/advertisement">` plus `@stack('styles')/@stack('scripts')` so all Ads pages consume the same API host and Mix bundles.
 
 ## API (all behind `api` + `auth:sanctum` and `advertisement.enabled`)
+
+API routes inherit the `api.advertisement.*` prefix and are grouped beneath `/api/advertisement/*`, matching the Laravel mixins in `config/advertisement.php`.
+
+### JavaScript entrypoints
+- `resources/js/advertisement/dashboard.js` – hydrates KPI cards and the multi-series performance chart on both Ads Overview and Ads Reports.
+- `resources/js/advertisement/campaigns.js` – drives table filters, bulk actions, and pagination on `/addons/advertisement/campaigns`.
+- `resources/js/advertisement/wizard.js` – powers the multistep campaign wizard with validation hints.
+- `resources/js/advertisement/creatives.js` – manages creative listings and modal editing.
+- `resources/js/advertisement/keyword_planner.js`, `forecast.js`, and `admin.js` – handle calculator widgets, forecasting charts, and placement/admin configuration panels respectively.
 - `GET /api/advertisement/advertisers` → `AdvertiserController@index`
   - Lists advertisers for the authenticated user. Name prefix: `api.advertisement.advertisers.index`.
 - `POST /api/advertisement/advertisers` → `AdvertiserController@store`

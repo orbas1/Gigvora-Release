@@ -9,6 +9,10 @@ class Notification extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'data' => 'array',
+    ];
+
     public function getUserData()
     {
         return $this->belongsTo(User::class, 'sender_user_id');

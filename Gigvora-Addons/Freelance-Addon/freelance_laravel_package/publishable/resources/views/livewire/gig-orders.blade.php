@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section wire:loading.class="tk-section-preloader">
         <div class="preloader-outer" wire:loading>
@@ -60,13 +63,13 @@
                                             <div class="tk-checkoutdetail">
                                                 <h6>
                                                     @foreach($single->gig->categories as $cat )
-                                                        <a href="{{ route('search-gigs', ['category_id' => $cat->category_id])}}">
+                                                        <a href="{{ route('freelance.search.gigs', ['category_id' => $cat->category_id])}}">
                                                             {{ $cat->name}}
                                                         </a>
                                                     @endforeach
                                                 </h6>
                                             </div>
-                                            <h5><a href="{{ route('gig-activity', ['slug' => $single->gig->slug, 'order_id' => $single->id])}}" target="_blank">{{ $single->gig->title }}</a></h5>
+                                            <h5><a href="{{ route('freelance.gigs.activity', ['slug' => $single->gig->slug, 'order_id' => $single->id])}}" target="_blank">{{ $single->gig->title }}</a></h5>
                                         </div>
                                         <div class="tk-price">
                                             <span> {{ __('gig.order_budget') }}</span>
@@ -236,6 +239,7 @@
         </div>
     </div>
 </main>
+@endsection
 
 @push('scripts')
 <script defer src="{{ asset('common/js/select2.min.js')}}"></script>

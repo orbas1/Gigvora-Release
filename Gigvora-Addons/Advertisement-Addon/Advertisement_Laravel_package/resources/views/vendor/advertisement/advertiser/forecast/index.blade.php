@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('advertisement::layouts.app')
 
 @section('title', 'Forecast')
 
@@ -11,74 +11,66 @@
 </nav>
 @endsection
 
-@section('content')
-<div class="row g-4">
-    <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="mb-0">Adjust Inputs</h5>
+@section('ads-page')
+<div class="gv-forecast-grid">
+    <section class="gv-card h-100">
+        <div class="space-y-4">
+            <div>
+                <p class="gv-label mb-1">{{ __('Budget') }}</p>
+                <label class="gv-label">{{ __('Daily budget') }}</label>
+                <input type="range" class="form-range" name="budget" id="forecast-budget" min="10" max="1000" step="10" value="100">
+                <div class="d-flex justify-content-between gv-muted small">
+                    <span>$10</span><span id="forecast-budget-label">$100</span><span>$1000</span>
+                </div>
             </div>
-            <div class="card-body">
-                <form id="forecast-form" class="d-flex flex-column gap-3">
-                    <div>
-                        <label class="form-label">Daily Budget</label>
-                        <input type="range" class="form-range" name="budget" id="forecast-budget" min="10" max="1000" step="10" value="100">
-                        <div class="d-flex justify-content-between text-muted small">
-                            <span>$10</span><span id="forecast-budget-label">$100</span><span>$1000</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">Duration (days)</label>
-                        <input type="range" class="form-range" name="duration" id="forecast-duration" min="1" max="60" value="7">
-                        <div class="d-flex justify-content-between text-muted small">
-                            <span>1</span><span id="forecast-duration-label">7</span><span>60</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">Target Campaign</label>
-                        <select name="campaign_id" class="form-select">
-                            <option value="">Use custom targeting</option>
-                            @foreach(($campaignOptions ?? []) as $id => $name)
-                                <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Forecast</button>
-                </form>
+            <div>
+                <label class="gv-label">{{ __('Duration (days)') }}</label>
+                <input type="range" class="form-range" name="duration" id="forecast-duration" min="1" max="60" value="7">
+                <div class="d-flex justify-content-between gv-muted small">
+                    <span>1</span><span id="forecast-duration-label">7</span><span>60</span>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Forecast Results</h5>
-                <button class="btn btn-success btn-sm" id="apply-forecast">Apply these settings to Campaign</button>
-            </div>
-            <div class="card-body">
-                <div class="row g-3" id="forecast-results">
-                    @foreach([
-                        ['label' => 'Impressions', 'id' => 'forecast-impressions'],
-                        ['label' => 'Clicks', 'id' => 'forecast-clicks'],
-                        ['label' => 'Conversions', 'id' => 'forecast-conversions'],
-                        ['label' => 'Cost', 'id' => 'forecast-cost'],
-                    ] as $metric)
-                        <div class="col-md-6">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-body">
-                                    <p class="text-muted small mb-1">{{ $metric['label'] }}</p>
-                                    <h4 class="fw-bold mb-0" id="{{ $metric['id'] }}">--</h4>
-                                </div>
-                            </div>
-                        </div>
+            <div>
+                <label class="gv-label">{{ __('Target campaign') }}</label>
+                <select name="campaign_id" class="gv-input" form="forecast-form">
+                    <option value="">{{ __('Use custom targeting') }}</option>
+                    @foreach(($campaignOptions ?? []) as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
                     @endforeach
-                </div>
-                <div class="mt-4">
-                    <h6 class="mb-2">Projected Performance</h6>
-                    <canvas id="forecast-chart" height="120" class="w-100"></canvas>
-                </div>
+                </select>
             </div>
         </div>
-    </div>
+        <form id="forecast-form" class="mt-4">
+            @csrf
+            <button type="submit" class="gv-btn gv-btn-primary w-100">{{ __('Update forecast') }}</button>
+        </form>
+    </section>
+
+    <section class="gv-card space-y-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <p class="gv-label mb-1">{{ __('Forecast results') }}</p>
+                <h5 class="gv-heading text-lg mb-0">{{ __('Projected performance') }}</h5>
+            </div>
+            <button class="gv-btn gv-btn-ghost gv-btn-sm" id="apply-forecast">{{ __('Apply to campaign') }}</button>
+        </div>
+        <div class="gv-grid-two" id="forecast-results">
+            @foreach([
+                ['label' => 'Impressions', 'id' => 'forecast-impressions'],
+                ['label' => 'Clicks', 'id' => 'forecast-clicks'],
+                ['label' => 'Conversions', 'id' => 'forecast-conversions'],
+                ['label' => 'Cost', 'id' => 'forecast-cost'],
+            ] as $metric)
+                <article class="gv-kpi-card">
+                    <p class="gv-label">{{ __($metric['label']) }}</p>
+                    <p class="gv-kpi-value" id="{{ $metric['id'] }}">--</p>
+                </article>
+            @endforeach
+        </div>
+        <div class="gv-chart">
+            <canvas id="forecast-chart" height="120" class="w-100"></canvas>
+        </div>
+    </section>
 </div>
 @endsection
 

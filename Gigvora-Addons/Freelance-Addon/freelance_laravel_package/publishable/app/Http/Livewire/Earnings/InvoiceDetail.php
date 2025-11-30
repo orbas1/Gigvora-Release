@@ -46,7 +46,10 @@ class InvoiceDetail extends Component
 
         $title = __('general.invoice_detail');
         $invoice = $this->invoiceInfo();
-        return view('livewire.earnings.invoice_detail', compact('invoice'))->extends('layouts.app', compact('title'));
+
+        return view('livewire.earnings.invoice_detail', compact('invoice'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function invoiceInfo(){

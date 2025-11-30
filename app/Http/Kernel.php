@@ -69,5 +69,8 @@ class Kernel extends HttpKernel
         'user'=> \App\Http\Middleware\UserMiddleware::class,
         'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         'fileUploadDisabled' => \App\Http\Middleware\DisableFileUpload::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'module-enabled' => \App\Http\Middleware\ModuleEnabled::class,
+        'verify-payment-gateway' => \App\Http\Middleware\VerfiyPaymentGateway::class,
     ];
 }

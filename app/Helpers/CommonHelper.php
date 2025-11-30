@@ -3,6 +3,10 @@
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Profile;
+use App\Models\Role;
 
 if (!function_exists('addon_status')) {
     function addon_status($unique_identifier = '')
@@ -747,5 +751,183 @@ if (!function_exists('is_url')) {
     {
         $pattern = '/^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i';
         return preg_match($pattern, $url) === 1;
+    }
+}
+
+if (!function_exists('setting')) {
+    function setting(string $path, $default = null)
+    {
+        static $cache = [];
+
+        if (array_key_exists($path, $cache)) {
+            return $cache[$path];
+        }
+
+        if (strpos($path, '.') !== false) {
+            [$group, $key] = explode('.', $path, 2);
+            $value = data_get(get_settings($group, true) ?: [], $key);
+            if ($value === null || $value === '') {
+                $value = data_get(config("freelance.defaults.{$group}", []), $key);
+            }
+        } else {
+            $value = data_get(config('freelance.defaults', []), $path);
+        }
+
+        return $cache[$path] = $value ?? $default;
+    }
+}
+
+if (!function_exists('getTPSetting')) {
+    function getTPSetting($sections = false, array $keys = []): array
+    {
+        $defaults = config('freelance.defaults', []);
+        $payload = [];
+
+        $groups = $sections === false ? array_keys($defaults) : (array) $sections;
+
+        foreach ($keys as $key) {
+            $value = null;
+
+            foreach ($groups as $group) {
+                $candidate = data_get($defaults, "{$group}.{$key}");
+                if ($candidate !== null) {
+                    $value = $candidate;
+                    break;
+                }
+            }
+
+            if ($value === null) {
+                $value = data_get($defaults, $key);
+            }
+
+            $payload[$key] = $value;
+        }
+
+        return $payload;
+    }
+}
+
+if (!function_exists('currencyList')) {
+    function currencyList(?string $code): array
+    {
+        $code = strtoupper($code ?? '');
+        $currencies = config('freelance.payments.currencies', []);
+        $meta = $currencies[$code] ?? ['symbol' => '$', 'precision' => 2];
+
+        return array_merge([
+            'code' => $code,
+        ], $meta);
+    }
+}
+
+if (!function_exists('isDemoSite')) {
+    function isDemoSite(): bool
+    {
+        return (bool) env('APP_DEMO', false);
+    }
+}
+
+if (!function_exists('SanitizeArray')) {
+    function SanitizeArray($payload)
+    {
+        if (is_array($payload)) {
+            return array_map('SanitizeArray', $payload);
+        }
+
+        if (is_string($payload)) {
+            return trim(strip_tags($payload));
+        }
+
+        return $payload;
+    }
+}
+
+if (!function_exists('AddVisitCount')) {
+    function AddVisitCount($resourceId, $type): void
+    {
+        if (! $resourceId || ! $type) {
+            return;
+        }
+
+        static $tableExists;
+
+        if ($tableExists === null) {
+            $tableExists = Schema::hasTable('user_visit_counts');
+        }
+
+        if (! $tableExists) {
+            return;
+        }
+
+        DB::table('user_visit_counts')->insert([
+            'corresponding_id' => $resourceId,
+            'visit_type' => $type,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+}
+
+if (!function_exists('freelanceEnabled')) {
+    function freelanceEnabled(): bool
+    {
+        return (bool) config('freelance.enabled', true);
+    }
+}
+
+if (!function_exists('projectEnabled')) {
+    function projectEnabled(): bool
+    {
+        return freelanceEnabled() && (bool) config('freelance.modules.projects', true);
+    }
+}
+
+if (!function_exists('gigEnabled')) {
+    function gigEnabled(): bool
+    {
+        return freelanceEnabled() && (bool) config('freelance.modules.gigs', true);
+    }
+}
+
+if (!function_exists('packagesEnabled')) {
+    function packagesEnabled(): bool
+    {
+        return freelanceEnabled() && (bool) config('freelance.modules.packages', true);
+    }
+}
+
+if (!function_exists('getUserRole')) {
+    function getUserRole(): array
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return [
+                'userId' => null,
+                'profileId' => null,
+                'roleId' => null,
+                'roleName' => null,
+            ];
+        }
+
+        $profile = Profile::with('role')->where('user_id', $user->id)->first();
+
+        return [
+            'userId' => $user->id,
+            'profileId' => optional($profile)->id,
+            'roleId' => optional($profile)->role_id,
+            'roleName' => optional(optional($profile)->role)->name,
+        ];
+    }
+}
+
+if (!function_exists('getRoleById')) {
+    function getRoleById($roleId): ?string
+    {
+        if (! $roleId) {
+            return null;
+        }
+
+        return optional(Role::find($roleId))->name;
     }
 }

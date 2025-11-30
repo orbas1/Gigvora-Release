@@ -13,7 +13,7 @@
                     <div class="card group-card e_media">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between gp_grap">
-                                <h3 class="h6 fw-7 m-0">{{ get_phrase('Photos') }}</h3>
+                                <h3 class="h6 fw-7 m-0">{{ get_phrase('Photos & Reels') }}</h3>
                                 <div class="gap-2">
                                     <!-- Button trigger modal -->
                                     <a onclick="showCustomModal('{{route('load_modal_content', ['view_path' => 'frontend.profile.album_create_form','group_id'=>$group->id])}}', '{{get_phrase('Create Album')}}');" data-bs-toggle="modal" data-bs-target="#albumModal"
@@ -28,7 +28,7 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="g-photo-tab" data-bs-toggle="tab"
                                         data-bs-target="#g-photo" type="button" role="tab"
-                                        aria-controls="g-photo" aria-selected="true">{{ get_phrase('Photos of you') }}</button>
+                                        aria-controls="g-photo" aria-selected="true">{{ get_phrase('Photos & Reels of you') }}</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="g-video-tab" data-bs-toggle="tab"

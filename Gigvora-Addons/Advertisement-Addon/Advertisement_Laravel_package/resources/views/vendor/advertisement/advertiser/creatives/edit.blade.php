@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('advertisement::layouts.app')
 
 @section('title', ($creative['id'] ?? false) ? 'Edit Creative' : 'Create Creative')
 
@@ -12,7 +12,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="row g-3">
     <div class="col-lg-8">
         <div class="card">

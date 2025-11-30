@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('advertisement::layouts.app')
 
 @section('title', $campaign['name'] ?? 'Campaign Detail')
 
@@ -12,7 +12,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
     <div>
         <h1 class="h4 mb-1">{{ $campaign['name'] ?? 'Campaign' }}</h1>

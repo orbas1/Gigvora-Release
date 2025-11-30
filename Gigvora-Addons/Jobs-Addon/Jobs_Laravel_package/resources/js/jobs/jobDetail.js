@@ -1,13 +1,9 @@
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-const scrollToApply = () => {
-    const form = document.querySelector('#job-apply-wizard') || document.querySelector('#application-form');
-    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
 const toggleSave = async (button) => {
     const jobId = button.dataset.jobId;
     const saved = button.classList.toggle('active');
+    button.setAttribute('aria-pressed', saved ? 'true' : 'false');
     try {
         await fetch(`/jobs/${jobId}/save`, {
             method: saved ? 'POST' : 'DELETE',
@@ -20,20 +16,11 @@ const toggleSave = async (button) => {
     } catch (error) {
         console.error('Save toggle failed', error);
         button.classList.toggle('active');
+        button.setAttribute('aria-pressed', button.classList.contains('active') ? 'true' : 'false');
     }
 };
 
 const initJobDetail = () => {
-    document.querySelector('#apply-now-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        const modal = document.querySelector('#applyModal');
-        if (modal && typeof bootstrap !== 'undefined') {
-            new bootstrap.Modal(modal).show();
-        } else {
-            scrollToApply();
-        }
-    });
-
     document.querySelectorAll('.save-job').forEach((button) => {
         button.addEventListener('click', (e) => {
             e.preventDefault();

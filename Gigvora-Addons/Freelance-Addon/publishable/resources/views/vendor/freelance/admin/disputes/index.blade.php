@@ -2,7 +2,7 @@
 
 @section('title', 'Manage Disputes')
 
-@section('content')
+@section('freelance-content')
 <div class="container-fluid py-4" id="admin-disputes">
     <h1 class="mb-3">Disputes</h1>
     <div class="table-responsive">

@@ -1,46 +1,78 @@
-@extends('layouts.app')
+@extends('wnip::layouts.live')
 
-@section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+@section('live-header')
+    <div>
+        <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Podcasts') }}</p>
+        <h1 class="live-header__title">{{ __('Podcasts & Series') }}</h1>
+        <p class="live-header__subtitle">{{ __('Listen live, catch replays, and manage your subscribed series in one place.') }}</p>
+    </div>
+@endsection
+
+@section('live-content')
+@php
+    use Illuminate\Support\Str;
+@endphp
+
+<div class="space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="mb-1">Podcasts</h1>
-            <p class="text-muted mb-0">Browse series and latest episodes.</p>
+            <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                {{ get_phrase('Podcasts & series') }}
+            </h1>
+            <p class="gv-muted mb-0">
+                {{ get_phrase('Browse live recordings, series, and latest episodes.') }}
+            </p>
         </div>
-        <a class="btn btn-primary" href="{{ route('wnip.podcasts.index', ['create' => 1]) }}">Create Series</a>
+        <a class="gv-btn gv-btn-primary" href="{{ route('wnip.podcasts.index', ['create' => 1]) }}">
+            {{ get_phrase('Create series') }}
+        </a>
     </div>
 
-    <form method="get" class="card p-3 shadow-sm mb-3">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-6">
-                <label class="form-label">Search</label>
-                <input type="text" name="q" class="form-control" value="{{ $filters['q'] ?? '' }}" placeholder="Series title">
-            </div>
-            <div class="col-md-2 text-end">
-                <button class="btn btn-outline-secondary" type="submit">Filter</button>
-            </div>
+    <form method="get" class="gv-card space-y-3">
+        <label class="space-y-1 w-full md:w-1/2">
+            <span class="gv-label">{{ get_phrase('Search series') }}</span>
+            <input type="text" name="q" class="gv-input" value="{{ $filters['q'] ?? '' }}"
+                placeholder="{{ get_phrase('Series title') }}">
+        </label>
+        <div class="flex justify-end">
+            <button class="gv-btn gv-btn-primary" type="submit">{{ get_phrase('Filter') }}</button>
         </div>
     </form>
 
-    <div class="row g-3">
+    <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         @forelse($series as $item)
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $item->title }}</h5>
-                        <p class="text-muted flex-grow-1">{{ \Illuminate\Support\Str::limit($item->description, 100) }}</p>
-                        <div class="small text-muted mb-2">Episodes: {{ $item->episodes->count() }}</div>
-                        <a class="btn btn-outline-primary w-100" href="{{ route('wnip.podcasts.series', $item) }}">Open Series</a>
+            <article class="gv-card space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-[var(--gv-color-neutral-100)] flex items-center justify-center text-sm text-[var(--gv-color-neutral-400)]">
+                        {{ Str::substr($item->title, 0, 2) }}
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                            {{ $item->title }}
+                        </h3>
+                        <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
+                            {{ trans_choice('{1}1 episode|[2,*]:count episodes', $item->episodes->count(), ['count' => $item->episodes->count()]) }}
+                        </p>
                     </div>
                 </div>
-            </div>
+                <p class="text-sm text-[var(--gv-color-neutral-600)]">
+                    {{ Str::limit($item->description, 120) }}
+                </p>
+                <a class="gv-btn gv-btn-ghost w-full" href="{{ route('wnip.podcasts.series', $item) }}">
+                    {{ get_phrase('Open series') }}
+                </a>
+            </article>
         @empty
-            <div class="col-12">
-                <div class="alert alert-info">No podcast series found.</div>
+            <div class="lg:col-span-2 xl:col-span-3">
+                <div class="gv-empty">
+                    {{ get_phrase('No podcast series found.') }}
+                </div>
             </div>
         @endforelse
     </div>
 
-    <div class="mt-3">{{ $series->links() }}</div>
+    <div>
+        {{ $series->links() }}
+    </div>
 </div>
 @endsection

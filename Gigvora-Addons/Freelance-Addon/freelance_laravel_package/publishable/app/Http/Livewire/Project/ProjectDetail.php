@@ -135,11 +135,12 @@ class ProjectDetail extends Component
 
         $this->save_project = $this->savedProject;
         return view('livewire.project.project-detail')
-        ->extends('layouts.app', [
-                'title'         =>$this->project->project_title, 
+            ->extends('freelance::layouts.freelance', [
+                'title'         => $this->project->project_title,
                 'include_menu'  => true,
-                'OgContent'     => $OgContent
-            ]);
+                'OgContent'     => $OgContent,
+            ])
+            ->section('freelance-content');
     }
 
     public function getsavedProjectProperty(){

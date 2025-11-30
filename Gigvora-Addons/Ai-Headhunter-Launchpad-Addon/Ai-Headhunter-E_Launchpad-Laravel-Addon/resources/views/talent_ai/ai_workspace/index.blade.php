@@ -15,11 +15,14 @@
     <div class="talent-ai-page">
         <div class="talent-ai-header">
             <div>
-                <h1 class="h4 mb-1">@lang('talent_ai::addons_talent_ai.ai_workspace.title')</h1>
-            <p class="text-muted mb-0">Run curated AI tools for profiles, outreach, marketing, and more.</p>
+                <p class="gv-eyebrow mb-1">@lang('talent_ai::addons_talent_ai.ai_workspace.title')</p>
+                <h1 class="gv-heading text-lg mb-1">{{ get_phrase('Run curated AI tools for profiles, outreach, marketing, and more.') }}</h1>
+                <p class="text-sm gv-muted mb-0">{{ get_phrase('Usage is rate-limited based on your subscription or BYOK configuration.') }}</p>
+            </div>
+            <a class="gv-btn gv-btn-ghost" href="{{ url()->previous() }}">
+                <i class="fa-solid fa-arrow-left me-1"></i>@lang('talent_ai::addons_talent_ai.common.back')
+            </a>
         </div>
-        <a class="btn btn-light" href="{{ url()->previous() }}">@lang('talent_ai::addons_talent_ai.common.back')</a>
-    </div>
 
     <div class="ai-workspace-grid">
         @php
@@ -38,16 +41,16 @@
         @endphp
 
         @foreach($tools as $tool)
-            <div class="ai-tool-card">
+            <div class="ai-tool-card gv-card">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">{{ $tool['title'] }}</h3>
-                    <span class="status-pill">AI</span>
+                    <h3 class="text-base fw-semibold mb-0">{{ $tool['title'] }}</h3>
+                    <span class="talent-ai-badge">AI</span>
                 </div>
                 <form class="ai-tool-form" data-endpoint="{{ $tool['endpoint'] }}">
-                    <textarea name="prompt" class="form-control mb-2" rows="3" placeholder="Describe what you need"></textarea>
-                    <button class="btn btn-primary" type="submit">@lang('talent_ai::addons_talent_ai.ai_workspace.run_ai')</button>
+                    <textarea name="prompt" class="form-control mb-2" rows="3" placeholder="{{ get_phrase('Describe what you need') }}"></textarea>
+                    <button class="gv-btn gv-btn-primary w-100" type="submit">@lang('talent_ai::addons_talent_ai.ai_workspace.run_ai')</button>
                 </form>
-                <div data-ai-output class="mt-2 alert-muted">Awaiting input...</div>
+                <div data-ai-output class="mt-2 alert-muted">{{ get_phrase('Awaiting input...') }}</div>
             </div>
         @endforeach
     </div>

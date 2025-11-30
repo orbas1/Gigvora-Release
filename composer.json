@@ -7,11 +7,27 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../Gigvora-Addons-main/Advertisement-Addon/Advertisement_Laravel_package"
+            "url": "./Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package"
         },
         {
             "type": "path",
-            "url": "../Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-Laravel-Addon"
+            "url": "./Gigvora-Addons/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-Laravel-Addon"
+        },
+        {
+            "type": "path",
+            "url": "./Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package"
+        },
+        {
+            "type": "path",
+            "url": "./Gigvora-Addons/Utilities-Addon/utilities,security and analytics package"
+        },
+        {
+            "type": "path",
+            "url": "./Gigvora-Addons/Jobs-Addon/Jobs_Laravel_package"
+        },
+        {
+            "type": "path",
+            "url": "./Gigvora-Addons/Freelance-Addon/freelance_laravel_package"
         }
     ],
     "require": {
@@ -21,19 +37,25 @@
         "firebase/php-jwt": "^6.4",
         "flutterwavedev/flutterwave-v3": "^1.0",
         "fruitcake/laravel-cors": "^2.0",
+        "gigvora/talent-ai": "*@dev",
         "guzzlehttp/guzzle": "^7.5",
         "intervention/image": "^2.7",
+        "livewire/livewire": "^2.12",
+        "jobi/webinar-networking-interview-podcast": "*@dev",
+        "jobs/laravel-package": "*@dev",
+        "sociopro/pro-network-utilities-security-analytics": "*@dev",
         "jorenvanhocht/laravel-share": "^4.2",
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "league/flysystem-aws-s3-v3": "^3.12",
         "paypal/rest-api-sdk-php": "^1.6",
+        "php-ffmpeg/php-ffmpeg": "^1.1",
         "php-flasher/flasher-laravel": "^1.7",
         "razorpay/razorpay": "^2.8",
         "stripe/stripe-php": "^10.11",
         "yajra/laravel-datatables-oracle": "^10.3",
-        "gigvora/talent-ai": "*@dev"
+        "taskup/freelance-laravel-package": "*@dev"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.0",
@@ -49,11 +71,18 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Amentotech\\LaraPayEase\\Facades\\": "app/Support/Freelance/"
         },
+        "classmap": [
+            "Gigvora-Addons/Freelance-Addon/freelance_laravel_package/publishable/app"
+        ],
         "files": [
             "app/Helpers/CommonHelper.php",
             "app/Helpers/ApiHelper.php"
+        ],
+        "exclude-from-classmap": [
+            "Gigvora-Addons/Freelance-Addon/freelance_laravel_package/publishable/app/Http/Requests/Auth/LoginRequest.php"
         ]
     },
     "autoload-dev": {

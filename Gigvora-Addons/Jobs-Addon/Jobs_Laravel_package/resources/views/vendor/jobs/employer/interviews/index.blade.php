@@ -1,60 +1,54 @@
 @extends('layouts.app')
 
-@section('title', 'Interviews')
+@section('title', get_phrase('Interviews'))
 
-@section('breadcrumbs')
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/employer">Employer</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Interviews</li>
-    </ol>
-</nav>
+@section('page-header')
+    <div class="flex items-center justify-between flex-wrap gap-2">
+        <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Interviews') }}</h1>
+        <a href="{{ route('employer.interviews.calendar') }}" class="gv-btn gv-btn-ghost">
+            <i class="fa-regular fa-calendar me-2"></i>{{ get_phrase('Calendar view') }}
+        </a>
+    </div>
 @endsection
 
 @section('content')
-<div class="container py-4" id="interviews-list">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Interviews</h1>
-        <a href="{{ route('employer.interviews.calendar') }}" class="btn btn-outline-primary">Calendar view</a>
-    </div>
-    <div class="card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
+    <div class="gv-card space-y-3" id="interviews-list">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="text-left text-[var(--gv-color-neutral-500)] border-b border-[var(--gv-color-border)]">
+                    <tr>
+                        <th class="py-2 pr-4">{{ get_phrase('Candidate') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Role') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Date & time') }}</th>
+                        <th class="py-2 pr-4">{{ get_phrase('Status') }}</th>
+                        <th class="py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--gv-color-border)]">
+                    @forelse($interviews as $interview)
                         <tr>
-                            <th>Candidate</th>
-                            <th>Role</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th></th>
+                            <td class="py-3 pr-4">{{ optional($interview->application->candidate->user)->name }}</td>
+                            <td class="py-3 pr-4">{{ optional($interview->application->job)->title }}</td>
+                            <td class="py-3 pr-4">{{ optional($interview->scheduled_at)->format('M d, Y h:i A') }}</td>
+                            <td class="py-3 pr-4">
+                                <span class="gv-chip gv-chip-muted">{{ ucfirst($interview->status ?? 'scheduled') }}</span>
+                            </td>
+                            <td class="py-3 text-right space-x-2">
+                                <button class="gv-btn gv-btn-ghost gv-btn-sm reschedule" data-id="{{ $interview->id }}">{{ get_phrase('Reschedule') }}</button>
+                                <button class="gv-btn gv-btn-ghost gv-btn-sm cancel text-[var(--gv-color-danger-600)]" data-id="{{ $interview->id }}">{{ get_phrase('Cancel') }}</button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse(($interviews ?? []) as $interview)
-                            <tr>
-                                <td>{{ $interview->candidate->name ?? '' }}</td>
-                                <td>{{ $interview->job->title ?? '' }}</td>
-                                <td>{{ optional($interview->scheduled_at)->format('M d, Y h:i A') }}</td>
-                                <td><span class="badge bg-light text-dark">{{ $interview->status ?? 'Scheduled' }}</span></td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <button class="btn btn-outline-secondary reschedule" data-id="{{ $interview->id ?? '' }}">Reschedule</button>
-                                        <button class="btn btn-outline-danger cancel" data-id="{{ $interview->id ?? '' }}">Cancel</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="5" class="text-center text-muted py-4">No interviews scheduled.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-6 text-center gv-muted">{{ get_phrase('No interviews scheduled.') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/jobs/interviewCalendar.js') }}"></script>
+    <script type="module" src="{{ mix('resources/js/jobs/interviewCalendar.js') }}"></script>
 @endpush

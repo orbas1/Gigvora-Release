@@ -1,4 +1,4 @@
-@extends('layouts.freelance')
+@extends('freelance::layouts.freelance')
 
 @section('freelance-content')
         <section class="tk-giglist-section" aria-label="{{ __('Freelance gig list') }}">

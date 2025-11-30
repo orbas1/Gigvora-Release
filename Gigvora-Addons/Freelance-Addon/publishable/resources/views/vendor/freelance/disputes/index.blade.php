@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Dispute Centre')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('freelance-content')
 <div class="container py-4" id="dispute-centre">
     <ul class="nav nav-tabs mb-3" id="dispute-tabs">
         <li class="nav-item"><a class="nav-link active" data-status="open" href="#">Open</a></li>

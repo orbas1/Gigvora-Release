@@ -1,51 +1,71 @@
-@extends('layouts.app')
+@extends('wnip::layouts.live')
 
-@section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+@section('live-header')
+    <div>
+        <p class="gv-eyebrow mb-1">{{ get_phrase('Interviews') }}</p>
+        <h1 class="live-header__title">{{ get_phrase('Interview schedule') }}</h1>
+        <p class="live-header__subtitle">{{ get_phrase('Upcoming and in-progress interviews with scoring and waiting rooms.') }}</p>
+    </div>
+@endsection
+
+@section('live-content')
+@php
+    use Illuminate\Support\Str;
+@endphp
+<div class="space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="mb-1">Interviews</h1>
-            <p class="text-muted mb-0">Upcoming and in-progress interviews.</p>
+            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ get_phrase('Interviews') }}</h2>
+            <p class="gv-muted mb-0">{{ get_phrase('Stay on top of interviews for candidates and panels.') }}</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('wnip.interviews.index', ['create' => 1]) }}">Schedule Interview</a>
+        <a class="gv-btn gv-btn-primary" href="{{ route('wnip.interviews.index', ['create' => 1]) }}">
+            {{ get_phrase('Schedule interview') }}
+        </a>
     </div>
 
-    <form method="get" class="card p-3 shadow-sm mb-3">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-6">
-                <label class="form-label">Search</label>
-                <input type="text" name="q" class="form-control" value="{{ $filters['q'] ?? '' }}" placeholder="Title">
-            </div>
-            <div class="col-md-2 text-end">
-                <button class="btn btn-outline-secondary" type="submit">Filter</button>
-            </div>
+    <form method="get" class="gv-card space-y-3">
+        <label class="space-y-1 w-full md:w-1/2">
+            <span class="gv-label">{{ get_phrase('Search interviews') }}</span>
+            <input type="text" name="q" class="gv-input" value="{{ $filters['q'] ?? '' }}"
+                placeholder="{{ get_phrase('Title') }}">
+        </label>
+        <div class="flex justify-end">
+            <button class="gv-btn gv-btn-primary" type="submit">{{ get_phrase('Filter') }}</button>
         </div>
     </form>
 
-    <div class="row g-3">
+    <div class="grid gap-4 lg:grid-cols-2">
         @forelse($interviews as $interview)
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title mb-1">{{ $interview->title }}</h5>
-                                <p class="text-muted mb-1">{{ $interview->scheduled_at?->toDayDateTimeString() }}</p>
-                                <p class="text-muted small mb-2">{{ \Illuminate\Support\Str::limit($interview->description, 120) }}</p>
-                            </div>
-                            <span class="badge bg-light text-dark">{{ $interview->is_panel ? 'Panel' : 'Single' }}</span>
-                        </div>
-                        <a class="btn btn-outline-primary" href="{{ route('wnip.interviews.show', $interview) }}">Open</a>
+            <article class="gv-card space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ $interview->title }}</h3>
+                        <p class="text-sm text-[var(--gv-color-neutral-500)] mb-1">
+                            {{ $interview->scheduled_at?->format('M j • g:i A') ?? get_phrase('TBD') }}
+                        </p>
+                        <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+                            {{ Str::limit($interview->description, 140) }}
+                        </p>
                     </div>
+                    <span class="gv-pill">
+                        {{ $interview->is_panel ? get_phrase('Panel') : get_phrase('1:1') }}
+                    </span>
                 </div>
-            </div>
+                <a class="gv-btn gv-btn-ghost w-full" href="{{ route('wnip.interviews.show', $interview) }}">
+                    {{ get_phrase('Open interview') }}
+                </a>
+            </article>
         @empty
-            <div class="col-12">
-                <div class="alert alert-info">No interviews scheduled.</div>
+            <div class="lg:col-span-2">
+                <div class="gv-empty">
+                    {{ get_phrase('No interviews scheduled.') }}
+                </div>
             </div>
         @endforelse
     </div>
 
-    <div class="mt-3">{{ $interviews->links() }}</div>
+    <div>
+        {{ $interviews->links() }}
+    </div>
 </div>
 @endsection

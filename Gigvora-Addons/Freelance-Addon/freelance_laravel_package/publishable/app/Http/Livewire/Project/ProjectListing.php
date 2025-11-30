@@ -187,7 +187,9 @@ class ProjectListing extends Component
         $siteTitle  = $sitInfo['site_name'];
         $title      = $siteTitle . ' | ' .  __('general.project_listing'); 
 
-        return view('livewire.project.'.$this->userRole.'-projects', compact($key))->extends('layouts.app', compact('title'));
+        return view('livewire.project.'.$this->userRole.'-projects', compact($key))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function addReviewPopup( $author_id ='', $project_id =''){

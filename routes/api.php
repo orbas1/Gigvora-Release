@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\FreelanceWorkspaceController;
+use App\Http\Controllers\Api\NavigationController as NavigationApiController;
+use App\Http\Controllers\Api\UtilitiesQuickToolsController;
+use App\Http\Controllers\UtilitiesComposerController;
 use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +22,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->get('/navigation', NavigationApiController::class)->name('api.navigation');
+Route::middleware('auth:sanctum')->get('/utilities/quick-tools', UtilitiesQuickToolsController::class)->name('api.utilities.quick-tools');
+Route::middleware('auth:sanctum')->get('/utilities/composer/assets', [UtilitiesComposerController::class, 'assets'])->name('api.utilities.composer.assets');
+Route::middleware('auth:sanctum')->get('/utilities/composer/gifs', [UtilitiesComposerController::class, 'gifs'])->name('api.utilities.composer.gifs');
+Route::middleware(['auth:sanctum', 'verified'])->get('/freelance/workspace', FreelanceWorkspaceController::class)->name('api.freelance.workspace');
 
 Route::get('/data', [ApiController::class,'userdata']);
 
@@ -134,14 +144,6 @@ Route::post('/blog_delete/{id}', [ApiController::class,'blog_delete']);
 
 Route::get('/paid_content', [ApiController::class,'paid_content']);
 Route::get('/paid_content_package', [ApiController::class,'paid_content_package']);
-
-Route::get('/jobs', [ApiController::class,'jobs']);
-Route::post('/create_jobs', [ApiController::class,'create_jobs']);
-Route::post('/update_jobs/{id}', [ApiController::class,'update_jobs']);
-Route::post('/job_delete/{id}', [ApiController::class,'job_delete']);
-Route::get('/job_wishlist', [ApiController::class,'job_wishlist']);
-Route::post('/job_add_wishlist/{id}', [ApiController::class,'job_add_wishlist']);
-Route::post('/JobApply/{id}', [ApiController::class,'JobApply']);
 
 Route::get('/fundraisers', [ApiController::class,'fundraisers']);
 Route::post('/create_fundraiser', [ApiController::class,'create_fundraiser']);

@@ -21,4 +21,9 @@ class Subscription extends Model
     protected $casts = [
         'renews_at' => 'datetime',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(CompanyProfile::class, 'company_id');
+    }
 }

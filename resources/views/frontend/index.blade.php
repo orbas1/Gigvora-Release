@@ -74,11 +74,6 @@
 
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/fundraiser/css/custom_new.css') }}" />
 
-    {{-- Job Addon Css --}}
-    @if (addon_status('job') == 1)
-     <link rel="stylesheet" href="{{ asset('assets/frontend/css/job/style.css') }}" />
-    @endif
-    {{-- Job Addon Css --}}
 	<link rel="stylesheet" href="{{ asset('assets/frontend/css/fundraiser/css/custom_responsive.css') }}" />
     <script src="{{ asset('assets/frontend/js/jquery-3.6.0.min.js') }}"></script>
 
@@ -104,36 +99,30 @@
 @php
     $themeColor = App\Models\Setting::where('type', 'theme_color')->value('description');
 @endphp
-<body class="{{$themeColor}} {{$theme_color}}">
+<body class="{{$themeColor}} {{$theme_color}} gv-shell">
     @php $user_info = Auth()->user() @endphp
 
     @include('frontend.header')
 
     <!-- Main Start -->
-    <main class="main my-4 mt-12">
-        <div class="container">
-            <div class="row">
-
-                @if (isset($layout))
+    <main class="gv-shell-main">
+        @if (isset($layout))
+            <div class="container">
+                @include($view_path)
+            </div>
+        @else
+            <div class="gv-shell-grid">
+                <aside>
+                    @include('frontend.left_navigation')
+                </aside>
+                <section class="gv-main">
                     @include($view_path)
-                @else
-                    <div class="col-lg-3">
-                        @include('frontend.left_navigation')
-                    </div>
-                    <!-- Timeline Navigation End -->
-
-                    <!-- Content Section Start -->
-                    <div class="col-lg-6 col-sm-12 order-3 order-lg-2">
-                        @include($view_path)
-                    </div>
-                    <div class="col-lg-3 order-2 order-lg-3">
-                        @include('frontend.right_sidebar', ['type' => 'my_account'])
-                    </div>
-                @endif
-
-            </div> <!-- row end -->
-
-        </div> <!-- container end -->
+                </section>
+                <section class="space-y-4">
+                    @include('frontend.right_sidebar', ['type' => 'my_account'])
+                </section>
+            </div>
+        @endif
     </main>
     <!-- Main End -->
 

@@ -4,7 +4,7 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="profile-photo-tab"
                 data-bs-toggle="tab" data-bs-target="#profile-photo" type="button"
-                role="tab" aria-controls="profile-photo" aria-selected="true">{{get_phrase('Photos')}}</button>
+                role="tab" aria-controls="profile-photo" aria-selected="true">{{get_phrase('Photos & Reels')}}</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="profile-album-tab" data-bs-toggle="tab"

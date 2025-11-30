@@ -1,4 +1,4 @@
-@extends('layouts.freelance')
+@extends('freelance::layouts.freelance')
 
 @section('freelance-content')
     <section class="tk-searchproject-section tk-main-bg" aria-label="{{ __('Freelance project search') }}">

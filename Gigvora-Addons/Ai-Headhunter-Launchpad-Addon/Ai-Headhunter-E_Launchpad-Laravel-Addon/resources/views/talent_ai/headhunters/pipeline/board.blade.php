@@ -15,11 +15,14 @@
     <div class="talent-ai-page">
         <div class="talent-ai-header">
             <div>
-                <h1 class="h4 mb-1">Pipeline: {{ $mandate->title ?? '' }}</h1>
-            <p class="text-muted mb-0">Drag candidates between stages and keep notes synced.</p>
+                <p class="gv-eyebrow mb-1">{{ get_phrase('Pipeline') }}</p>
+                <h1 class="gv-heading text-lg mb-1">{{ $mandate->title ?? get_phrase('Untitled mandate') }}</h1>
+                <p class="text-sm gv-muted mb-0">{{ get_phrase('Drag candidates between stages and keep notes synced.') }}</p>
+            </div>
+            <a href="{{ url()->previous() }}" class="gv-btn gv-btn-ghost">
+                <i class="fa-solid fa-arrow-left me-1"></i>@lang('talent_ai::addons_talent_ai.common.back')
+            </a>
         </div>
-        <a href="{{ url()->previous() }}" class="btn btn-light">@lang('talent_ai::addons_talent_ai.common.back')</a>
-    </div>
 
     <div data-pipeline-feedback class="mb-3"></div>
 

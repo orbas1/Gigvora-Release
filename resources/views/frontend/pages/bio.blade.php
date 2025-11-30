@@ -81,7 +81,7 @@
 
         <div class="widget">
             <div class="n_pro_con d-flex align-items-start">
-                <h4 class="widget-title">{{ get_phrase('Photo/Video') }}</h4>
+                <h4 class="widget-title">{{ get_phrase('Photos & Reels') }}/{{ get_phrase('Videos') }}</h4>
                 <a href="{{ route('single.page.photos',$page->id) }}">{{ get_phrase('See All') }}</a>
             </div>
            

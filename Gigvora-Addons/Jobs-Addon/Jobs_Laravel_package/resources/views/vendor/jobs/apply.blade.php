@@ -1,123 +1,125 @@
 @extends('layouts.app')
 
-@section('title', 'Apply for ' . ($job->title ?? 'Job'))
+@section('title', get_phrase('Apply') . ' – ' . ($job->title ?? get_phrase('Role')))
 
-@section('breadcrumbs')
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="/jobs">Jobs</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('jobs.show', $job->id ?? null) }}">{{ $job->title ?? 'Role' }}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Apply</li>
-    </ol>
-</nav>
+@section('page-header')
+    <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Application wizard') }}</p>
+            <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-0">
+                {{ get_phrase('Apply to :role', ['role' => $job->title]) }}
+            </h1>
+        </div>
+        <span class="gv-chip gv-chip-muted">{{ optional($job->company)->name }}</span>
+    </div>
 @endsection
 
 @section('content')
-<div class="container py-4" id="job-apply-wizard" data-job-id="{{ $job->id ?? '' }}">
-    <div class="row">
-        <div class="col-lg-8">
-            <h1 class="h3 mb-4">Apply to {{ $job->title ?? 'this role' }}</h1>
-            <div class="progress mb-3" style="height: 6px;">
-                <div class="progress-bar" id="apply-progress" style="width:20%;"></div>
+    <div id="job-apply-wizard" class="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]" data-job-id="{{ $job->id ?? '' }}">
+        <div class="space-y-4">
+            <div class="bg-[var(--gv-color-neutral-100)] rounded-full h-2 overflow-hidden">
+                <div id="apply-progress" class="h-full bg-[var(--gv-color-primary-500)] transition-all duration-300" style="width: 20%;"></div>
             </div>
-            <form id="application-form" method="post" action="{{ route('jobs.apply.submit', $job->id ?? null) }}" novalidate>
+
+            <form id="application-form" method="post" action="{{ route('jobs.apply.submit', $job->id) }}" class="space-y-6">
                 @csrf
                 <input type="hidden" name="job_id" value="{{ $job->id }}">
                 <input type="hidden" name="candidate_id" value="{{ auth()->id() }}">
-                <div class="step" data-step="1">
-                    <h5 class="mb-3">Profile & Contact</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Full name</label>
-                        <input type="text" class="form-control" name="name" value="{{ auth()->user()->name ?? '' }}" required>
+
+                <section class="gv-card step space-y-4" data-step="1">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-1">{{ get_phrase('CV & Experience') }}</h2>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Pick a saved CV from Gigvora or connect a new one.') }}</p>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" value="{{ auth()->user()->email ?? '' }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="tel" class="form-control" name="phone" value="{{ auth()->user()->phone ?? '' }}">
-                    </div>
-                </div>
-                <div class="step d-none" data-step="2">
-                    <h5 class="mb-3">CV Selection</h5>
-                    <div class="mb-3">
-                        <label class="form-label">Choose existing CV</label>
-                        <select class="form-select" name="cv_template_id">
+                    <div class="space-y-2">
+                        <label class="gv-label" for="cv_template_id">{{ get_phrase('Choose a CV') }}</label>
+                        <select class="gv-input" name="cv_template_id" id="cv_template_id" required>
+                            <option value="">{{ get_phrase('Select a CV template') }}</option>
                             @foreach(($cvs ?? []) as $cv)
                                 <option value="{{ $cv->id }}">{{ $cv->title }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Upload new CV</label>
-                        <input type="file" class="form-control" name="cv_upload">
-                        <small class="text-muted">Upload handled by backend.</small>
+                </section>
+
+                <section class="gv-card step hidden space-y-4" data-step="2">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-1">{{ get_phrase('Cover letter') }}</h2>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Let the hiring team know why you stand out.') }}</p>
                     </div>
-                </div>
-                <div class="step d-none" data-step="3">
-                    <h5 class="mb-3">Cover Letter</h5>
-                    <textarea class="form-control" rows="6" name="notes" placeholder="Write a short message"></textarea>
-                    <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="generate-cover-letter">Generate from template</button>
-                </div>
-                <div class="step d-none" data-step="4">
-                    <h5 class="mb-3">Screening Questions</h5>
+                    <textarea class="gv-input min-h-[180px]" name="notes" placeholder="{{ get_phrase('Write your cover letter...') }}"></textarea>
+                    <button type="button" class="gv-btn gv-btn-ghost gv-btn-sm" id="generate-cover-letter">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>{{ get_phrase('Generate starter copy') }}
+                    </button>
+                </section>
+
+                <section class="gv-card step hidden space-y-4" data-step="3">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-1">{{ get_phrase('Screening questions') }}</h2>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Answer honestly to help recruiters assess fit.') }}</p>
+                    </div>
                     @forelse(($screeningQuestions ?? []) as $question)
-                        <div class="mb-3">
+                        <div class="space-y-2">
                             <input type="hidden" name="answers[{{ $loop->index }}][screening_question_id]" value="{{ $question->id }}">
-                            <label class="form-label">{{ $question->question ?? 'Question' }}</label>
-                            @if(($question['type'] ?? '') === 'multiple_choice')
-                                <select class="form-select" name="answers[{{ $loop->index }}][answer]">
-                                    @foreach($question['options'] ?? [] as $option)
+                            <label class="gv-label">{{ $question->question }}</label>
+                            @if($question->type === 'multiple_choice')
+                                <select class="gv-input" name="answers[{{ $loop->index }}][answer]">
+                                    @foreach($question->options ?? [] as $option)
                                         <option value="{{ $option }}">{{ $option }}</option>
                                     @endforeach
                                 </select>
-                            @elseif(($question['type'] ?? '') === 'boolean')
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="answers[{{ $loop->index }}][answer]" value="yes" id="q{{ $loop->index }}yes">
-                                    <label class="form-check-label" for="q{{ $loop->index }}yes">Yes</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="answers[{{ $loop->index }}][answer]" value="no" id="q{{ $loop->index }}no">
-                                    <label class="form-check-label" for="q{{ $loop->index }}no">No</label>
+                            @elseif($question->type === 'boolean')
+                                <div class="flex gap-4">
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="radio" class="gv-radio" name="answers[{{ $loop->index }}][answer]" value="yes">
+                                        <span>{{ get_phrase('Yes') }}</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-2">
+                                        <input type="radio" class="gv-radio" name="answers[{{ $loop->index }}][answer]" value="no">
+                                        <span>{{ get_phrase('No') }}</span>
+                                    </label>
                                 </div>
                             @else
-                                <textarea class="form-control" name="answers[{{ $loop->index }}][answer]" rows="3"></textarea>
+                                <textarea class="gv-input" rows="3" name="answers[{{ $loop->index }}][answer]"></textarea>
                             @endif
                         </div>
                     @empty
-                        <p class="text-muted">No screening questions for this role.</p>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('No screening questions for this role.') }}</p>
                     @endforelse
-                </div>
-                <div class="step d-none" data-step="5">
-                    <h5 class="mb-3">Review & Submit</h5>
-                    <p class="text-muted">Review your details before submitting.</p>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="1" id="consentCheck" required>
-                        <label class="form-check-label" for="consentCheck">I consent to sharing my data with {{ $job->company->name ?? 'the employer' }}</label>
+                </section>
+
+                <section class="gv-card step hidden space-y-4" data-step="4">
+                    <div>
+                        <h2 class="text-lg font-semibold mb-1">{{ get_phrase('Review & submit') }}</h2>
+                        <p class="gv-muted text-sm mb-0">{{ get_phrase('Confirm the details below and submit your application.') }}</p>
                     </div>
-                    <button class="btn btn-success" type="submit">Submit Application</button>
-                </div>
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-secondary" id="prev-step">Back</button>
-                    <button type="button" class="btn btn-primary" id="next-step">Next</button>
+                    <label class="inline-flex items-start gap-2 text-sm">
+                        <input type="checkbox" class="gv-checkbox mt-1" value="1" id="consentCheck" required>
+                        <span>{{ get_phrase('I consent to sharing my information with :company', ['company' => optional($job->company)->name ?? get_phrase('the employer')]) }}</span>
+                    </label>
+                    <button class="gv-btn gv-btn-primary" type="submit">{{ get_phrase('Submit application') }}</button>
+                </section>
+
+                <div class="flex items-center justify-between">
+                    <button type="button" class="gv-btn gv-btn-ghost" id="prev-step">{{ get_phrase('Back') }}</button>
+                    <button type="button" class="gv-btn gv-btn-primary" id="next-step">{{ get_phrase('Next') }}</button>
                 </div>
             </form>
         </div>
-        <div class="col-lg-4">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h6 class="text-muted">Summary</h6>
-                    <p class="mb-1 fw-semibold">{{ $job->title ?? 'Role' }}</p>
-                    <p class="text-muted small mb-1">{{ $job->company->name ?? '' }}</p>
-                    <p class="text-muted small mb-0">{{ $job->location ?? '' }} · {{ $job->employment_type ?? '' }} · {{ $job->salary_label ?? '' }}</p>
-                </div>
-            </div>
-        </div>
+
+        <aside class="gv-card space-y-2">
+            <h3 class="text-lg font-semibold mb-0">{{ get_phrase('Summary') }}</h3>
+            <p class="text-sm text-[var(--gv-color-neutral-700)] mb-1">{{ $job->title }}</p>
+            <p class="gv-muted text-sm mb-2">{{ optional($job->company)->name }} · {{ $job->location }}</p>
+            <ul class="space-y-1 text-sm text-[var(--gv-color-neutral-700)]">
+                <li>{{ get_phrase('Workplace') }}: {{ $job->workplace_type ?? get_phrase('Flexible') }}</li>
+                <li>{{ get_phrase('Employment type') }}: {{ $job->employment_type ?? get_phrase('Full-time') }}</li>
+                <li>{{ get_phrase('Salary') }}: {{ $job->salary_label ?? get_phrase('Competitive') }}</li>
+            </ul>
+        </aside>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script type="module" src="{{ mix('resources/js/jobs/jobApplyWizard.js') }}"></script>
+    <script type="module" src="{{ mix('resources/js/jobs/jobApplyWizard.js') }}"></script>
 @endpush

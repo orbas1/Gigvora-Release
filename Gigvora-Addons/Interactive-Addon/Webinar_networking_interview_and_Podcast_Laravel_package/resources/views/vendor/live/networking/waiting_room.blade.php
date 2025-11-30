@@ -1,27 +1,41 @@
-@extends('layouts.app')
+@extends('wnip::layouts.live')
 
-@section('content')
-<div class="container py-4">
-    <h1 class="mb-1">Networking Waiting Room</h1>
-    <p class="text-muted">{{ $session->title }} • {{ $session->starts_at?->toDayDateTimeString() }}</p>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="fw-semibold">Countdown</div>
-                <span class="badge bg-secondary session-state">{{ ucfirst($session->status) }}</span>
-            </div>
-            <div class="display-6" id="networking-countdown" data-start="{{ $session->starts_at?->toIso8601String() }}">--:--</div>
-            <p class="text-muted">Finalise your intro card while we prepare your first rotation.</p>
-            <form class="mt-3">
-                <div class="row g-2">
-                    <div class="col-md-6"><input class="form-control" placeholder="Headline" /></div>
-                    <div class="col-md-6"><input class="form-control" placeholder="Bio / Links" /></div>
-                </div>
-            </form>
-            <a id="enter-networking" href="{{ route('wnip.networking.live', $session) }}" class="btn btn-primary mt-3" {{ $session->status === 'in_rotation' ? '' : 'disabled' }}>Join Session</a>
-        </div>
+@section('live-header')
+    <div>
+        <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Networking Waiting Room') }}</p>
+        <h1 class="live-header__title">{{ $networkingSession->title }}</h1>
+        <p class="live-header__subtitle">{{ __('Shuffle into the next rotation as soon as the host starts the room.') }}</p>
     </div>
+@endsection
+
+@section('live-content')
+<div class="gv-card space-y-4">
+    @include('wnip::components.waiting_room_header', [
+        'title' => $session->title,
+        'host' => optional($session->host)->name ?? get_phrase('Host'),
+        'start' => $session->starts_at?->format('M j • g:i A'),
+        'status' => ucfirst($session->status ?? 'waiting'),
+        'statusAttributes' => 'data-waiting-status="true"',
+    ])
+
+    <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+        {{ get_phrase('Rotations every :seconds seconds', ['seconds' => $session->rotation_interval ?? 60]) }}
+    </p>
+    <div class="text-4xl font-mono text-[var(--gv-color-neutral-900)]" id="networking-countdown"
+        data-start="{{ $session->starts_at?->toIso8601String() }}">--:--</div>
+    <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+        {{ get_phrase('Finalise your intro card while we prepare your first rotation.') }}
+    </p>
+    <form class="grid gap-3 md:grid-cols-2">
+        <input class="gv-input" placeholder="{{ get_phrase('Headline') }}" />
+        <input class="gv-input" placeholder="{{ get_phrase('Bio / Links') }}" />
+    </form>
+    @php $canJoin = $session->status === 'in_rotation'; @endphp
+    <a id="enter-networking" href="{{ route('wnip.networking.live', $session) }}"
+        class="gv-btn gv-btn-primary {{ $canJoin ? '' : 'opacity-50 pointer-events-none' }}"
+        @unless($canJoin) aria-disabled="true" @endunless>
+        {{ get_phrase('Join session') }}
+    </a>
 </div>
 @endsection
 
@@ -30,18 +44,35 @@
     const countdown = document.getElementById('networking-countdown');
     if (countdown) {
         const start = new Date(countdown.dataset.start);
-        const state = document.querySelector('.session-state');
+        const state = document.querySelector('[data-waiting-status]');
         const join = document.getElementById('enter-networking');
+        const enableJoin = () => {
+            if (!join) {
+                return;
+            }
+            join.classList.remove('opacity-50', 'pointer-events-none');
+            join.removeAttribute('aria-disabled');
+        };
+        const disableJoin = () => {
+            if (!join) {
+                return;
+            }
+            join.classList.add('opacity-50', 'pointer-events-none');
+            join.setAttribute('aria-disabled', 'true');
+        };
         const tick = () => {
             const now = new Date();
             const diff = start - now;
             if (diff <= 0) {
                 countdown.textContent = '00:00';
-                state.textContent = 'Live';
-                state.classList.replace('bg-secondary', 'bg-success');
-                join?.removeAttribute('disabled');
+                if (state) {
+                    state.textContent = '{{ get_phrase('Live now') }}';
+                    state.classList.add('gv-pill--danger');
+                }
+                enableJoin();
                 return;
             }
+            disableJoin();
             const minutes = Math.floor(diff / 1000 / 60);
             const seconds = Math.floor((diff / 1000) % 60);
             countdown.textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;

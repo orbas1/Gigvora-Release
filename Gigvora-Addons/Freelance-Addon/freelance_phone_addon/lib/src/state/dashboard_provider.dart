@@ -23,6 +23,23 @@ class DashboardSnapshot {
 final dashboardSnapshotProvider = FutureProvider.autoDispose<DashboardSnapshot>((ref) async {
   final repository = ref.watch(freelanceRepositoryProvider);
 
+  try {
+    final snapshot = await repository.fetchWorkspaceSnapshot();
+    final freelancer = snapshot.freelancer;
+
+    if (freelancer != null) {
+      return DashboardSnapshot(
+        gigCount: freelancer.activeGigs,
+        projectCount: freelancer.openContracts,
+        disputeCount: freelancer.openDisputes,
+        escrows: freelancer.escrows,
+        recommendedProjects: freelancer.recommendations,
+      );
+    }
+  } catch (_) {
+    // Fallback to legacy multi-call flow below.
+  }
+
   final gigs = await repository.fetchGigs(filters: {'per_page': 5});
   final projects = await repository.fetchProjects(filters: {'per_page': 5});
   final disputes = await repository.fetchDisputes();

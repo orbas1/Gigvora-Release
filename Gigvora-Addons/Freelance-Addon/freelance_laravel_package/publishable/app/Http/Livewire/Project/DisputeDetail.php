@@ -226,7 +226,10 @@ class DisputeDetail extends Component
             }
         }
         $title = __('general.dispute_detail');
-        return view('livewire.project.dispute-detail', compact('chat', 'chatId', 'gig_addons'))->extends('layouts.app', compact('title'));
+
+        return view('livewire.project.dispute-detail', compact('chat', 'chatId', 'gig_addons'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
 
     }
 

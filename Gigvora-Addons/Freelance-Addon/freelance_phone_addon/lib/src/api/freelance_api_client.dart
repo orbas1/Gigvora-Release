@@ -20,6 +20,7 @@ import '../models/project_board.dart';
 import '../models/recommendations.dart';
 import '../models/search_result.dart';
 import '../models/tag.dart';
+import '../models/workspace_snapshot.dart';
 
 class FreelanceApiClient {
   FreelanceApiClient({
@@ -183,6 +184,11 @@ class FreelanceApiClient {
   Future<FreelanceRecommendations> fetchRecommendations({int limit = 10}) async {
     final data = await _get('freelance/recommendations', {'limit': limit.toString()});
     return FreelanceRecommendations.fromJson((data['data'] as Map<String, dynamic>?) ?? data);
+  }
+
+  Future<WorkspaceSnapshot> fetchWorkspaceSnapshot() async {
+    final data = await _get('workspace');
+    return WorkspaceSnapshot.fromJson(data['data'] as Map<String, dynamic>?);
   }
 
   Future<void> updateProfileTags({required List<String> tags, String type = 'freelancer'}) async {

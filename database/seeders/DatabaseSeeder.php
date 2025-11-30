@@ -14,12 +14,12 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->callAddonSeederIfExists(
-            'Gigvora-Addons-main/Advertisement-Addon/Advertisement_Laravel_package/database/seeders/AdvertisementSeeder.php',
+            'Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package/database/seeders/AdvertisementSeeder.php',
             \Database\Seeders\AdvertisementSeeder::class
         );
 
         $this->callAddonSeederIfExists(
-            'Gigvora-Addons-main/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-Laravel-Addon/database/seeders/TalentAiSeeder.php',
+            'Gigvora-Addons/Ai-Headhunter-Launchpad-Addon/Ai-Headhunter-E_Launchpad-Laravel-Addon/database/seeders/TalentAiSeeder.php',
             \Database\Seeders\TalentAiSeeder::class
         );
     }

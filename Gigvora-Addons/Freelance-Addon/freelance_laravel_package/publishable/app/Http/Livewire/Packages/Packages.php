@@ -43,7 +43,9 @@ class Packages extends Component
 
         $packages               = Package::with('package_role:id,name')->where(['status' => 'active', 'role_id' => $this->role_id])->get();
         $title = __('general.packages');
-        return view('livewire.packages.packages', compact('packages','subscribe_packages'))->extends('layouts.app', compact('title'));
+        return view('livewire.packages.packages', compact('packages','subscribe_packages'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function buyPackage( $id ){
@@ -71,7 +73,7 @@ class Packages extends Component
             session()->forget('project_data');
             session()->forget('gig_data');
             session()->put(['package_data' => $package_data ]);
-            return redirect()->route('checkout');
+            return redirect()->route('freelance.checkout');
         }
     }
 }

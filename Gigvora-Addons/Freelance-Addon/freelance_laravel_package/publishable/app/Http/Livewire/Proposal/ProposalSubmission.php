@@ -136,7 +136,9 @@ class ProposalSubmission extends Component
    
     public function render(){
         $title = __('general.submit_proposal');
-        return view('livewire.proposal.submit-proposal')->extends('layouts.app', compact('title'));
+        return view('livewire.proposal.submit-proposal')
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function edit( $id ){
@@ -436,7 +438,7 @@ class ProposalSubmission extends Component
                             'type'          => 'error',
                             'message'       => $e->getMessage(),
                             'autoClose'     => 4000,
-                            'redirectUrl'   => route('project-listing'),
+                            'redirectUrl'   => route('freelance.projects.index'),
                         ]);
                         return;
                     }
@@ -449,7 +451,7 @@ class ProposalSubmission extends Component
         $eventData['title']         = __('general.success_title');
         $eventData['message']       =  $status == 'draft' ? __('proposal.proposal_draft_msg') : __('proposal.proposal_submit_msg');;
         $eventData['type']          = 'success';
-        $eventData['redirectUrl']   = route('project-listing');
+        $eventData['redirectUrl']   = route('freelance.projects.index');
         $eventData['autoClose']     = 3000;
         
         $this->dispatchBrowserEvent('showAlertMessage', $eventData);

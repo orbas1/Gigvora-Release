@@ -7,7 +7,7 @@ The freelance package layers a complete marketplace experience on top of a socia
 - **Route shape**: API endpoints are grouped under the configurable `freelance.api.prefix` (default `api`); set `FREELANCE_API_PREFIX=api/freelance` to isolate the namespace while preserving Sanctum + `verified` + `role` middleware from the route file. Web middleware can be aligned with `FREELANCE_WEB_MIDDLEWARE` and optional `FREELANCE_WEB_PREFIX` for Blade/Llivewire pages. The Flutter client mirrors this through `apiPrefixProvider` (default `freelance/`) so mobile calls hit the same `/api/freelance/*` paths without custom URL concatenation.
 - **Middleware**: The API group uses `freelance.api.middleware` (default `api`) and nests Sanctum + role middleware for authenticated flows, matching the Sociopro Gigvora guard pattern.
 - **Policies/roles**: Controllers assume host roles `buyer`, `seller`, and `admin`; navigation/menu exposure in both web and Flutter should respect these roles when wiring links.
-- **Navigation hooks**: Web menus live in `resources/views/components/navigation/freelance-menu.blade.php` (Gigvora layout-friendly with responsive BEM styling). Flutter exposes `buildFreelanceMenu(isFreelancer: bool, isClient: bool, includeGlobal: bool)` to merge items into the host drawer/tab structure, and all published web pages should extend `resources/views/layouts/freelance.blade.php` to inherit the host shell and navigation.
+- **Navigation hooks**: Web menus live in `resources/views/components/navigation/freelance-menu.blade.php` (Gigvora layout-friendly with responsive BEM styling). Flutter exposes `buildFreelanceMenu(isFreelancer: bool, isClient: bool, includeGlobal: bool)` to merge items into the host drawer/tab structure, and all published web pages should extend `freelance::layouts.freelance` to inherit the host shell and navigation. The layout now loads the shared Mix bundles `mix('css/freelance/app.css')` and `mix('js/freelance/app.js')`, so individual Blade files should not push duplicate CSS/JS for controls that already live in those assets.
 - **Auth source of truth**: Login, registration, and password reset flows remain in the core Gigvora app; the freelance add-on consumes the shared session/token instead of publishing duplicate endpoints.
 
 ## Architecture & Modules
@@ -77,6 +77,10 @@ The freelance package layers a complete marketplace experience on top of a socia
   - `FreelanceRepository` wraps API for gigs/projects/disputes/escrow/tags/portfolios/education/certifications/reviews/recommendations and bid/dispute actions.
   - Providers: `gigsProvider`, `projectsProvider`, `disputesProvider`, `disputeStagesProvider`, `escrowProvider`, `tagActionsProvider`, `dashboardSnapshotProvider`.
   - UI widgets: `GigCard`, `ProjectCard`, `MetricGrid`, `MilestoneList`, etc.
+- **Integration helpers**
+  - `FreelanceAddonIntegration.providerOverrides` builds Riverpod overrides (base URL, API prefix, token provider, timeout, optional HTTP client) so the host can wrap each `/freelance/*` route inside a `ProviderScope` without writing glue code.
+  - `FreelanceAddonIntegration.navigationItems` mirrors the Laravel menu gating (freelancer/client/global) and should be used when composing the mobile drawer or bottom navigation.
+  - `FreelanceIntegrationOptions` in `GigvoraAddonNavigation` wires the add-on into the Sociopro shell by passing `enabled`, `baseUrl`, `apiPrefix`, `tokenProvider`, and visibility flags for freelancer/client menus; routes are automatically wrapped with the overrides above.
 
 ## Integration Guide – Feed & Search
 - **Feed**
@@ -114,8 +118,8 @@ The freelance package layers a complete marketplace experience on top of a socia
    - Run `php artisan migrate` and seed any initial taxonomies/tags.
    - Wire navigation links to `/dashboard`, `/gigs-listing`, `/projects`, `/create-project`, `/create-gig`, `/dispute-list`, `/gig-activity/{slug}`.
 2. **Flutter add-on**
-   - Add dependency in host `pubspec.yaml` pointing to `freelance_phone_addon`.
-   - Wrap app with `ProviderScope`; override `baseUrlProvider`, `apiPrefixProvider`, `requestTimeoutProvider`, and `tokenProviderOverride` (or use `FreelanceAddonIntegration.providerOverrides`) to point at your Laravel API base and auth token getter.
-   - Register routes from `buildRoutes()` (or `FreelanceAddonIntegration.routes()`) and expose menu items via `FreelanceAddonIntegration.navigationItems` to mirror Gigvora’s role-aware nav.
+   - Add dependency in host `pubspec.yaml` pointing to `freelance_phone_addon` (the Sociopro shell already references it alongside advertisement/talent add-ons).
+   - Wrap the root app with `ProviderScope`; override `baseUrlProvider`, `apiPrefixProvider`, `requestTimeoutProvider`, and `tokenProviderOverride` (or rely on `FreelanceAddonIntegration.providerOverrides` + `FreelanceIntegrationOptions` in `GigvoraAddonNavigation.routes`) to point at your Laravel API base and synchronous auth token getter.
+   - Register routes from `FreelanceAddonIntegration.routes()` (exposed through `GigvoraAddonNavigation.routes`) and expose menu items via `FreelanceAddonIntegration.navigationItems` to mirror Gigvora’s role-aware drawer/tab entries.
    - Add analytics hooks around repository calls for the events listed above.
    - Use UI screens from `lib/src/ui/screens` for gigs/projects/disputes/escrow; dashboards and proposal/review flows are wired to live API data via Riverpod providers.

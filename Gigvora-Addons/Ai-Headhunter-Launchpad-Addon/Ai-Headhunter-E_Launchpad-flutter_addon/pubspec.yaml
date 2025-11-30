@@ -1,5 +1,5 @@
-name: pro_network_utilities_security_analytics
-description: Flutter addon for Sociopro professional utilities, security and analytics.
+name: talent_ai_flutter_addon
+description: Flutter addon for Gigvora Talent & AI (headhunter, launchpad, volunteering, AI workspace) routes.
 version: 0.1.0
 publish_to: 'none'
 

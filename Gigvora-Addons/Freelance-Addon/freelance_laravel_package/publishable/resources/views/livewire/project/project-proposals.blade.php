@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section class="tk-main-section">
         <div class="container">
@@ -26,7 +29,7 @@
                                 <div class="tk-project-detail">
                                     
                                     @if($project->status == 'draft' || $project->status == 'pending')<a href="{{ route('create-project', [ 'step'=> 2, 'id'=> $project->id ] ) }}" class="tk-edit-project"><i class="icon-edit-3"></i> {{ __('project.edit_project') }}</a>@endif
-                                    <a href="{{ route('project-detail', ['slug'=> $project->slug] ) }}" class="tk-btn-solid-lg">{{ __('project.view_project') }}</a>
+                                    <a href="{{ route('freelance.projects.detail', ['slug'=> $project->slug] ) }}" class="tk-btn-solid-lg">{{ __('project.view_project') }}</a>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +108,7 @@
                                                     <td data-label="{{ __('proposal.dated') }}">{{ date($date_format, strtotime($single->updated_at)) }}</td>
                                                     <td data-label="{{ __('general.status') }}"><span class="{{ $tag['class'] }}">{{ $tag['text'] }}</span></td>
                                                     @if( in_array($single->status, array('hired', 'completed', 'refunded', 'queued', 'rejected', 'disputed')))
-                                                        <td data-label="{{ __('general.actions') }}"><a href="{{route('project-activity', [ 'slug'=> $project->slug, 'id'=> $single->id ])}}">{{ __('project.project_activity') }}</a></td>
+                                                        <td data-label="{{ __('general.actions') }}"><a href="{{route('freelance.projects.activity', [ 'slug'=> $project->slug, 'id'=> $single->id ])}}">{{ __('project.project_activity') }}</a></td>
                                                     @else
                                                         <td data-label="{{ __('general.actions') }}"><a href="{{route('proposal-detail', [ 'slug'=> $project->slug, 'id'=> $single->id ])}}">{{ __('proposal.proposal_detail') }}</a></td>    
                                                     @endif
@@ -129,6 +132,7 @@
         </div>
     </section>
 </main>
+@endsection
 @push('scripts')
     <script defer src="{{ asset('common/js/popper-core.js') }}"></script> 
     <script defer src="{{ asset('common/js/tippy.js') }}"></script>

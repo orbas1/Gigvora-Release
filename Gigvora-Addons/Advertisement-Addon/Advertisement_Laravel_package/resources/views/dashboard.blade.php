@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('advertisement::layouts.app')
 
 @section('title', 'Gigvora Ads Manager')
 
@@ -6,44 +6,32 @@
     <script src="{{ mix('js/advertisement/dashboard.js') }}" defer></script>
 @endpush
 
-@section('content')
-<div class="container">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-        <div>
-            <h1 class="mb-2">Gigvora Ads Manager</h1>
-            <p class="text-muted mb-0">Manage campaigns, creatives, targeting, and affiliate payouts in one place.</p>
+@section('ads-page')
+    <div class="ads-page">
+        <div class="ads-page__header">
+            <div>
+                <h1 class="ads-page__title">Gigvora Ads Manager</h1>
+                <p class="ads-page__subtitle">Manage campaigns, creatives, targeting, and affiliate payouts in one place.</p>
+            </div>
+            <div class="ads-actions">
+                <a class="ads-button ads-button--primary" href="{{ route('advertisement.campaigns.create') }}">Create campaign</a>
+                <a class="ads-button ads-button--ghost" href="{{ route('advertisement.campaigns.index') }}">Keyword planner</a>
+            </div>
         </div>
-        <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a class="btn btn-primary" href="#">Create campaign</a>
-            <a class="btn btn-outline-secondary" href="#">Keyword planner</a>
-        </div>
-    </div>
 
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Performance overview</h5>
-                    <p class="card-text text-muted">Track spend, impressions, clicks, and conversions across active Gigvora placements.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Forecasts & keyword planner</h5>
-                    <p class="card-text text-muted">Model reach and budgets using the integrated forecast and planner widgets.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Affiliate payouts</h5>
-                    <p class="card-text text-muted">Monitor referrals and payout statuses for web and mobile partner traffic.</p>
-                </div>
-            </div>
+        <div class="ads-grid ads-grid--thirds">
+            <article class="ads-card">
+                <h2 class="ads-card__title">Performance overview</h2>
+                <p class="ads-card__body">Track spend, impressions, clicks, and conversions across all live placements.</p>
+            </article>
+            <article class="ads-card">
+                <h2 class="ads-card__title">Forecast & planner</h2>
+                <p class="ads-card__body">Model reach and budgets before campaigns go live using AI-assisted estimators.</p>
+            </article>
+            <article class="ads-card">
+                <h2 class="ads-card__title">Affiliate payouts</h2>
+                <p class="ads-card__body">Monitor referrals and payouts across web and mobile surfaces.</p>
+            </article>
         </div>
     </div>
-</div>
 @endsection

@@ -1,5 +1,5 @@
-@extends('layouts.app')
-    @section('content')
+@extends('freelance::layouts.freelance')
+@section('freelance-content')
         <main class="tk-scetiondb">
             <section class="tk-main-section tk-gigcheckout">
                 <div class="preloader-outer d-none">
@@ -46,7 +46,7 @@
                                     <div class="tk-checkoutdetail">
                                         <h6>
                                             @foreach($gig->categories as $single )
-                                                <a href="{{ route('search-gigs', ['category_id' => $single->category_id])}}">
+                                                <a href="{{ route('freelance.search.gigs', ['category_id' => $single->category_id])}}">
                                                     {{ $single->name}}
                                                 </a>
                                             @endforeach
@@ -341,7 +341,7 @@
                 @endif
             </section>   
         </main>
-    @endsection('content')
+    @endsection
 
  @push('scripts') 
     <script defer src="{{ asset('common/js/select2.min.js')}}"></script>
@@ -494,8 +494,5 @@
             });
         }
     </script>
- @endpush('scripts')   
-
-
-
-
+@endpush
+@endsection

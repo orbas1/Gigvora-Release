@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Pricing Table</h5>

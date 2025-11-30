@@ -22,6 +22,7 @@ use DB;
 use Illuminate\Database\Query\JoinClause;
 use Str;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Arr;
 
 use Carbon\Carbon;
 
@@ -246,8 +247,15 @@ class MainController extends Controller
             }
         }
 
+        $mediaStudio = app(\App\Services\MediaStudioService::class);
+        $studioManifest = $mediaStudio->sanitizeManifest($request->input('studio_manifest'));
+        $resolutionPreset = $mediaStudio->sanitizeResolution($request->input('resolution_preset'));
+        $composerMode = $request->input('composer_mode', 'standard');
+        $liveConfig = $this->sanitizeLiveConfig($request);
+
         $data['user_id'] = $this->user->id;
         $data['privacy'] = $request->privacy;
+        $data['composer_mode'] = $composerMode;
 
         if (isset($request->publisher) && !empty($request->publisher)) {
             $data['publisher'] = $request->publisher;
@@ -290,6 +298,10 @@ class MainController extends Controller
             $data['location'] = '';
         }
 
+        if (!empty($studioManifest)) {
+            $data['studio_manifest'] = json_encode($studioManifest);
+        }
+
 
         if (isset($request->description) && !empty($request->description)) {
             preg_match_all('/#(\w+)/', $request->description, $matchesHashtags); // Extract hashtags
@@ -324,6 +336,15 @@ class MainController extends Controller
         // Mobile App View Image
         $mobile_app_image = FileUploader::upload($request->mobile_app_image,'public/storage/post/images/');
         $data['mobile_app_image'] = $mobile_app_image;
+
+        $scheduledFor = $this->resolveScheduledFor($request);
+        if ($scheduledFor) {
+            $data['scheduled_for'] = $scheduledFor->format('Y-m-d H:i:s');
+        }
+
+        if (!empty($liveConfig)) {
+            $data['live_config'] = json_encode($liveConfig);
+        }
 
 
         $data['status'] = 'active';
@@ -361,7 +382,15 @@ class MainController extends Controller
             $ai_media_file_data = array('user_id' => auth()->user()->id, 'post_id' => $post_id, 'file_name' => $fileName, 'file_type' => 'image', 'privacy' => $request->privacy);
             $ai_media_file_data['created_at'] = time();
             $ai_media_file_data['updated_at'] = time();
-            Media_files::create($ai_media_file_data);
+            $aiMedia = Media_files::create($ai_media_file_data);
+            $absolutePath = $this->absoluteMediaPath('image', $fileName);
+            $dimension = $mediaStudio->ensureResolution($absolutePath, 'image', $resolutionPreset);
+            if (!empty($studioManifest)) {
+                $mediaStudio->applyFilter($absolutePath, 'image', $studioManifest['filter'] ?? 'none');
+            }
+            $aiMedia->resolution_preset = $resolutionPreset;
+            $aiMedia->processing_manifest = $mediaStudio->sanitizeProcessingMeta($studioManifest, $resolutionPreset, $dimension);
+            $aiMedia->save();
             unlink($tempImagePath);
         }
 
@@ -407,7 +436,16 @@ class MainController extends Controller
                 }
                 $media_file_data['created_at'] = time();
                 $media_file_data['updated_at'] = $media_file_data['created_at'];
-                Media_files::create($media_file_data);
+                $mediaRecord = Media_files::create($media_file_data);
+
+                $absolutePath = $this->absoluteMediaPath($file_type, $file_name);
+                $dimension = $mediaStudio->ensureResolution($absolutePath, $file_type, $resolutionPreset);
+                if (!empty($studioManifest)) {
+                    $mediaStudio->applyFilter($absolutePath, $file_type, $studioManifest['filter'] ?? 'none');
+                }
+                $mediaRecord->resolution_preset = $resolutionPreset;
+                $mediaRecord->processing_manifest = $mediaStudio->sanitizeProcessingMeta($studioManifest, $resolutionPreset, $dimension);
+                $mediaRecord->save();
             }
         }
 
@@ -417,6 +455,14 @@ class MainController extends Controller
             $live['publisher_id'] = $post_id;
             $live['user_id'] = auth()->user()->id;
             $live['details'] = json_encode(['link' => url('/streaming/live/' . $post_id), 'status' => TRUE]);
+            if (!empty($liveConfig)) {
+                $live['engagement_config'] = json_encode([
+                    'donation_goal' => (float) Arr::get($liveConfig, 'donation_goal', 0),
+                    'viewer_goal' => (int) Arr::get($liveConfig, 'viewer_goal', 0),
+                    'cta_links' => Arr::get($liveConfig, 'cta_links', []),
+                ]);
+                $live['viewer_goal'] = (int) Arr::get($liveConfig, 'viewer_goal', 0);
+            }
             $live['created_at'] = date('Y-m-d H:i:s', time());
             $live['updated_at'] = $live['created_at'];
   
@@ -711,6 +757,65 @@ class MainController extends Controller
     {
         Posts::where('post_id', $post_id)->update(['description' => json_encode(['live_video_ended' => 'yes'])]);
         return redirect()->route('timeline');
+    }
+
+    protected function resolveScheduledFor(Request $request): ?\Carbon\Carbon
+    {
+        $scheduleInput = $request->input('scheduled_for');
+
+        if (!$scheduleInput && $request->filled('scheduled_date')) {
+            $scheduleInput = trim($request->input('scheduled_date') . ' ' . $request->input('scheduled_time'));
+        }
+
+        if (!$scheduleInput) {
+            return null;
+        }
+
+        try {
+            $scheduled = Carbon::parse($scheduleInput);
+            if ($scheduled->isPast()) {
+                return null;
+            }
+
+            return $scheduled;
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    protected function sanitizeLiveConfig(Request $request): array
+    {
+        $links = collect($request->input('live_cta_links', []))
+            ->filter(fn ($link) => !empty($link['label']) && !empty($link['url']))
+            ->map(fn ($link) => [
+                'label' => strip_tags($link['label']),
+                'url' => filter_var($link['url'], FILTER_SANITIZE_URL),
+            ])
+            ->values()
+            ->toArray();
+
+        $config = array_filter([
+            'donation_goal' => $request->filled('live_donation_goal') ? (float) $request->input('live_donation_goal') : null,
+            'viewer_goal' => $request->filled('live_viewer_goal') ? (int) $request->input('live_viewer_goal') : null,
+            'cta_links' => $links,
+        ], function ($value) {
+            if (is_array($value)) {
+                return !empty($value);
+            }
+
+            return $value !== null;
+        });
+
+        return $config;
+    }
+
+    protected function absoluteMediaPath(string $fileType, string $fileName): string
+    {
+        $baseDirectory = $fileType === 'video'
+            ? public_path('storage/post/videos')
+            : public_path('storage/post/images');
+
+        return rtrim($baseDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public function search_friends_for_tagging(Request $request)
@@ -1022,7 +1127,7 @@ class MainController extends Controller
         
         $done = $post->save();
 
-        Session::flash('success_message', get_phrase('Posted On My Timeline Successfully'));
+        Session::flash('success_message', get_phrase('Posted On My Feed Successfully'));
         return json_encode(array('url' => route('profile')));
     }
 

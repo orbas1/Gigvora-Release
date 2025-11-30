@@ -152,7 +152,7 @@
         <div class="edit-modal-footer text-center p-3">
             <button type="button" data-tab="tab-file{{ $post->post_id }}"
                 class="btn btn-secondary status-type-btn"><img src="{{ asset('storage/images/image.svg') }}"
-                    alt="photo">{{ get_phrase('Photo') }}/{{ get_phrase('Video') }}</button>
+                    alt="photo">{{ get_phrase('Photos & Reels (≤2 min)') }}</button>
 
             <button type="button" data-tab="tab-tag{{ $post->post_id }}"
                 class="btn btn-secondary status-type-btn"><img src="{{ asset('storage/images/peoples.png') }}"

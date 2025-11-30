@@ -2,7 +2,7 @@
 
 @section('title', 'Dispute Review')
 
-@section('content')
+@section('freelance-content')
 <div class="container-fluid py-4" id="admin-dispute-detail">
     <div class="card mb-3">
         <div class="card-body">

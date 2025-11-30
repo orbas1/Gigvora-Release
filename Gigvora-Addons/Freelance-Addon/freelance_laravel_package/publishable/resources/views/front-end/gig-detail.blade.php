@@ -1,5 +1,5 @@
-@extends('layouts.app', ['title' =>$gig->title, 'include_menu' => true])
-@section('content')
+@extends('freelance::layouts.freelance', ['title' => $gig->title])
+@section('freelance-content')
     <main class="tk-scetiondb">
         <section>
             <div class="container">
@@ -54,6 +54,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    @php($freelanceDetailAd = config('advertisement.enabled') ? app(\App\Services\AdvertisementSurfaceService::class)->forSlot('freelance_detail') : null)
+                    <div class="col-12 mb-4">
+                        @includeWhen($freelanceDetailAd, 'advertisement::components.ad_banner', ['ad' => $freelanceDetailAd])
                     </div>
                     @php
                         $attachments = [];
@@ -335,7 +339,7 @@
                                                         </div>
                                                         @role('buyer')
                                                         <div class="tk-sidebarpkg__btn">
-                                                            <a href="{{route('gig-cart',['slug' => $gig->slug, 'plan_id' => $plan->id ])}}" class="tk-btn-solid-lg">{{__('gig.hire_for_gig')}} <i class="icon-arrow-right"></i></a>
+                                                            <a href="{{route('freelance.buyer.gig-cart',['slug' => $gig->slug, 'plan_id' => $plan->id ])}}" class="tk-btn-solid-lg">{{__('gig.hire_for_gig')}} <i class="icon-arrow-right"></i></a>
                                                         </div>
                                                         @endrole
                                                     </div>
@@ -400,7 +404,7 @@
                                             </ul>
 
                                             <div class="tk-btnviewpro">
-                                                <a href="{{route('seller-profile',['slug' => $gig->gigAuthor->slug ])}}" class="tk-btn-plain tk-btn-solid-lg"> {{ ucwords( __('proposal.view_profile') )}}</a>
+                                                <a href="{{route('freelance.sellers.profile',['slug' => $gig->gigAuthor->slug ])}}" class="tk-btn-plain tk-btn-solid-lg"> {{ ucwords( __('proposal.view_profile') )}}</a>
                                                 @role('buyer')
                                                     <a href="javascript:void(0);" data-type="profile" class="tk-fav-item {{$is_favourite ? 'tk-favourite' : '' }}">
                                                         <i class="icon-heart"></i>
@@ -422,7 +426,7 @@
             </div>
         </section>
     </main>
-@endsection('content')
+@endsection
 
 @push('styles')
         @vite([

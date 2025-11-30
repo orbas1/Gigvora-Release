@@ -35,8 +35,12 @@ use App\Http\Controllers\Api\SendMessageController;
 |
 */
 
-Route::prefix(config('freelance.api.prefix', 'api'))
-    ->middleware(config('freelance.api.middleware', ['api']))
+$apiMiddleware = config('freelance.api.middleware', ['api']);
+$apiPrefix = trim(config('freelance.api.prefix', 'api/freelance'), '/');
+
+Route::prefix($apiPrefix === '' ? '' : $apiPrefix)
+    ->middleware($apiMiddleware)
+    ->as('freelance.api.')
     ->group(function () {
         // Auth endpoints are provided by the host app; avoid duplicating login/register here.
 

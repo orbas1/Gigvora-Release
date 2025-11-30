@@ -93,7 +93,9 @@ class ProposalDetail extends Component
     public function render()
     {
         $title          = __('general.proposal_detail'); 
-        return view('livewire.proposal.proposal-detail')->extends('layouts.app', compact('title'));
+        return view('livewire.proposal.proposal-detail')
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function confirmDeclineProposal(){
@@ -135,11 +137,11 @@ class ProposalDetail extends Component
             $eventData['project_title']             = $this->project->project_title;
             $eventData['user_name']                 = $this->proposal->proposalAuthor->full_name;
             $eventData['user_id']                   = $this->proposal->proposalAuthor->user_id;
-            $eventData['project_activity_link']     = route('project-activity', ['slug' => $this->project->slug, 'id'=> $this->proposal->id]);
+            $eventData['project_activity_link']     = route('freelance.projects.activity', ['slug' => $this->project->slug, 'id'=> $this->proposal->id]);
             $eventData['email_type']                = 'proposal_request_accepted';
             // send mail in hourly project using event
             event(new NotifyUser($eventData));
-            return redirect()->route('project-activity', ['slug' => $this->project->slug, 'id' => $this->proposal->id]);
+            return redirect()->route('freelance.projects.activity', ['slug' => $this->project->slug, 'id' => $this->proposal->id]);
         }else{
 
             $project_data = [
@@ -163,7 +165,7 @@ class ProposalDetail extends Component
             session()->forget('gig_data');
             session()->put(['project_data' => $project_data ]);
     
-            return redirect()->route('checkout');
+            return redirect()->route('freelance.checkout');
         }
         
     }

@@ -1,48 +1,36 @@
-<!-- Profile Nav End -->
-<div class="friends-tab ct-tab bg-white radius-8 p-3">
-    <div class="n_friend_search">
-        <div class="search_left">
-           <h3>{{get_phrase('Friends')}}</h3>
-           {{-- <form action="#" class="f_search">
-               <input type="text" class="form-control" placeholder="Search">
-               <i class="fa-solid fa-magnifying-glass"></i>
-           </form> --}}
+<div class="gv-card friends-tab space-y-4">
+    <div class="d-flex flex-wrap justify-content-between gap-3 align-items-center">
+        <div>
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Network') }}</p>
+            <h3 class="gv-heading text-xl mb-0">{{ get_phrase('Friends') }}</h3>
         </div>
-      
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                data-bs-target="#home" type="button" role="tab" aria-controls="home"
-                aria-selected="true">{{get_phrase('My Friends')}}</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
-                data-bs-target="#profile" type="button" role="tab"
-                aria-controls="profile" aria-selected="false">{{get_phrase('Friend Requests')}}</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="add_friend-tab" data-bs-toggle="tab"
-                data-bs-target="#add_friend" type="button" role="tab"
-                aria-controls="add_friend" aria-selected="false">{{get_phrase('Find Friends')}}</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="block_friend-tab" data-bs-toggle="tab"
-                data-bs-target="#block_friend" type="button" role="tab"
-                aria-controls="block_friend" aria-selected="false">{{get_phrase('Block List')}}</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="followers-tab" data-bs-toggle="tab"
-                data-bs-target="#followers" type="button" role="tab"
-                aria-controls="followers" aria-selected="false">{{get_phrase('Followers')}}</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="following-tab" data-bs-toggle="tab"
-                data-bs-target="#following" type="button" role="tab"
-                aria-controls="following" aria-selected="false">{{get_phrase('Following')}}</button>
-        </li>
-        
-    </ul>
- </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2" role="tablist">
+        @php
+            $tabs = [
+                ['id' => 'home', 'label' => get_phrase('My Friends')],
+                ['id' => 'profile', 'label' => get_phrase('Friend Requests')],
+                ['id' => 'add_friend', 'label' => get_phrase('Find Friends')],
+                ['id' => 'block_friend', 'label' => get_phrase('Block List')],
+                ['id' => 'followers', 'label' => get_phrase('Followers')],
+                ['id' => 'following', 'label' => get_phrase('Following')],
+            ];
+        @endphp
+        @foreach ($tabs as $index => $tab)
+            <button class="gv-pill tab-trigger @if($index === 0) active @endif"
+                id="{{ $tab['id'] }}-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#{{ $tab['id'] }}"
+                type="button"
+                role="tab"
+                aria-controls="{{ $tab['id'] }}"
+                aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
+                {{ $tab['label'] }}
+            </button>
+        @endforeach
+    </div>
+
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel"
             aria-labelledby="home-tab">

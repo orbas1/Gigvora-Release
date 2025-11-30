@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'My Projects')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('freelance-content')
 <div class="container py-4" id="client-projects" data-fetch-url="{{ $fetchUrl ?? '' }}">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">My Projects</h2>

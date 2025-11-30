@@ -1,7 +1,7 @@
 # Talent & AI Backend Functions & Endpoints
 
 ## Web (`web` + `auth` middleware, gated by `gigvora_talent_ai.enabled` and module toggles)
-UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/addons/talent_ai/talent_ai.css` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles.
+UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `mix('css/addons/talent_ai/talent_ai.css')` to keep Gigvora branding consistent across dashboards, pipelines, and AI workspace tiles. All web routes inherit the `addons.talent_ai.*` name prefix defined in the service provider, preventing collisions with existing Sociopro pages, and the Sociopro navigation exposes these routes through the **Talent & AI** dropdown (guarded by module flags and the `manage_talent_ai` gate for admin items).
 
 ### Primary screens
 - `GET /addons/talent-ai/headhunters/dashboard` → `view('talent_ai::headhunters.dashboard')` (name: `addons.talent_ai.headhunters.dashboard`)
@@ -74,6 +74,7 @@ UI assets are delivered via Laravel Mix from `js/addons/talent_ai/*` and `css/ad
   - Creates or updates AI workspace plans.
 
 ## API (`api` + `auth:sanctum`, `gigvora_talent_ai.enabled`)
+The API router reuses the `api.addons.talent_ai.*` name prefix and resides beneath `/api/addons/talent-ai/*`, mirroring the structure documented in `config/gigvora_talent_ai.php`.
 ### Headhunters (`modules.headhunters.enabled`)
 - `GET /api/addons/talent-ai/headhunters/profile` → `HeadhunterProfileController@show` (`api.addons.talent_ai.headhunters.profile.show`)
   - Returns the authenticated headhunter profile with mandate and candidate counts.

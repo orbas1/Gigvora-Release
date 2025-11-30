@@ -104,6 +104,8 @@ class ProjectProposals extends Component
         $project = $project->whereNotIn('status', array('draft', 'pending'));
         $project = $project->where('slug', $this->slug)->firstOrFail();
         $title   = __('general.project_proposals');
-        return view('livewire.project.project-proposals', compact('project'))->extends('layouts.app', compact('title'));
+        return view('livewire.project.project-proposals', compact('project'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 }

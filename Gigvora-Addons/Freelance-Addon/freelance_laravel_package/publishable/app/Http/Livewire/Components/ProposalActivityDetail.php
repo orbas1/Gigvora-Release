@@ -237,7 +237,7 @@ class ProposalActivityDetail extends Component
             session()->forget('package_data');
             session()->forget('gig_data');
             session()->put(['project_data' => $project_data ]);
-            return redirect()->route('checkout');
+            return redirect()->route('freelance.checkout');
         }
     }
 
@@ -428,7 +428,7 @@ class ProposalActivityDetail extends Component
                 $projectTitle   = $proposal->project->project_title;
                 $projectSlug    = $proposal->project->slug;
                 $sellerName     = $proposal->proposalAuthor->full_name;
-                $activitLink    = route('project-activity',['slug' => $projectSlug, 'id' => $this->proposal_id]);
+                $activitLink    = route('freelance.projects.activity',['slug' => $projectSlug, 'id' => $this->proposal_id]);
 
                 if( !empty($email_template) ){
 
@@ -503,7 +503,7 @@ class ProposalActivityDetail extends Component
                 session()->forget('package_data');
                 session()->forget('gig_data');
                 session()->put(['project_data' => $project_data ]);
-                return redirect()->route('checkout');
+                return redirect()->route('freelance.checkout');
             }
         }
     }
@@ -570,7 +570,7 @@ class ProposalActivityDetail extends Component
                     $userName       = $proposal->proposalAuthor->full_name;
                     $projectTitle   = $proposal->project->project_title;
                     $projectSlug    = $proposal->project->slug;
-                    $activitLink    = route('project-activity',['slug' => $projectSlug, 'id' => $this->proposal_id]);
+                    $activitLink    = route('freelance.projects.activity',['slug' => $projectSlug, 'id' => $this->proposal_id]);
 
                     if(!empty($email_template)){
                         $template_data              = unserialize($email_template->content);
@@ -777,7 +777,7 @@ class ProposalActivityDetail extends Component
         $project_slug       = $milestoneInfo->proposal->project->slug;
         $user_name          = $milestoneInfo->proposal->project->projectAuthor->full_name;
         $seller_name        = $milestoneInfo->proposal->proposalAuthor->full_name;
-        $activity_link      = route('project-activity', ['slug' => $project_slug, 'id'=> $milestoneInfo->proposal->id]);
+        $activity_link      = route('freelance.projects.activity', ['slug' => $project_slug, 'id'=> $milestoneInfo->proposal->id]);
 
         if(!empty($email_template)){
             $template_data              =  unserialize($email_template->content);
@@ -981,7 +981,7 @@ class ProposalActivityDetail extends Component
         $project_slug       = $milestoneInfo->proposal->project->slug;
 
         $user_name        = $milestoneInfo->proposal->proposalAuthor->full_name;
-        $activity_link      = route('project-activity', ['slug' => $project_slug, 'id'=> $milestoneInfo->proposal->id]);
+        $activity_link      = route('freelance.projects.activity', ['slug' => $project_slug, 'id'=> $milestoneInfo->proposal->id]);
 
         if(!empty($email_template)){
             $template_data              =  unserialize($email_template->content);
@@ -1139,7 +1139,7 @@ class ProposalActivityDetail extends Component
                         'user_name'             => $proposal->proposalAuthor->full_name,
                         'project_title'         => $proposal->project->project_title,
                         'declined_reason'       => sanitizeTextField($this->decline_reason, true),
-                        'project_activity_link' => route('project-activity', [ 'slug' => $proposal->project->slug , 'id' => $this->proposal_id ] ),
+                        'project_activity_link' => route('freelance.projects.activity', [ 'slug' => $proposal->project->slug , 'id' => $this->proposal_id ] ),
                         'email_subject'         => !empty($template_data['subject']) ?   $template_data['subject'] : '',
                         'email_greeting'        => !empty($template_data['greeting']) ?  $template_data['greeting'] : '',
                         'email_content'         => !empty($template_data['content']) ?   $template_data['content'] : '',
@@ -1417,7 +1417,7 @@ class ProposalActivityDetail extends Component
                                 'user_name'             => $user_name,
                                 'seller_name'           => $seller_name,
                                 'project_title'         => $project->project_title,
-                                'project_activity_link' => route('project-activity', [ 'slug' => $project->slug , 'id' => $proposal_id ] ),
+                                'project_activity_link' => route('freelance.projects.activity', [ 'slug' => $project->slug , 'id' => $proposal_id ] ),
                                 'email_subject'         => !empty($template_data['subject']) ?   $template_data['subject'] : '',
                                 'email_greeting'        => !empty($template_data['greeting']) ?  $template_data['greeting'] : '',
                                 'email_content'         => !empty($template_data['content']) ?   $template_data['content'] : '',
@@ -1467,7 +1467,7 @@ class ProposalActivityDetail extends Component
                         $params['email_params']     = array(
                             'user_name'             => $proposal->proposalAuthor->full_name,
                             'project_title'         => $project->project_title,
-                            'project_activity_link' => route('project-activity', [ 'slug' => $project->slug , 'id' => $this->proposal_id ] ),
+                            'project_activity_link' => route('freelance.projects.activity', [ 'slug' => $project->slug , 'id' => $this->proposal_id ] ),
                             'email_subject'         => !empty($template_data['subject']) ?   $template_data['subject'] : '',
                             'email_greeting'        => !empty($template_data['greeting']) ?  $template_data['greeting'] : '',
                             'email_content'         => !empty($template_data['content']) ?   $template_data['content'] : '',

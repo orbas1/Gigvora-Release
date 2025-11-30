@@ -1,52 +1,36 @@
-@include('auth.layout.header')
-
-    <style type="text/css">
-        .font-family-serif{
-            font-family: serif;
-        }
-    </style>
-    <!-- Main Start -->
-    <main class="main my-4 p-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="login-img">
-                        <img class="img-fluid" src="{{ asset('assets/frontend/images/login.png') }}" alt="">
-                    </div>
+<x-guest-layout>
+    <div class="min-h-screen bg-[var(--gv-color-neutral-50)]">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="gv-card space-y-6 text-center">
+                <img class="mx-auto max-w-xs" src="{{ asset('assets/frontend/images/login.png') }}" alt="{{ get_phrase('Verification illustration') }}">
+                <div class="space-y-2">
+                    <p class="gv-eyebrow">{{ get_phrase('Verify your email') }}</p>
+                    <h1 class="gv-heading text-2xl">{{ get_phrase('One last step before you start') }}</h1>
+                    <p class="gv-muted">{{ get_phrase('We just sent a verification link to your inbox. Click it to activate your Gigvora account. Didn’t receive anything? Request a new link below.') }}</p>
                 </div>
-                <div class="col-lg-6">
-                    <div class="login-txt ms-0 ms-lg-5 text-center fs-5 w-100 mb-20 fw-bold font-family-serif">
-                        {{ get_phrase('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+
+                @if (session('status') == 'verification-link-sent')
+                    <div class="gv-section bg-[var(--gv-color-success)]/5 border-[var(--gv-color-success)] text-[var(--gv-color-success)]">
+                        {{ get_phrase('A new verification link has been sent to your email address.') }}
                     </div>
-                    
-                    
+                @endif
 
-                    <div class="ms-0 ms-lg-5 my-5">
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <form method="POST" action="{{ route('verification.send') }}">
+                        @csrf
+                        <x-button class="w-full justify-center">
+                            {{ get_phrase('Resend verification email') }}
+                        </x-button>
+                    </form>
 
-                    @if (session('status') == 'verification-link-sent')
-                        <div class="alert alert-success text-center">
-                            {{ get_phrase('A new verification link has been sent to the email address you provided during registration.') }}
-                        </div>
-                    @endif
-
-                        <form method="POST" action="{{ route('verification.send') }}">
-                            @csrf
-
-                            <div>
-                                <button type="submit" class="btn btn-primary w-100 p-10px rounded-10px">{{ get_phrase('Resend Verification Email') }}</button>
-                            </div>
-                        </form>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <button type="submit" class="btn btn-primary w-100 my-3 p-10px rounded-10px">
-                                {{ get_phrase('Log Out') }}
-                            </button>
-                        </form>
-                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="gv-btn gv-btn-ghost w-full justify-center">
+                            {{ get_phrase('Log out') }}
+                        </button>
+                    </form>
                 </div>
             </div>
-        </div> <!-- container end -->
-    </main>
-    <!-- Main End -->
-@include('auth.layout.footer')
+        </div>
+    </div>
+</x-guest-layout>

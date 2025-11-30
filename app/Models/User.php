@@ -39,6 +39,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'address',
         'cover_photo',
         'status',
+        'profile_locked_for_verification',
+        'profile_lock_reason',
         'timezone',
         'lastActive',
         'email_verified_at',
@@ -56,14 +58,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    // /**
-    //  * The attributes that should be cast.
-    //  *
-    //  * @var array<string, string>
-    //  */
-    // protected $casts = [
-    //     'email_verified_at' => 'datetime',
-    // ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'profile_locked_for_verification' => 'boolean',
+    ];
 
 
 

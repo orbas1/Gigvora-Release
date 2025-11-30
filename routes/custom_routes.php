@@ -89,43 +89,6 @@ Route::controller(BlogController::class)->middleware('auth', 'user', 'verified',
 
 });
 
-//  FrontEnd Jobs Route
-Route::controller(JobController::class)->middleware('auth', 'user', 'verified', 'activity')->group(function () {
-    Route::get('/jobs', 'jobs')->name('jobs');
-    Route::get('/create/job', 'job_create')->name('create.job');
-    Route::POST('/job/store', 'job_store')->name('job.store');
-    Route::get('my/job', 'myjob')->name('job.myjob');
-    Route::get('/edit/job/{id}', 'job_edit')->name('job.edit');
-    Route::post('/update/job/{id}', 'job_update')->name('job.update');
-    Route::get('job/delete', 'job_delete')->name('job.delete');
-
-    Route::get('job/follow/{id}/{user_id}', 'job_follow')->name('job.follow');
-
-    Route::get('job/save/view', 'job_save')->name('job.save.view');
-    Route::get('job/search/view', 'search_job')->name('search.job');
-    Route::get('/job/filter/{category?}/{max?}/{location?}', 'job_filter')->name('filter.job');
-
-    Route::get('job/single/details/{id}', 'single_job_details')->name('job.single.details');
-
-    Route::get('job/apply/form/{id}', 'ApplyForm')->name('job.apply.form');
-
-    Route::post('job/applyed/{id}', 'JobApply')->name('job.apply');
-
-    Route::get('job/my/apply/list', 'MyApply')->name('job.my.apply.list');
-    Route::get('job/apply/all-list', 'AllApplyList')->name('job.apply.all.list');
-    Route::get('job/apply/list-delete/{id}', 'applyListDelete')->name('job.apply.list-delete');
-    Route::get('job/pdf/download/{id}', 'DownloadPdf')->name('job.pdf.download');
-
-
-    Route::get('job/pay/form/{jobId}', 'job_pay_form')->name('job.pay.form');
-
-    Route::post('job/payment_configuration/{id}', 'payment_configuration')->name('job.payment_configuration');
-    Route::get('job/payment/history', 'job_payment_history')->name('job.payment.history');
-    
-
-});
-
-
 //  page
 Route::controller(PageController::class)->middleware('auth', 'user', 'verified', 'activity', 'prevent-back-history')->group(function () {
     Route::get('/pages', 'pages')->name('pages');

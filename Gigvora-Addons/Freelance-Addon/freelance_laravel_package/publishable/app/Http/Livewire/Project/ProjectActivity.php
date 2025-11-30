@@ -109,6 +109,8 @@ class ProjectActivity extends Component
    
     public function render(){
         $title = __('general.project_activity');
-        return view('livewire.project.project-activity')->extends('layouts.app', compact('title'));
+        return view('livewire.project.project-activity')
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 }

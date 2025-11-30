@@ -137,14 +137,14 @@ class PaymentService
                         'ipn_url'       => !empty($ipnUrl) ? route($ipnUrl, ['payment_method' => $params['payment_method']]) : url('/'),
                         'order_id'      => $transaction->id,
                         'track'         => Str::random(36),
-                        'cancel_url'    => route('checkout.cancel'),
-                        'success_url'   => route('dashboard'),
+                        'cancel_url'    => route('freelance.checkout.cancel'),
+                        'success_url'   => route('freelance.dashboard'),
                         'email'         => $params['email'],
                         'name'          => $params['first_name'],
                         'payment_type'  => 'project',
                     ]
                 ]);
-                return redirect()->route('payment.process', ['gateway' => $params['payment_method']]);
+                return redirect()->route('freelance.payments.process', ['gateway' => $params['payment_method']]);
 
             }
 
@@ -253,7 +253,7 @@ class PaymentService
             $eventData['user_name']                 = $proposal_detail->proposalAuthor->full_name;
             $eventData['user_id']                   = $proposal_detail->proposalAuthor->user_id;
             $eventData['email_type']                = 'proposal_request_accepted';
-            $eventData['project_activity_link']     = route('project-activity', ['slug' => $project->slug, 'id'=> $proposal_detail->id]);
+            $eventData['project_activity_link']     = route('freelance.projects.activity', ['slug' => $project->slug, 'id'=> $proposal_detail->id]);
             event(new NotifyUser($eventData));
         }
 
@@ -324,14 +324,14 @@ class PaymentService
                         'ipn_url'       => !empty($ipnUrl) ? route($ipnUrl, ['payment_method' => $params['payment_method']]) : url('/'),
                         'order_id'      => $transaction->id,
                         'track'         => Str::random(36),
-                        'cancel_url'    => route('checkout.cancel'),
-                        'success_url'   => route('dashboard'),
+                        'cancel_url'    => route('freelance.checkout.cancel'),
+                        'success_url'   => route('freelance.dashboard'),
                         'email'         => $params['email'],
                         'name'          => $params['first_name'],
                         'payment_type'  => 'package',
                     ]
                 ]);
-                return redirect()->route('payment.process', ['gateway' => $params['payment_method']]);
+                return redirect()->route('freelance.payments.process', ['gateway' => $params['payment_method']]);
             }
 
             if( !$charge_from_stripe || !empty($transaction)){
@@ -528,14 +528,14 @@ class PaymentService
                         'ipn_url'       => !empty($ipnUrl) ? route($ipnUrl, ['payment_method' => $params['payment_method']]) : url('/'),
                         'order_id'      => $transaction->id,
                         'track'         => Str::random(36),
-                        'cancel_url'    => route('checkout.cancel'),
-                        'success_url'   => route('dashboard'),
+                        'cancel_url'    => route('freelance.checkout.cancel'),
+                        'success_url'   => route('freelance.dashboard'),
                         'email'         => $params['email'],
                         'name'          => $params['first_name'],
                         'payment_type'  => 'gig',
                     ]
                 ]);
-                return redirect()->route('payment.process', ['gateway' => $params['payment_method']]);
+                return redirect()->route('freelance.payments.process', ['gateway' => $params['payment_method']]);
             }
 
             if( !$charge_from_stripe || !empty($transaction)){
@@ -612,7 +612,7 @@ class PaymentService
 
         event(new NotifyUser($eventData));
 
-        return route('gig-activity', ['slug' => $gig_slug, 'order_id' => $order_id]);
+        return route('freelance.gigs.activity', ['slug' => $gig_slug, 'order_id' => $order_id]);
     }
 
     protected function addTransaction($creatorId, $type, $params, $status = 'pending')
@@ -684,7 +684,7 @@ class PaymentService
             'plan_type'             => $gigOrder?->plan_type,
             'plan_price'            => $gigOrder?->plan_amount,
             'delivery_time'         => $gigOrder?->gig_delivery_days,
-            'return_url'            => route('gig-activity', ['slug' => $gigOrder?->gig?->slug, 'order_id' => $gigOrderId]),
+            'return_url'            => route('freelance.gigs.activity', ['slug' => $gigOrder?->gig?->slug, 'order_id' => $gigOrderId]),
             'type'                  => 'gig'
         ];
     }
@@ -718,7 +718,7 @@ class PaymentService
             'proposal_amount'           => $projectData?->proposal?->proposal_amount,
             'transaction_type'          => $projectType, // 1: mile 2: fixed 3: hourly
             'payout_type'               => $projectType == 2 ? $projectData?->payout_type :$projectData?->proposal?->payout_type,
-            'return_url'                => route('project-activity', ['slug' => $projectData?->project?->slug, 'id'=> $projectData?->proposal_id]),
+            'return_url'                => route('freelance.projects.activity', ['slug' => $projectData?->project?->slug, 'id'=> $projectData?->proposal_id]),
             'type'                      => 'project'
         ];
     }

@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section  wire:loading.class="tk-section-preloader">
         <div class="preloader-outer" wire:loading>
@@ -174,7 +177,7 @@
                                                                                 @endif
                                                                             </h6>
                                                                             <div class="tk-activity-tags-wrapper">
-                                                                                <a href="{{route('project-activity',['slug' => $single->slug,'id' => $proposal->id ])}}" >{{__('project.view_activity')}}</a>
+                                                                                <a href="{{route('freelance.projects.activity',['slug' => $single->slug,'id' => $proposal->id ])}}" >{{__('project.view_activity')}}</a>
                                                                                 @if( $proposal->status == "completed" )
                                                                                     @if($proposal->sellerProjectReting)
                                                                                         <a href="jvascript:void(0)" wire:click.prevent="readReview({{$proposal->id}},{{$proposal->proposalAuthor->id}})">{{__('project.read_review')}}</a>
@@ -220,7 +223,7 @@
                                                     @endif
                                                 @endforeach
                                                 <li>
-                                                    <a href="{{ route('project-proposals', ['slug' => $single->slug]) }}" class="tk-view-proposal">{{ __('project.view_proposals') }} <i class="icon-chevron-right"></i></a>
+                                                    <a href="{{ route('freelance.buyer.projects.proposals', ['slug' => $single->slug]) }}" class="tk-view-proposal">{{ __('project.view_proposals') }} <i class="icon-chevron-right"></i></a>
                                                 </li>
                                             @else 
                                                 <li>
@@ -232,7 +235,7 @@
                                             @if( $single->status == 'draft' || $single->status == 'pending' )
                                                 <a href="{{ route('create-project', [ 'step'=> 2, 'id'=> $single->id ] ) }}" class="tk-edit-project"><i class="icon-edit-3"></i> {{ __('project.edit_project') }}</a>
                                             @endif
-                                            <a href="{{ route('project-detail', ['slug'=> $single->slug] ) }}" class="tk-invite-bidbtn">{{ __('project.view_project') }}</a>
+                                            <a href="{{ route('freelance.projects.detail', ['slug'=> $single->slug] ) }}" class="tk-invite-bidbtn">{{ __('project.view_project') }}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -346,6 +349,7 @@
         </div>
     </div>
 </main>
+@endsection
 
 @push('scripts')
     <script defer src="{{ asset('common/js/select2.min.js')}}"></script>

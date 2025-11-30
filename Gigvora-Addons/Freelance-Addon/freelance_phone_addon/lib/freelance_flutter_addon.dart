@@ -21,6 +21,7 @@ export 'src/state/project_state.dart';
 export 'src/state/contract_state.dart';
 export 'src/state/escrow_state.dart';
 export 'src/state/dispute_state.dart';
+export 'src/integration.dart';
 export 'src/pages/global/freelance_onboarding_screen.dart';
 export 'src/pages/freelancer/freelancer_dashboard_screen.dart';
 export 'src/pages/freelancer/gigs/my_gigs_screen.dart';

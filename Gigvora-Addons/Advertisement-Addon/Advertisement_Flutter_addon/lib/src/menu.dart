@@ -19,12 +19,10 @@ class MenuItem {
   final String route;
 }
 
-final List<MenuItem> adsMenuItems = [
-  const MenuItem(title: 'Ads Manager', icon: Icons.campaign_outlined, route: AdsHomeScreen.routeName),
-  const MenuItem(title: 'Campaigns', icon: Icons.list_alt_outlined, route: CampaignListScreen.routeName),
-  const MenuItem(title: 'Keyword Planner', icon: Icons.search, route: KeywordPlannerScreen.routeName),
-  const MenuItem(title: 'Forecast', icon: Icons.trending_up, route: ForecastScreen.routeName),
-  const MenuItem(title: 'Reports', icon: Icons.analytics_outlined, route: AdsReportsScreen.routeName),
+const List<MenuItem> adsMenuItems = [
+  MenuItem(title: 'Ads Manager', icon: Icons.campaign_outlined, route: AdsHomeScreen.routeName),
+  MenuItem(title: 'Campaigns', icon: Icons.list_alt_outlined, route: CampaignListScreen.routeName),
+  MenuItem(title: 'Ads Reports', icon: Icons.analytics_outlined, route: AdsReportsScreen.routeName),
 ];
 
 Map<String, WidgetBuilder> buildAdsRoutes() {

@@ -112,7 +112,9 @@ class GigOrders extends Component
         $siteTitle    = $sitInfo['site_name'];
         $title        = $siteTitle . ' | ' . __('general.gigs_order'); 
 
-        return view('livewire.gig.gig-orders', compact('gigs_orders'))->extends('layouts.app', compact('title'));
+        return view('livewire.gig.gig-orders', compact('gigs_orders'))
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
 

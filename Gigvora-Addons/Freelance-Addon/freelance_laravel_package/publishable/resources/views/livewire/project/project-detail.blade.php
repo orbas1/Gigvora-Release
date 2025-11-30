@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section>
         <div class="container">
@@ -280,7 +283,7 @@
                                         <span>{{ $hired_projects }}</span>
                                     </li>
                                     <li>
-                                        <a href={{ route('search-projects', ['author_id' => $project->author_id]) }} class="tk-btn"> 
+                                        <a href={{ route('freelance.search.projects', ['author_id' => $project->author_id]) }} class="tk-btn"> 
                                             <span>{{ __('project.see_all_posted_projects') }}</span><i class="icon-arrow-right"></i>
                                         </a>
                                     </li>
@@ -325,7 +328,7 @@
                                         <div class="tk-verified-info">
                                             <div class="tk-verified-info_title">
                                                 <span>{{ \Carbon\Carbon::parse($single->updated_at)->format('M d, Y') }}</span>
-                                                <h5><a href="{{ route('project-detail', ['slug'=> $single->slug] ) }}">{{ $single->project_title }}</a></h5>
+                                                <h5><a href="{{ route('freelance.projects.detail', ['slug'=> $single->slug] ) }}">{{ $single->project_title }}</a></h5>
                                             </div>
                                             @role('seller')  
                                                 <a href="javascript:void(0)" wire:key="{{ $single->id }}" wire:click.prevent="saveProject({{$single->id}})" class="{{$single->is_favourite ? 'tk-btnline tk-liked tk-saved' : 'tk-btnline tk-save' }} tk-btn-like-{{ $single->id }}"> 
@@ -386,7 +389,7 @@
                                                     @endif
                                                 </a>
                                             </div>
-                                            <a href="{{ route('project-detail', ['slug'=> $single->slug] ) }}" class="tk-btnline">{{ __('project.view_project') }}</a>
+                                            <a href="{{ route('freelance.projects.detail', ['slug'=> $single->slug] ) }}" class="tk-btnline">{{ __('project.view_project') }}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -398,6 +401,7 @@
         </div>
     </section>
 </main>
+@endsection
 
 @push('scripts')
     <script defer src="{{ asset('common/js/popper-core.js') }}"></script> 

@@ -11,6 +11,9 @@
     <input type="hidden" id="post_privacy" name="privacy" value="public">
     @endif
     <input type="hidden" id="post_type" name="post_type" value="general">
+    <input type="hidden" id="composer_mode" name="composer_mode" value="standard">
+    <input type="hidden" id="resolution_preset" name="resolution_preset" value="auto">
+    <input type="hidden" id="studio_manifest" name="studio_manifest">
     @isset($event_id)
         <input type="hidden" id="event_id" name="event_id" value="{{ $event_id }}">
         <input type="hidden" id="publisher" name="publisher" value="event">
@@ -123,6 +126,8 @@
                         <label class="form-label" for="">{{get_phrase("Upload a preview(for mobile application )")}}</label>
                     </div>
                 </div>
+
+                @include('frontend.main_content.composer_studio')
 
                 {{-- Text to Image --}}
                 <div id="tab-ai" class="post-inner file-tab cursor-pointer p-0 mt-2">

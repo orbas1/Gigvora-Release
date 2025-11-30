@@ -21,4 +21,9 @@ class InterviewSchedule extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
     ];
+
+    public function application()
+    {
+        return $this->belongsTo(JobApplication::class, 'job_application_id');
+    }
 }

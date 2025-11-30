@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class= "tk-scetiondb">
     <section class="tk-project-activity-section">   
         <div class="container">
@@ -22,7 +25,7 @@
                             </div>
                             <div class="tk-employerproject-edit">
                                 <h4>{{ getProjectPriceFormat($project->project_type, $currency_symbol, $project->project_min_price, $project->project_max_price) }}</h4>
-                                <a href="{{ route('project-detail', ['slug'=> $project->slug] ) }}" class="tk-btn-solid-lg">{{ __('project.view_project') }}</a>
+                                <a href="{{ route('freelance.projects.detail', ['slug'=> $project->slug] ) }}" class="tk-btn-solid-lg">{{ __('project.view_project') }}</a>
                             </div>
                         </div>
                         <div class="tk-projectstatus">
@@ -99,6 +102,7 @@
         </div>
     </section>
 </main>
+@endsection
 
 @push('styles')
     @vite([

@@ -85,6 +85,6 @@ class GigCartAddons extends Component
             'plan_price'            => $this->gig_plan[0]['price'],
             'delivery_time'         => $this->gig_plan[0]['delivery_time'],
         ]]);
-        return redirect()->route('checkout');
+        return redirect()->route('freelance.checkout');
     }
 }

@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('ads-page')
 <div class="container py-4">
 <div class="row g-3 mb-3">
     @foreach([

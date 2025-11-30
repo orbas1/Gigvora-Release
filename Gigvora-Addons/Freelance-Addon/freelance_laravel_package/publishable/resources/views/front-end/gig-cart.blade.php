@@ -1,5 +1,5 @@
-@extends('layouts.app')
-    @section('content')
+@extends('freelance::layouts.freelance')
+@section('freelance-content')
     <main class="tk-scetiondb">
         <section class="tk-main-section">
             <div class="container">
@@ -27,7 +27,7 @@
                                 <div class="tk-checkoutdetail">
                                     <h6>
                                         @foreach($gig->categories as $single )
-                                            <a href="{{ route('search-gigs', ['category_id' => $single->category_id])}}">
+                                            <a href="{{ route('freelance.search.gigs', ['category_id' => $single->category_id])}}">
                                                 {{ $single->name}}
                                             </a>
                                         @endforeach
@@ -101,7 +101,7 @@
             </div>
         </section>
     </main>  
-@endsection('content')
+@endsection
 
 @push('scripts') 
     <script>

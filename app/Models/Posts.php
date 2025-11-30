@@ -19,7 +19,31 @@ class Posts extends Model
 
      protected $primaryKey = 'post_id';
     protected $fillable = [
-        'post_id', 'user_id', 'publisher', 'publisher_id', 'post_type', 'privacy', 'tagged_user_ids', 'feel_and_activity', 'location', 'description', 'user_reacts', 'status', 'created_at', 'updated_at','album_image_id'
+        'post_id',
+        'user_id',
+        'publisher',
+        'publisher_id',
+        'post_type',
+        'privacy',
+        'tagged_user_ids',
+        'feel_and_activity',
+        'location',
+        'description',
+        'user_reacts',
+        'status',
+        'created_at',
+        'updated_at',
+        'album_image_id',
+        'composer_mode',
+        'studio_manifest',
+        'scheduled_for',
+        'live_config',
+    ];
+
+    protected $casts = [
+        'studio_manifest' => 'array',
+        'scheduled_for' => 'datetime',
+        'live_config' => 'array',
     ];
 
     public function getUser(){

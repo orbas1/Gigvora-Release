@@ -1,3 +1,6 @@
+@extends('freelance::layouts.freelance')
+
+@section('freelance-content')
 <main class="tk-scetiondb">
     <section>
         <div class="container">
@@ -94,6 +97,7 @@
         </div>
     </section>
 </main>
+@endsection
 
 @push('scripts')
 <script defer src="{{ asset('common/js/select2.min.js')}}"></script>

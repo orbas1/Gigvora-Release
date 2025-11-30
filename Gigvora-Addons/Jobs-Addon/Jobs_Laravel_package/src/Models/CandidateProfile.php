@@ -29,4 +29,10 @@ class CandidateProfile extends Model
     {
         return $this->hasMany(JobApplication::class, 'candidate_id');
     }
+
+    public function user()
+    {
+        $model = config('auth.providers.users.model', \App\Models\User::class);
+        return $this->belongsTo($model, 'user_id');
+    }
 }

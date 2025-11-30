@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('freelance::layouts.freelance')
 
 @section('title', 'Project Detail')
 
@@ -11,7 +11,7 @@
 </nav>
 @endsection
 
-@section('content')
+@section('freelance-content')
 <div class="container py-4" id="client-project-detail" data-project-id="{{ $project['id'] ?? '' }}">
     <div class="card mb-3">
         <div class="card-body">

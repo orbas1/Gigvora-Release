@@ -1,23 +1,29 @@
-<div class="card h-100">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Live Chat</span>
-        <span class="badge bg-secondary" id="live-attendee-count">{{ $count ?? 0 }} online</span>
+<div class="gv-card h-full flex flex-col">
+    <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">
+            {{ get_phrase('Live chat') }}
+        </span>
+        <span class="gv-pill">
+            <span id="live-attendee-count">{{ $count ?? 0 }}</span> {{ get_phrase('online') }}
+        </span>
     </div>
-    <div class="card-body overflow-auto" style="max-height: 320px;" id="live-chat-feed">
+    <div class="flex-1 overflow-auto space-y-3 pr-1" style="max-height: 320px;" id="live-chat-feed">
         @forelse(($messages ?? []) as $message)
-            <div class="mb-2">
-                <strong>{{ $message['author'] ?? 'User' }}</strong>
-                <small class="text-muted">{{ $message['time'] ?? 'Now' }}</small>
-                <div>{{ $message['body'] ?? '' }}</div>
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-sm">
+                    <strong class="text-[var(--gv-color-neutral-900)]">{{ $message['author'] ?? get_phrase('User') }}</strong>
+                    <span class="text-xs text-[var(--gv-color-neutral-500)]">{{ $message['time'] ?? get_phrase('Now') }}</span>
+                </div>
+                <div class="text-sm text-[var(--gv-color-neutral-700)]">{{ $message['body'] ?? '' }}</div>
             </div>
         @empty
-            <p class="text-muted">No messages yet. Say hello!</p>
+            <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">{{ get_phrase('No messages yet. Say hello!') }}</p>
         @endforelse
     </div>
-    <div class="card-footer">
-        <form id="live-chat-form" class="d-flex gap-2">
-            <input class="form-control" name="message" placeholder="Type a message" />
-            <button class="btn btn-primary" type="submit">Send</button>
+    <div class="pt-4">
+        <form id="live-chat-form" class="flex gap-2">
+            <input class="gv-input flex-1" name="message" placeholder="{{ get_phrase('Type a message') }}" />
+            <button class="gv-btn gv-btn-primary" type="submit">{{ get_phrase('Send') }}</button>
         </form>
     </div>
 </div>

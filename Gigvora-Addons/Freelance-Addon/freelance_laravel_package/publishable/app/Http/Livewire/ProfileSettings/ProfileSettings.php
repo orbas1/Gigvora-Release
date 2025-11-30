@@ -284,7 +284,10 @@ class ProfileSettings extends Component
 
         }
         $title = __('general.settings');
-        return view('livewire.profile-settings.settings', $record)->extends('layouts.app', compact('title'));
+
+        return view('livewire.profile-settings.settings', $record)
+            ->extends('freelance::layouts.freelance', compact('title'))
+            ->section('freelance-content');
     }
 
     public function removeBanner(){
