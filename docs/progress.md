@@ -1,7 +1,30 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-11-30
+Last updated: 2025-12-01
+
+## Todo – Task 18 (Podcasts Experience Completion)
+- [done] Web podcast experience: fix Blade views, routes, and playback/follow telemetry for catalogue → series → episode → live shells.
+- [done] Flutter podcast parity: refresh catalogue, series detail, episode player, and live recording screens with resilient loading/controls.
+- [done] Documentation & QA: align `logic_flows.md`, `docs/ui-audit.md`, and `docs/qa-bugs.md` with the completed podcast experience.
+
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### 1. Web & API
+- Added podcast follower persistence (`podcast_series_followers`), follow/unfollow APIs (`/api/live/podcast-series/{series}/follow`) and web routes (`wnip.podcasts.follow`), and surfaced follower counts on catalogue + series detail. Episode lists now filter unpublished/private items for non-host viewers.
+- Extended podcast episode routes (`wnip.podcasts.episode`) with HTML5 audio controls, playback speed/seek UI, local progress persistence, and analytics posts to `wnip.podcasts.playback`. Live shells use the new `podcastLive.js` controls for record/mute/timer plus Utilities notes sidebar.
+- API now exposes episode detail and playback endpoints for mobile parity; series detail responses include follower counts and `is_followed` flags. Added playback/follow analytics events.
+
+### 2. Flutter Parity
+- Catalogue/series/episode screens now show loading/error/empty states, follower counts, and refreshed cards. Series detail adds follow toggles; episode player hydrates deep links via new API calls and records playback progress with completion tracking.
+- `podcast_state` gains episode-level loading and `PodcastService` now wraps follow/playback endpoints so Flutter mirrors web telemetry and state handling.
+
+### 3. Docs & QA
+- Updated `logic_flows.md` (podcast catalogue/episode/live behaviors), `docs/ui-audit.md` (Interactive add-on token + podcast parity), `docs/qa-bugs.md` (Task 18 QA notes), and `Gigvora-Addons/Interactive-Addon/functions.md` (routes, analytics, Flutter parity).
+- Manual smoke tests covered web catalogue/series/episode/live shells and Flutter catalogue/series/episode flows; noted risk about Flutter’s simulated audio timer pending real stream validation.
+
+### 4. Tests
+- `npm run build` (Mix production) to compile new podcast assets and confirm bundle health. 【bdf652†L1-L86】
 
 ## Snapshot – 2025-11-30 – Task 15 (Interactive / Live Addon Alignment)
 

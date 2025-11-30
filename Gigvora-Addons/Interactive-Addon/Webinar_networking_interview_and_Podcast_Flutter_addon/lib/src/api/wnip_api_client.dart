@@ -235,6 +235,47 @@ class WnipApiClient {
     return PodcastEpisode.fromJson(body);
   }
 
+  Future<PodcastEpisode> fetchPodcastEpisodeDetails(int seriesId, int episodeId) async {
+    final uri = _buildUri('podcast-series/' + seriesId.toString() + '/episodes/' + episodeId.toString());
+    final response = await _send(() => _httpClient.get(uri, headers: await _headers()));
+    final body = await _handleResponse(response) as Map<String, dynamic>;
+    return PodcastEpisode.fromJson(body);
+  }
+
+  Future<void> togglePodcastSeriesFollow(int seriesId, {bool follow = true}) async {
+    final uri = _buildUri('podcast-series/' + seriesId.toString() + '/follow');
+    final response = await _send(
+      () => _httpClient.post(
+        uri,
+        headers: await _headers(),
+        body: jsonEncode({'state': follow ? 'follow' : 'unfollow'}),
+      ),
+    );
+    await _handleResponse(response);
+  }
+
+  Future<void> recordPodcastPlayback(
+    int seriesId,
+    int episodeId, {
+    int? progressSeconds,
+    bool completed = false,
+  }) async {
+    final uri = _buildUri(
+      'podcast-series/' + seriesId.toString() + '/episodes/' + episodeId.toString() + '/playback',
+    );
+    final response = await _send(
+      () => _httpClient.post(
+        uri,
+        headers: await _headers(),
+        body: jsonEncode({
+          if (progressSeconds != null) 'progress_seconds': progressSeconds,
+          'completed': completed,
+        }),
+      ),
+    );
+    await _handleResponse(response);
+  }
+
   Future<PaginatedResponse<Interview>> fetchInterviews({int page = 1}) async {
     final uri = _buildUri('interviews', {'page': page.toString()});
     final response = await _send(() => _httpClient.get(uri, headers: await _headers()));

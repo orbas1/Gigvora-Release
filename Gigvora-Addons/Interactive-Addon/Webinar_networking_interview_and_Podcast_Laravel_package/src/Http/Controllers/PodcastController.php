@@ -14,9 +14,30 @@ class PodcastController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $series = PodcastSeries::query()->with(['episodes', 'recordings'])->paginate();
+        $series = PodcastSeries::query()
+            ->withCount(['episodes', 'followers'])
+            ->with(['episodes' => function ($query) {
+                $query->where('is_public', true)
+                    ->whereNotNull('published_at')
+                    ->latest('published_at')
+                    ->limit(3);
+            }])
+            ->where(function ($query) use ($request) {
+                $query->where('is_public', true);
+
+                if ($request->user()) {
+                    $query->orWhere('host_id', $request->user()->getAuthIdentifier());
+                }
+            })
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $search = $request->string('q')->toString();
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->orderByDesc('created_at')
+            ->paginate();
+
         return response()->json($series);
     }
 
@@ -41,10 +62,29 @@ class PodcastController extends Controller
         return response()->json($series, 201);
     }
 
-    public function showSeries(PodcastSeries $podcastSeries): JsonResponse
+    public function showSeries(Request $request, PodcastSeries $podcastSeries): JsonResponse
     {
         $this->authorize('view', $podcastSeries);
-        return response()->json($podcastSeries->load('episodes'));
+
+        $canManage = $request->user()?->can('update', $podcastSeries) ?? false;
+
+        $podcastSeries
+            ->loadCount(['episodes', 'followers'])
+            ->load(['episodes' => function ($query) use ($canManage) {
+                $query->orderByDesc('published_at');
+
+                if (!$canManage) {
+                    $query->where('is_public', true)->whereNotNull('published_at');
+                }
+            }]);
+
+        $isFollowed = $request->user()
+            ? $podcastSeries->followers()->where('user_id', $request->user()->getAuthIdentifier())->exists()
+            : false;
+
+        return response()->json(
+            array_merge($podcastSeries->toArray(), ['is_followed' => $isFollowed])
+        );
     }
 
     public function updateSeries(Request $request, PodcastSeries $podcastSeries): JsonResponse
@@ -92,6 +132,11 @@ class PodcastController extends Controller
     public function publishEpisode(PodcastSeries $podcastSeries, PodcastEpisode $episode): JsonResponse
     {
         $this->authorize('update', $podcastSeries);
+
+        if ($episode->podcast_series_id !== $podcastSeries->getKey()) {
+            abort(404);
+        }
+
         $episode->update(['published_at' => now(), 'is_public' => true]);
 
         Analytics::track('podcast_episode_published', [
@@ -100,6 +145,77 @@ class PodcastController extends Controller
         ]);
 
         return response()->json($episode);
+    }
+
+    public function showEpisode(PodcastSeries $podcastSeries, PodcastEpisode $episode): JsonResponse
+    {
+        if ($episode->podcast_series_id !== $podcastSeries->getKey()) {
+            abort(404);
+        }
+
+        $this->authorize('view', $podcastSeries);
+
+        return response()->json($episode->load('series'));
+    }
+
+    public function toggleFollow(Request $request, PodcastSeries $podcastSeries): JsonResponse
+    {
+        $this->authorize('view', $podcastSeries);
+
+        $request->validate([
+            'state' => 'nullable|in:follow,unfollow,toggle',
+        ]);
+
+        $userId = $request->user()?->getAuthIdentifier();
+        if (!$userId) {
+            abort(403, 'Authentication required');
+        }
+
+        $isFollowing = $podcastSeries->followers()->where('user_id', $userId)->exists();
+        $shouldFollow = match ($request->input('state')) {
+            'follow' => true,
+            'unfollow' => false,
+            default => !$isFollowing,
+        };
+
+        if ($shouldFollow && !$isFollowing) {
+            $podcastSeries->followers()->attach($userId);
+            Analytics::track('podcast_series_followed', ['series_id' => $podcastSeries->id, 'user_id' => $userId]);
+        }
+
+        if (!$shouldFollow && $isFollowing) {
+            $podcastSeries->followers()->detach($userId);
+            Analytics::track('podcast_series_unfollowed', ['series_id' => $podcastSeries->id, 'user_id' => $userId]);
+        }
+
+        return response()->json([
+            'followed' => $shouldFollow,
+            'followers_count' => $podcastSeries->followers()->count(),
+        ]);
+    }
+
+    public function recordPlayback(Request $request, PodcastSeries $podcastSeries, PodcastEpisode $episode): JsonResponse
+    {
+        if ($episode->podcast_series_id !== $podcastSeries->getKey()) {
+            abort(404);
+        }
+
+        $this->authorize('view', $podcastSeries);
+
+        $validated = $request->validate([
+            'progress_seconds' => 'nullable|integer|min:0',
+            'completed' => 'boolean',
+        ]);
+
+        Analytics::track('podcast_episode_played', [
+            'series_id' => $podcastSeries->id,
+            'episode_id' => $episode->id,
+            'user_id' => $request->user()?->getAuthIdentifier(),
+            'progress_seconds' => $validated['progress_seconds'] ?? null,
+            'completed' => $validated['completed'] ?? false,
+        ]);
+
+        return response()->json(['status' => 'ok']);
     }
 }
 

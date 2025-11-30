@@ -200,3 +200,13 @@ Last updated: 2025-11-30
 - **QA references**:
   - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-15-interactive--live-addon-alignment`, `docs/ui-audit.md#interactive--live`.
 
+## Section – Task 18 Podcasts Experience Completion
+
+- **Scope**: Podcast catalogue/series/episode experiences on web + Flutter, including follow states, playback analytics, and host live shells.
+- **Checked areas**:
+  - Web catalogue (`/events/podcasts`), series detail (`/events/podcasts/{series}`), episode player (`/events/podcasts/{series}/episodes/{episode}`) follow/unfollow, follower counts, permission-filtered episodes, playback progress analytics (`wnip.podcasts.playback`), and live shell controls (record/mute/timer).
+  - Flutter catalogue/series detail/episode player navigation with loading/error handling, follow refresh, and playback progress submission via `PodcastService.recordPlayback`.
+- **Findings**:
+  - No blocking regressions observed during manual smoke tests; follow toggles respect auth and analytics events fire on publish/playback.
+  - **Risk**: Flutter episode player uses a simulated timer (no audio plugin); verify against real audio streams before release to ensure progress reporting matches actual playback.
+

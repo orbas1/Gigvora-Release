@@ -30,6 +30,7 @@ mix.js('resources/js/live/app.js', 'public/js/live')
     ]);
 
 mix.js('Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package/resources/js/live/podcastPlayer.js', 'public/js/live');
+mix.js('Gigvora-Addons/Interactive-Addon/Webinar_networking_interview_and_Podcast_Laravel_package/resources/js/live/podcastLive.js', 'public/js/live');
 
 mix.js('Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package/resources/js/advertisement/dashboard.js', 'public/js/advertisement');
 mix.js('Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package/resources/js/advertisement/campaigns.js', 'public/js/advertisement');
