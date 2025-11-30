@@ -49,6 +49,17 @@
                 'status' => ucfirst($session->status ?? 'Scheduled'),
                 'tag' => $session->is_paid ? get_phrase('Paid') : get_phrase('Open'),
                 'detail' => trans_choice('{0}Be first to register|{1}1 participant|[2,*]:count participants', $session->participants->count(), ['count' => $session->participants->count()]),
+                'secondary' => collect([
+                    $session->is_paid
+                        ? get_phrase('Ticket from :amount', ['amount' => currency_format($session->price ?? 0)])
+                        : get_phrase('Free to join'),
+                    $session->rotation_count
+                        ? get_phrase(':count rotations • :interval s', ['count' => $session->rotation_count, 'interval' => $session->rotation_interval])
+                        : get_phrase('Rotation ready'),
+                    $session->ends_at
+                        ? get_phrase('Ends :time', ['time' => $session->ends_at->format('g:i A')])
+                        : null,
+                ])->filter()->take(2)->implode(' • '),
                 'href' => route('wnip.networking.show', $session),
                 'cta' => get_phrase('View session'),
             ])

@@ -76,6 +76,11 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 6. **Feed/Search Integration**: Jobs, Freelance, Live, and Ads appear sporadically (or not at all) in the core feed/search, reducing discoverability.
 7. **CSS Debt**: Inline styles and repeated selectors (`.tk-serviesbann`, `.gigvora-ad`) without shared tokens make reskinning labor-intensive.
 
+### Live/Networking polish – Task 19
+
+- Waiting room refreshed with countdown + CTA gating, tokenized pills for rotation/price states, and an intro card form (headline/bio/goal) that persists locally so Utilities follow-ups can hydrate once syncing is wired.
+- Live networking shell now surfaces per-rotation timers (progress + remaining seconds), partner card with contact exchange CTA, and notes persistence that mirrors the Utilities recap expectations. Flutter needs matching countdown/progress UI and local draft storage to keep parity.
+
 ## 4. Recommended Token-Based Upgrade Path
 
 1. **Create Token Layer** (`resources/css/gigvora/tokens.css`):
