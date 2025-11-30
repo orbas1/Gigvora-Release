@@ -1,5 +1,7 @@
 @extends('wnip::layouts.live')
 
+@php use Illuminate\Support\Str; @endphp
+
 @section('live-header')
     <div>
         <p class="gv-eyebrow mb-1">{{ get_phrase('Interviewer panel') }}</p>
@@ -10,23 +12,23 @@
 
 @section('live-content')
 @php
-    $interview = $interview ?? [
-        'candidate' => 'Jamie Doe',
-        'role' => 'Senior Engineer',
-        'time' => 'May 7, 10:00',
-        'criteria' => [
-            ['name' => 'Communication', 'score' => 3, 'comment' => 'Clear answers'],
-            ['name' => 'Problem Solving', 'score' => 4, 'comment' => 'Strong approach'],
-            ['name' => 'Collaboration', 'score' => 3, 'comment' => 'Team-oriented'],
-        ],
+    $primarySlot = $primarySlot ?? $interview->slots->sortBy('starts_at')->first();
+    $criteria = $interview->metadata['criteria'] ?? [
+        ['key' => 'communication', 'name' => get_phrase('Communication'), 'score' => 3, 'comment' => ''],
+        ['key' => 'problem_solving', 'name' => get_phrase('Problem solving'), 'score' => 3, 'comment' => ''],
+        ['key' => 'collaboration', 'name' => get_phrase('Collaboration'), 'score' => 3, 'comment' => ''],
     ];
 @endphp
-<div class="space-y-4" id="interviewer-panel" data-save-url="{{ route('wnip.interviews.score', ['interview' => $interview['id'] ?? 1]) ?? '#' }}">
+<div class="space-y-4" id="interviewer-panel"
+    data-save-url="{{ $primarySlot ? route('wnip.interviews.score', ['interview' => $interview, 'interviewSlot' => $primarySlot]) : '' }}">
     <div class="gv-card flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ $interview['candidate'] }}</h2>
+            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                {{ optional($primarySlot?->interviewee)->name ?? get_phrase('Candidate') }}
+            </h2>
             <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
-                {{ $interview['role'] }} • {{ $interview['time'] }}
+                {{ $interview->title }} •
+                {{ $primarySlot?->starts_at?->format('M j • g:i A') ?? $interview->scheduled_at?->format('M j • g:i A') }}
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -55,23 +57,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($interview['criteria'] as $criterion)
-                                <tr class="border-t border-[var(--gv-color-border)]" data-name="{{ $criterion['name'] }}">
+                            @foreach($criteria as $criterion)
+                                <tr class="border-t border-[var(--gv-color-border)]" data-name="{{ $criterion['name'] }}" data-key="{{ $criterion['key'] ?? Str::slug($criterion['name']) }}">
                                     <td class="py-2 pr-3">{{ $criterion['name'] }}</td>
                                     <td class="py-2 pr-3">
                                         <select class="gv-input" name="score">
                                             @for($i=1;$i<=5;$i++)
-                                                <option value="{{ $i }}" @selected($criterion['score'] === $i)>{{ $i }}</option>
+                                                <option value="{{ $i }}" @selected(($criterion['score'] ?? 3) === $i)>{{ $i }}</option>
                                             @endfor
                                         </select>
                                     </td>
                                     <td class="py-2">
-                                        <input class="gv-input" name="comment" value="{{ $criterion['comment'] }}" placeholder="{{ get_phrase('Comments') }}">
+                                        <input class="gv-input" name="comment" value="{{ $criterion['comment'] ?? '' }}" placeholder="{{ get_phrase('Comments') }}">
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div>
+                    <label class="gv-label" for="panel-comments">{{ get_phrase('Overall comments') }}</label>
+                    <textarea id="panel-comments" class="gv-input" rows="3" placeholder="{{ get_phrase('Notes visible to the panel') }}"></textarea>
                 </div>
                 <div>
                     <label class="gv-label">{{ get_phrase('Recommendation') }}</label>
@@ -86,6 +92,9 @@
 
         <aside class="space-y-4">
             @include('wnip::components.notes_sidebar')
+            <div class="gv-card" data-status role="status" aria-live="polite">
+                {{ get_phrase('Scores auto-save while you edit. Locked entries are read-only.') }}
+            </div>
         </aside>
     </div>
 </div>

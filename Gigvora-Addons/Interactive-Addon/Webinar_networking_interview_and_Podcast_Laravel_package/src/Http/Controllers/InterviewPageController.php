@@ -45,6 +45,17 @@ class InterviewPageController extends Controller
         return view('wnip::interviews.waiting_room', ['interview' => $interview]);
     }
 
+    public function live(Interview $interview): View
+    {
+        $this->authorize('view', $interview);
+        $interview->load(['slots.interviewer', 'slots.interviewee', 'host']);
+
+        return view('wnip::interviews.live_candidate', [
+            'interview' => $interview,
+            'primarySlot' => $interview->slots->sortBy('starts_at')->first(),
+        ]);
+    }
+
     public function score(Request $request, Interview $interview, InterviewSlot $interviewSlot)
     {
         $this->authorize('score', $interview);

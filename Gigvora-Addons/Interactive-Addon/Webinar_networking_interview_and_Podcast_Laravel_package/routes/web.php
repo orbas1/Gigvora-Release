@@ -30,6 +30,7 @@ Route::group([
     Route::get('/interviews', [InterviewPageController::class, 'index'])->name('wnip.interviews.index');
     Route::get('/interviews/{interview}', [InterviewPageController::class, 'show'])->name('wnip.interviews.show');
     Route::get('/interviews/{interview}/waiting-room', [InterviewPageController::class, 'waitingRoom'])->name('wnip.interviews.waiting');
+    Route::get('/interviews/{interview}/live', [InterviewPageController::class, 'live'])->name('wnip.interviews.live');
     Route::post('/interviews/{interview}/slots/{interviewSlot}/score', [InterviewPageController::class, 'score'])
         ->name('wnip.interviews.score');
 });

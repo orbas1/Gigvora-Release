@@ -460,4 +460,26 @@ Last updated: 2025-11-30
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-11-30 – Task 16 (Interviews Experience Completion)
+
+### 1. Routing + CTA gating
+
+- Added a dedicated live route (`wnip.interviews.live`) and wired waiting room/candidate views to scheduled slot timestamps so CTAs unlock only when the countdown completes; status pills now expose `data-live-label` for accessibility + parity with Flutter timers.
+- Candidate prep view now renders real interview metadata (title, schedule, duration, location/meeting link, interviewer from slot) and attachment lists pulled from `metadata.attachments`, removing placeholder arrays.
+- Live candidate shell surfaces slot timing + interviewer context with a live-status pill driven by JS timers.
+
+### 2. Scoring workflow hardening
+
+- Interviewer scoring panel now hydrates criteria from interview metadata (with sensible defaults), supports overall comments, and uses a CSRF-protected fetch to `wnip.interviews.score` for autosave + explicit saves; autosave status is announced in a tokenized status card.
+- Waiting room and candidate join buttons share the same countdown utilities, keeping accessibility attributes/focus states in sync with Gigvora tokens.
+
+### 3. Build & bundling
+
+- `webpack.mix.js` now compiles `interviewDashboard.js` + `interviewerScoring.js` alongside other Live assets so countdowns, join CTAs, and scoring persistence ship in production builds.
+
+### QA / Testing
+
+- Manual smoke: validated waiting room countdown enabling the live CTA, candidate prep page (join buttons, attachments fallback), live shell status pill, and scoring autosave status messaging.
+- `npm run build` (Mix) ✅
+
 
