@@ -6,6 +6,12 @@ This document is the canonical map of end-to-end flows across the Gigvora platfo
 
 ## 1. Core Host App (Web)
 
+### 1.0 Cross-Addon Roles, Permissions & Analytics (Task 20)
+- **Role matrix**: `config/permission_matrix.php` centralizes platform personas (`member`, `freelancer`, `recruiter`, `company_admin`, `creator`, `moderator`, `platform_admin`) with permission slugs (`manage_advertisement`, `manage_talent_ai`, `access_admin_panel`, `manage_system_settings`, `viewAnalytics`, `viewSecurity`, `moderate`). `App\Support\Authorization\PermissionMatrix` resolves the active role (from `users.user_role` or `getUserRole()`) and maps it to gates registered in `AuthServiceProvider` plus the reusable `permission` middleware.
+- **Navigation enforcement**: `App\Support\Navigation\NavigationBuilder` now defers to the permission matrix so Ads/Talent & AI/Admin/Moderation items only render when the user’s role is authorized. API navigation responses (`NavigationController`) log `analytics.navigation.rendered` events to keep admin personas in sync across web + Flutter shells.
+- **Feature entry checks**: Freelance dashboard access (`DashboardController@index`) emits `analytics.freelance.dashboard.view` with role + profile identifiers after the `freelanceEnabled` gate passes, while role switching and favorites toggles (`SiteController`) emit `analytics.freelance.role.switched` and `analytics.freelance.favourite.toggled` for Utilities/Jobs/Freelance cross-journeys.
+- **Analytics pipeline**: `App\Events\AnalyticsEvent` + the unified `ForwardJobsAnalyticsEvent` listener forward all matrix-defined events into `ProNetwork\Services\AnalyticsService` (queue `analytics`), preserving the existing Jobs event contract while adding cross-addon taxonomy entries (`analytics.ads.*`, `analytics.talent_ai.*`, `analytics.admin.*`).
+
 ### 1.1 Authentication & Session Lifecycle
 - **Primary flow**: landing → register/login → email verification → onboarding wizard → feed.
 - **Sub-logic**:

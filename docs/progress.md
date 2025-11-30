@@ -460,4 +460,21 @@ Last updated: 2025-11-30
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-11-30 – Task 20 (Cross-Addon Roles, Permissions & Analytics)
+
+### 1. Role & permission matrix
+
+- Introduced `config/permission_matrix.php` with platform personas and shared permission slugs, registered gates in `AuthServiceProvider`, and exposed a reusable `permission` middleware plus `PermissionMatrix` helper for controllers/services.
+- Navigation builder now respects the matrix (Ads/Talent & AI/Admin/Moderation items hidden for unauthorised roles) and API navigation responses are telemetry-instrumented for admin personas.
+
+### 2. Cross-addon analytics taxonomy
+
+- Added `App\Events\AnalyticsEvent` + `AnalyticsEventPublisher` to emit namespaced events (`analytics.navigation.rendered`, `analytics.freelance.dashboard.view`, `analytics.freelance.role.switched`, `analytics.freelance.favourite.toggled`, `analytics.admin.*`) consumed by the unified `ForwardJobsAnalyticsEvent` listener and `ProNetwork\Services\AnalyticsService` queue.
+- Freelance dashboard entry, role switching, and favourites toggles now record actor/profile metadata so Utilities/Jobs/Freelance journeys share the same taxonomy; navigation API responses log rendered sections for parity tracking.
+
+### 3. QA / Risks
+
+- Static validation only: reviewed gate registration + middleware wiring, exercised navigation API/dashboards locally for payload shape and permission filtering. No DB-migrating steps executed.
+- Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) remain blocked by the previously documented Mix/yargs + addon package name issues; rerun once the toolchain is unblocked to validate the new authorization + analytics plumbing.
+
 

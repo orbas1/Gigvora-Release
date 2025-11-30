@@ -198,5 +198,16 @@ Last updated: 2025-11-30
   - Manual smoke passed for the flows above; countdowns enable CTAs as sessions go live, and shared components render consistently across event types.
   - `npm run build` now succeeds after the Live CSS/JS changes (see Task 15 snapshot). No open defects filed.
 - **QA references**:
-  - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-15-interactive--live-addon-alignment`, `docs/ui-audit.md#interactive--live`.
+- `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-15-interactive--live-addon-alignment`, `docs/ui-audit.md#interactive--live`.
+
+## Section – Task 20 Cross-Addon Roles, Permissions & Analytics
+
+- **Scope**: Validate the shared permission matrix/gates, navigation filtering, and analytics taxonomy added for admin/addon personas (Ads, Talent & AI, Utilities, Jobs/Freelance dashboards).
+- **Checks**:
+  - Navigation API returns only role-authorised groups; unauthorised permission slugs are filtered before JSON serialization.
+  - Freelance dashboard access blocked without profile + emits analytics payload when opened; role switch + favourites toggles emit namespaced events with actor/profile metadata.
+  - Analytics listener accepts both Jobs and host `AnalyticsEvent` payloads and forwards to `ProNetwork\Services\AnalyticsService` queue.
+- **Findings**: No new defects logged; telemetry payloads validated for required keys but automated suites remain pending.
+- **QA references**:
+  - `logic_flows.md#1.0`, `docs/progress.md#snapshot-–-2025-11-30-–-task-20-cross-addon-roles,-permissions--analytics`.
 

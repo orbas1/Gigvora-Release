@@ -2,12 +2,17 @@
 
 namespace App\Support\Navigation;
 
+use App\Support\Authorization\PermissionMatrix;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Route;
 
 class NavigationBuilder
 {
     protected ?Authenticatable $user;
+
+    public function __construct(protected PermissionMatrix $permissions)
+    {
+    }
 
     public function build(?Authenticatable $user): array
     {
@@ -80,7 +85,7 @@ class NavigationBuilder
             return false;
         }
 
-        return $this->user->can($permission);
+        return $this->permissions->allowed($this->user, $permission);
     }
 
     protected function buildMobile(array $config): array
