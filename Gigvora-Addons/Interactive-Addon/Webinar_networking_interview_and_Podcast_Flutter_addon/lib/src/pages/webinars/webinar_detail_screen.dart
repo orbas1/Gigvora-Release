@@ -36,6 +36,7 @@ class _WebinarDetailScreenState extends State<WebinarDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final webinar = _state.selected.data;
+    final registration = _state.registration;
     return Scaffold(
       appBar: AppBar(title: Text(webinar?.title ?? 'Webinar')),
       body: webinar == null
@@ -47,20 +48,88 @@ class _WebinarDetailScreenState extends State<WebinarDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(webinar.title, style: Theme.of(context).textTheme.headlineSmall),
-                      const SizedBox(height: 4),
-                      Text('${webinar.startsAt} • ${(webinar.endsAt.difference(webinar.startsAt).inMinutes)} mins',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: LiveMobileTheme.mutedText(context))),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(webinar.title, style: Theme.of(context).textTheme.headlineSmall),
+                                const SizedBox(height: 6),
+                                Text(
+                                  '${webinar.startsAt} • ${(webinar.endsAt.difference(webinar.startsAt).inMinutes)} mins',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(color: LiveMobileTheme.mutedText(context)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Chip(
+                            backgroundColor: webinar.isLive
+                                ? Theme.of(context).colorScheme.errorContainer
+                                : Theme.of(context).colorScheme.secondaryContainer,
+                            label: Text(webinar.isLive ? 'Live now' : 'Scheduled'),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
-                      Text(webinar.description ?? 'No description', style: Theme.of(context).textTheme.bodyLarge),
+                      Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Overview', style: Theme.of(context).textTheme.titleMedium),
+                              const SizedBox(height: 8),
+                              Text(webinar.description ?? 'No description',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: LiveMobileTheme.mutedText(context),
+                                      )),
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  InfoChip(label: webinar.isPaid ? 'Paid ticket' : 'Free'),
+                                  InfoChip(label: (webinar.host?['name'] as String?) ?? 'Host pending'),
+                                  InfoChip(label: 'Replay shared after the session'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 16),
-                      Text('Speakers', style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 8),
-                      Wrap(spacing: 8, runSpacing: 8, children: [const InfoChip(label: 'Host'), const InfoChip(label: 'Guest')]),
-                      const SizedBox(height: 24),
+                      Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Readiness checklist', style: Theme.of(context).textTheme.titleMedium),
+                              const SizedBox(height: 8),
+                              const ListTile(
+                                leading: Icon(Icons.mic_none_outlined),
+                                title: Text('Test mic and camera before going live'),
+                              ),
+                              const ListTile(
+                                leading: Icon(Icons.schedule_outlined),
+                                title: Text('Join a few minutes early to sync reminders'),
+                              ),
+                              const ListTile(
+                                leading: Icon(Icons.security_outlined),
+                                title: Text('Follow chat etiquette; hosts can moderate'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Text('Past recordings', style: Theme.of(context).textTheme.titleMedium),
                       ...webinar.recordings
                           .map((rec) => ListTile(
@@ -80,9 +149,9 @@ class _WebinarDetailScreenState extends State<WebinarDetailScreen> {
                   child: SafeArea(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_state.registration == null) {
+                    child: ElevatedButton(
+                      onPressed: () async {
+                          if (registration == null) {
                             await _state.registerForWebinar(widget.webinarId);
                           }
                           final data = _state.selected.data;

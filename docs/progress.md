@@ -3,6 +3,19 @@
 
 Last updated: 2025-11-30
 
+## Snapshot – 2025-11-30 – Task 17 (Webinars Experience Completion)
+
+### 1. Webinar catalogue, detail, waiting room, and live shell (web)
+- Refined webinar catalogue (`wnip::webinars.index`) with a live/up-next hero band, reminder/replay filters, and CTA logic that routes directly to detail, waiting room, or live shells based on start state. Event cards now inherit the CTA label from the same logic used by the Live hub sections so hosts/attendees always land on the right surface.
+- Enriched webinar detail with schedule/ticket/safety blocks, calendar export link, readiness checklist, and trust/safety messaging while keeping registration + waiting room CTAs alongside Utilities quick tools. Waiting room gained device/reminder/etiquette tiles, and the live shell now shows attendee counts plus an engagement/moderation card for hosts.
+
+### 2. Flutter parity
+- Updated the webinar detail screen in `webinar_networking_interview_and_Podcast_Flutter_addon` to mirror the new readiness/storytelling cues: status chip, overview card, readiness checklist, and replay list with the existing waiting-room registration flow.
+
+### 3. Documentation & QA notes
+- `logic_flows.md#3.3` documents the live/up-next CTA routing, schedule/ticket/safety blocks, and calendar/export readiness parity for web + Flutter. `docs/ui-audit.md` records the refreshed webinar catalogue/detail experience.
+- Manual smoke on webinar catalogue → detail → waiting room → live shell (web) and webinar detail → register → waiting room navigation (Flutter). No automated suites executed this round; schedule phpunit/build/analyzer before release once addon dependencies stabilise.
+
 ## Snapshot – 2025-11-30 – Task 15 (Interactive / Live Addon Alignment)
 
 ### 1. Live hub, recommendation pipeline & tokens

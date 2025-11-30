@@ -16,6 +16,20 @@ Last updated: 2025-11-30
   - Core flows: see `logic_flows.md` sections `1.2`, `1.13`, `1.5`, `1.8`, `1.10`.
   - Addons: see `logic_flows.md` sections `3.1–3.7`.
 
+## Section – Task 17 Webinars Experience Completion
+
+- **Scope**: Webinar attendee/host journey across catalogue → detail → waiting room → live shell and Flutter detail parity per `logic_flows.md#3.3` and `Gigvora-Addons/Interactive-Addon/About.md#11-webinars`.
+- **Checked areas**:
+  - Catalogue hero and cards display live/up-next CTA labels that deep-link to detail/waiting/live shells; filters render without layout regressions.
+  - Detail page shows schedule/ticket/readiness/safety blocks, calendar export link, registration + waiting room CTAs, and Utilities quick tools.
+  - Waiting room countdown enables the Join button at start time; live shell surfaces attendee counts and a moderation reminder panel.
+  - Flutter webinar detail renders status chip, overview/readiness cards, replay list, and preserves registration→waiting navigation.
+- **Findings**:
+  - No blocking regressions surfaced during manual smoke. Registration/waiting/live routes respond with the updated CTAs.
+  - **Risk**: Automated suites (`phpunit`, JS build, Flutter analyzer) not executed in this pass; rerun before release once addon deps settle.
+- **QA references**:
+  - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-17-webinars-experience-completion`, `docs/ui-audit.md#interactive--live`.
+
 ## Section – Task 4 Live Feed & Composer Overhaul
 
 - **Scope**: Validate the rebuilt feed shell (composer pills, feed transformers, recommendation lanes) plus advertisement slotting per `logic_flows.md#1.2`.
