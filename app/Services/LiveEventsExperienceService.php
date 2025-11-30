@@ -147,6 +147,18 @@ class LiveEventsExperienceService
         $webinars = $this->upcomingWebinars()
             ->map(function ($webinar) {
                 $count = $webinar->registrations_count ?? 0;
+                $startsSoon = $webinar->starts_at?->lessThanOrEqualTo(now()->addMinutes(30));
+
+                $ctaLabel = __('View details');
+                $ctaHref = $this->route('wnip.webinars.show', $webinar);
+
+                if ($webinar->is_live) {
+                    $ctaLabel = __('Join live room');
+                    $ctaHref = $this->route('wnip.webinars.live', $webinar);
+                } elseif ($startsSoon) {
+                    $ctaLabel = __('Enter waiting room');
+                    $ctaHref = $this->route('wnip.webinars.waiting', $webinar);
+                }
 
                 return [
                     'title' => $webinar->title,
@@ -155,7 +167,8 @@ class LiveEventsExperienceService
                     'status' => $webinar->is_live ? __('Live now') : __('Scheduled'),
                     'tag' => $webinar->is_paid ? __('Paid') : __('Free'),
                     'detail' => trans_choice('{0}No registrants|{1}1 registrant|[2,*]:count registrants', $count, ['count' => $count]),
-                    'href' => $this->route('wnip.webinars.show', $webinar),
+                    'href' => $ctaHref,
+                    'cta' => $ctaLabel,
                     'description' => Str::limit((string) $webinar->description, 120),
                 ];
             });

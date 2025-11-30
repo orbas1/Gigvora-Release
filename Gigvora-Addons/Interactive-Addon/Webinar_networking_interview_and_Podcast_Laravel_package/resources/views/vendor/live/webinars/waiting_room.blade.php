@@ -35,6 +35,21 @@
             </a>
         </div>
     </div>
+
+    <div class="grid gap-3 md:grid-cols-3">
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Device check') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Test audio/video so the host can pull you on stage without delay.') }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Reminders') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Keep this tab open; we will auto-enable the Join button when the host is live.') }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Etiquette') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Use Q&A for questions, chat for reactions; abuse is moderated per policy.') }}</p>
+        </div>
+    </div>
 </div>
 @endsection
 

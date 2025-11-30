@@ -14,6 +14,11 @@
 @endphp
 
 <div class="space-y-6">
+    @php
+        $liveNow = $webinars->firstWhere('is_live');
+        $soonest = $webinars->sortBy('starts_at')->first();
+    @endphp
+
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
@@ -24,7 +29,7 @@
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a class="gv-btn gv-btn-primary" href="{{ route('wnip.webinars.index', ['upcoming' => 1]) }}">
+            <a class="gv-btn gv-btn-primary" href="{{ url('/events/webinars') }}">
                 {{ get_phrase('Host a webinar') }}
             </a>
             <a class="gv-btn gv-btn-ghost" href="{{ route('wnip.webinars.recordings') }}">
@@ -32,6 +37,33 @@
             </a>
         </div>
     </div>
+
+    @if ($liveNow || $soonest)
+        <div class="gv-card grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+            <div class="space-y-1">
+                <p class="gv-eyebrow mb-1">{{ get_phrase($liveNow ? 'Live now' : 'Up next') }}</p>
+                <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                    {{ ($liveNow ?? $soonest)->title }}
+                </h2>
+                <p class="gv-muted mb-0">
+                    {{ optional(($liveNow ?? $soonest)->starts_at)->format('M j • g:i A') }} •
+                    {{ optional(($liveNow ?? $soonest)->host)->name ?? get_phrase('Host pending') }}
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-2 md:justify-end md:items-center">
+                <span class="gv-pill {{ $liveNow ? 'gv-pill--danger' : 'gv-pill--success' }}">
+                    {{ $liveNow ? get_phrase('Live session') : get_phrase('Scheduled') }}
+                </span>
+                <a class="gv-btn gv-btn-primary"
+                    href="{{ $liveNow ? route('wnip.webinars.live', $liveNow) : route('wnip.webinars.waiting', $soonest) }}">
+                    {{ $liveNow ? get_phrase('Join live room') : get_phrase('Enter waiting room') }}
+                </a>
+                <a class="gv-btn gv-btn-ghost" href="{{ route('wnip.webinars.show', $liveNow ?? $soonest) }}">
+                    {{ get_phrase('View details') }}
+                </a>
+            </div>
+        </div>
+    @endif
 
     <form method="get" class="gv-card space-y-4">
         <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -58,6 +90,21 @@
                     <span>{{ get_phrase('Include finished webinars') }}</span>
                 </label>
             </div>
+            <div class="space-y-1">
+                <span class="gv-label">{{ get_phrase('Reminders & replays') }}</span>
+                <div class="flex flex-wrap gap-2">
+                    <label class="inline-flex items-center gap-2 text-sm text-[var(--gv-color-neutral-600)]">
+                        <input type="checkbox" name="reminders" value="1" class="gv-checkbox"
+                            @checked($filters['reminders'] ?? false)>
+                        <span>{{ get_phrase('Show sessions with reminders') }}</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm text-[var(--gv-color-neutral-600)]">
+                        <input type="checkbox" name="replays" value="1" class="gv-checkbox"
+                            @checked($filters['replays'] ?? false)>
+                        <span>{{ get_phrase('Has replay ready') }}</span>
+                    </label>
+                </div>
+            </div>
             <label class="space-y-1">
                 <span class="gv-label">{{ get_phrase('Pricing') }}</span>
                 <select class="gv-input" name="paid">
@@ -74,6 +121,24 @@
 
     <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         @forelse($webinars as $webinar)
+            @php
+                $startsSoon = $webinar->starts_at?->lessThanOrEqualTo(now()->addMinutes(30));
+                $ctaLabel = $webinar->is_live
+                    ? get_phrase('Join live room')
+                    : ($startsSoon
+                        ? get_phrase('Enter waiting room')
+                        : get_phrase('View details'));
+                $ctaHref = $webinar->is_live
+                    ? route('wnip.webinars.live', $webinar)
+                    : ($startsSoon
+                        ? route('wnip.webinars.waiting', $webinar)
+                        : route('wnip.webinars.show', $webinar));
+                $eyebrow = $webinar->is_live
+                    ? get_phrase('Live now')
+                    : ($startsSoon
+                        ? get_phrase('Starting soon')
+                        : null);
+            @endphp
             @include('wnip::components.event_card', [
                 'title' => $webinar->title,
                 'description' => Str::limit($webinar->description, 140),
@@ -82,8 +147,9 @@
                 'status' => $webinar->is_live ? get_phrase('Live now') : ucfirst($webinar->status ?? 'Scheduled'),
                 'tag' => $webinar->is_paid ? get_phrase('Paid') : get_phrase('Free'),
                 'detail' => trans_choice('{0}No registrants yet|{1}1 registrant|[2,*]:count registrants', $webinar->registrations_count ?? 0, ['count' => $webinar->registrations_count ?? 0]),
-                'href' => route('wnip.webinars.show', $webinar),
-                'cta' => get_phrase('View details'),
+                'href' => $ctaHref,
+                'cta' => $ctaLabel,
+                'eyebrow' => $eyebrow,
             ])
         @empty
             <div class="lg:col-span-2 xl:col-span-3">
