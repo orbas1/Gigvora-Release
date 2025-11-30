@@ -221,6 +221,9 @@ This document is the canonical map of end-to-end flows across the Gigvora platfo
   - Session setup (rounds, duration, topics), ticketing, AI match suggestions, timed rotations, contact exchange, follow-up scheduler, host dashboard.
 - **Podcasts**:
   - Series/editor management, episode scheduling, guest intake, recording (live/upload), monetization (ads, donations, paid episodes), catalog filters, donation widgets.
+  - Catalogue + series detail now surface follower counts and follow/unfollow controls that respect permissions (`wnip.podcasts.follow`), while episode lists only expose published/public items to non-hosts.
+  - Episode player (`wnip.podcasts.episode`) persists playback progress locally, emits `podcast_episode_played` analytics via `wnip.podcasts.playback`, and provides speed/seek controls; follow state syncs via AJAX for parity with Utilities bookmarks.
+  - Live recording shell (`wnip.podcasts.live`) uses tokenized host tools (`podcastLive.js`) for record/mute/timer and inherits Utilities notes sidebar for real-time collaboration.
 - **Interviews**:
   - Slot offering, interviewer panel, scoring forms, structured notes, candidate join assistance, fallback dial-in, scoring consensus, feedback distribution.
   - Slots now push Utilities calendar entries + notifications for interviewers/interviewees, and cancellation/reschedule events immediately update Utilities timelines.

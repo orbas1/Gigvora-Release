@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Config;
 
 class PodcastSeries extends Model
 {
@@ -33,6 +35,14 @@ class PodcastSeries extends Model
     public function recordings(): MorphMany
     {
         return $this->morphMany(Recording::class, 'recordable');
+    }
+
+    public function followers(): BelongsToMany
+    {
+        $userModel = Config::get('auth.providers.users.model') ?? \App\Models\User::class;
+
+        return $this->belongsToMany($userModel, 'podcast_series_followers')
+            ->withTimestamps();
     }
 }
 

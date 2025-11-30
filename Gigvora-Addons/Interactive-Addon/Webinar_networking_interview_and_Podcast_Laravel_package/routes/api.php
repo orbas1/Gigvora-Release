@@ -29,8 +29,11 @@ Route::group([
     Route::post('/podcast-series', [PodcastController::class, 'storeSeries']);
     Route::get('/podcast-series/{podcastSeries}', [PodcastController::class, 'showSeries']);
     Route::put('/podcast-series/{podcastSeries}', [PodcastController::class, 'updateSeries']);
+    Route::post('/podcast-series/{podcastSeries}/follow', [PodcastController::class, 'toggleFollow']);
     Route::post('/podcast-series/{podcastSeries}/episodes', [PodcastController::class, 'storeEpisode']);
+    Route::get('/podcast-series/{podcastSeries}/episodes/{episode}', [PodcastController::class, 'showEpisode']);
     Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/publish', [PodcastController::class, 'publishEpisode']);
+    Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/playback', [PodcastController::class, 'recordPlayback']);
 
     Route::get('/interviews', [InterviewController::class, 'index']);
     Route::post('/interviews', [InterviewController::class, 'store']);

@@ -12,6 +12,7 @@ class PodcastState extends ChangeNotifier {
 
   final ViewState<List<PodcastSeries>> series = ViewState(data: []);
   final ViewState<PodcastSeries> selected = ViewState();
+  final ViewState<PodcastEpisode> episode = ViewState();
   PodcastEpisode? nowPlaying;
 
   Future<void> loadSeries() async {
@@ -35,6 +36,17 @@ class PodcastState extends ChangeNotifier {
       selected.setData(detail);
     } catch (error) {
       selected.setError(error.toString());
+    }
+  }
+
+  Future<void> loadEpisode(int seriesId, int episodeId) async {
+    try {
+      episode.setLoading();
+      final detail = await service.fetchEpisodeDetail(seriesId, episodeId);
+      episode.setData(detail);
+      setNowPlaying(detail);
+    } catch (error) {
+      episode.setError(error.toString());
     }
   }
 

@@ -19,6 +19,7 @@ import 'pages/webinars/webinar_live_screen.dart';
 import 'pages/webinars/webinar_recording_player_screen.dart';
 import 'pages/webinars/webinar_waiting_room_screen.dart';
 import 'pages/webinars/webinars_home_screen.dart';
+import 'models/podcast_episode.dart';
 import 'services/interview_service.dart';
 import 'services/networking_service.dart';
 import 'services/podcast_service.dart';
@@ -104,8 +105,22 @@ Map<String, WidgetBuilder> buildAddonRoutes(
       return PodcastSeriesDetailScreen(service: podcastSvc, seriesId: id);
     },
     '/live/podcasts/episode/:id': (context) {
-      final episode = ModalRoute.of(context)?.settings.arguments as dynamic;
-      return PodcastEpisodePlayerScreen(episode: episode);
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map<String, dynamic>) {
+        return PodcastEpisodePlayerScreen(
+          service: podcastSvc,
+          episode: args['episode'] as PodcastEpisode?,
+          episodeId: args['episodeId'] as int?,
+          seriesId: args['seriesId'] as int?,
+        );
+      }
+
+      if (args is PodcastEpisode) {
+        return PodcastEpisodePlayerScreen(service: podcastSvc, episode: args, seriesId: args.podcastSeriesId, episodeId: args.id);
+      }
+
+      final episodeId = args is int ? args : 0;
+      return PodcastEpisodePlayerScreen(service: podcastSvc, episodeId: episodeId, seriesId: null);
     },
     '/live/podcasts/live': (_) => const PodcastLiveRecordingScreen(),
     '/live/interviews': (_) => InterviewScheduleScreen(service: interviewSvc),

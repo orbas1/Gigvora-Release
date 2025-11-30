@@ -19,4 +19,21 @@ class PodcastService {
   Future<PodcastEpisode> createEpisode(int seriesId, PodcastEpisodePayload payload) {
     return apiClient.createPodcastEpisode(seriesId, payload);
   }
+
+  Future<PodcastEpisode> fetchEpisodeDetail(int seriesId, int episodeId) {
+    return apiClient.fetchPodcastEpisodeDetails(seriesId, episodeId);
+  }
+
+  Future<void> toggleFollow(int seriesId, {bool follow = true}) {
+    return apiClient.togglePodcastSeriesFollow(seriesId, follow: follow);
+  }
+
+  Future<void> recordPlayback(int seriesId, int episodeId, {int? progressSeconds, bool completed = false}) {
+    return apiClient.recordPodcastPlayback(
+      seriesId,
+      episodeId,
+      progressSeconds: progressSeconds,
+      completed: completed,
+    );
+  }
 }

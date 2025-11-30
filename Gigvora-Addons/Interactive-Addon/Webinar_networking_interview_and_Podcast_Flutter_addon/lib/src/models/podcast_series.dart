@@ -8,6 +8,8 @@ class PodcastSeries {
   final String? description;
   final String? coverArtPath;
   final bool isPublic;
+  final int followersCount;
+  final bool? isFollowed;
   final Map<String, dynamic>? metadata;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -18,6 +20,8 @@ class PodcastSeries {
     required this.hostId,
     required this.title,
     required this.isPublic,
+    this.followersCount = 0,
+    this.isFollowed,
     this.description,
     this.coverArtPath,
     this.metadata,
@@ -34,6 +38,8 @@ class PodcastSeries {
       description: json['description'] as String?,
       coverArtPath: json['cover_art_path'] as String?,
       isPublic: json['is_public'] as bool? ?? false,
+      followersCount: json['followers_count'] as int? ?? 0,
+      isFollowed: json['is_followed'] as bool?,
       metadata: parseMetadata(json['metadata']),
       createdAt: parseDateTime(json['created_at']),
       updatedAt: parseDateTime(json['updated_at']),
