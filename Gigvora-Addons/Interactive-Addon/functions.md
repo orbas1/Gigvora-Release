@@ -56,7 +56,7 @@ Core flow bullets:
   - `GET /events/interviews/{interview}/waiting-room` → `InterviewPageController@waitingRoom` (countdown to start).
   - `POST /events/interviews/{interview}/slots/{slot}/score` → `InterviewPageController@score` (auth, criteria + scores arrays).
   - API: CRUD + slot add + score at `/api/live/interviews*` via `InterviewController` (configurable prefix).
-- **Data**: Analytics events `interview_scheduled`, `interview_joined`, `interview_scored`.
+- **Data**: Analytics events `interview_scheduled`, `interview_joined`, `interview_scored`; aggregated averages + pass flags live in `Interview->metadata['aggregates']` with ATS + Utilities sync logs captured under `metadata['ats_logs']` and `metadata['utilities']`.
 
 ### Feed & Search Helpers
 - `Support\Feed\FeedTransformer`: map Webinars, NetworkingSessions, PodcastEpisodes, and Interviews into `FeedItem` arrays (title, summary, URL, timestamp, meta). Use routes `wnip.webinars.show`, `wnip.networking.show`, `wnip.podcasts.series`, `wnip.interviews.show` for deep links.

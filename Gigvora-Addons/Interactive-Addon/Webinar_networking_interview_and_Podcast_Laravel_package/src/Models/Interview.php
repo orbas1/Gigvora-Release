@@ -28,6 +28,21 @@ class Interview extends Model
         'is_panel' => 'boolean',
     ];
 
+    public function aggregatedScores(): array
+    {
+        return $this->metadata['aggregates'] ?? [
+            'total' => 0,
+            'average' => 0,
+            'count' => 0,
+            'pass' => null,
+        ];
+    }
+
+    public function consentFor(string $type): ?array
+    {
+        return $this->metadata['consents'][$type] ?? null;
+    }
+
     public function slots(): HasMany
     {
         return $this->hasMany(InterviewSlot::class);

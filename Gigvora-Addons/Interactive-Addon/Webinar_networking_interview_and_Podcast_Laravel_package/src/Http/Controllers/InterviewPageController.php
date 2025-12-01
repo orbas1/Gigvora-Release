@@ -8,7 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\View\View;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\Interview;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\InterviewSlot;
-use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
+use Jobi\WebinarNetworkingInterviewPodcast\Services\InterviewOutcomeService;
 
 class InterviewPageController extends Controller
 {
@@ -45,6 +45,17 @@ class InterviewPageController extends Controller
         return view('wnip::interviews.waiting_room', ['interview' => $interview]);
     }
 
+    public function live(Interview $interview): View
+    {
+        $this->authorize('view', $interview);
+        $interview->load(['slots.interviewer', 'slots.interviewee', 'host']);
+
+        return view('wnip::interviews.live_candidate', [
+            'interview' => $interview,
+            'primarySlot' => $interview->slots->sortBy('starts_at')->first(),
+        ]);
+    }
+
     public function score(Request $request, Interview $interview, InterviewSlot $interviewSlot)
     {
         $this->authorize('score', $interview);
@@ -53,21 +64,20 @@ class InterviewPageController extends Controller
             'criteria' => 'required|array',
             'scores' => 'required|array',
             'comments' => 'nullable|string',
+            'recommendation' => 'nullable|string',
+            'consent' => 'sometimes|array:granted,type,source,timestamp,region',
         ]);
 
-        $interview->scores()->create([
-            'interview_slot_id' => $interviewSlot->id,
-            'interviewer_id' => $request->user()->getAuthIdentifier(),
-            'criteria' => $validated['criteria'],
-            'scores' => $validated['scores'],
-            'comments' => $validated['comments'] ?? null,
-        ]);
+        if (! empty($validated['consent'])) {
+            app(InterviewOutcomeService::class)->captureConsent($interview, $validated['consent']);
+        }
 
-        Analytics::track('interview_scored', [
-            'interview_id' => $interview->id,
-            'interview_slot_id' => $interviewSlot->id,
-            'interviewer_id' => $request->user()->getAuthIdentifier(),
-        ]);
+        app(InterviewOutcomeService::class)->recordScore(
+            $interview,
+            $interviewSlot,
+            $request->user()->getAuthIdentifier(),
+            $validated
+        );
 
         return back()->with('status', 'Score submitted');
     }
