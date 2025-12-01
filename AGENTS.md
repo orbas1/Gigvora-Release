@@ -183,7 +183,8 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Protect live session access, recordings, ticket data, and interview scores; enforce role-based access for hosts, interviewers, attendees.
     - **Completion Criteria**: All event types and sub-flows in `logic_flows.md#33-#55` function smoothly across web and mobile with Gigvora UI.
 
-16. **Interviews Experience Completion**
+16. ✅ **Interviews Experience Completion**
+   - **Status**: Completed 2025-12-01 – see `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion` for evidence.
    - **Goal**: Deliver the full end-to-end interviews journey (scheduling → waiting rooms → live shells → scoring) defined in `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews`, mirroring the Laravel + Flutter specs in `Gigvora-Addons/Interactive-Addon/About.md#14-interviews`.
    - **Scope**:
      - Backend: finalize slot creation, interviewer panel orchestration, scoring matrices, structured notes, consent tracking, and ATS callbacks so Jobs (`logic_flows.md#31-jobs-addon`) always reflects interview outcomes.

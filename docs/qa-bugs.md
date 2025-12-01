@@ -200,3 +200,15 @@ Last updated: 2025-11-30
 - **QA references**:
   - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-15-interactive--live-addon-alignment`, `docs/ui-audit.md#interactive--live`.
 
+## Section – Task 16 Interviews Experience Completion
+
+- **Scope**: Close gaps on interview waiting rooms, live shells, candidate prep, and interviewer scoring so CTA gating, timers, and scoring persistence match `logic_flows.md#33` and the Interactive addon specs.
+- **Checked areas**:
+  - Waiting room countdown unlocking the new `wnip.interviews.live` route + status pill state change.
+  - Candidate prep view pulling real interview/slot metadata and attachment list; join buttons reflect schedule.
+  - Live shell status pill/timestamp rendering; interviewer scoring panel autosave to `wnip.interviews.score` with CSRF + error handling.
+- **Findings**:
+  - Manual smoke passed for the flows above; no defects opened. `npm run build` succeeded after adding the interview JS bundles to Mix.
+- **QA references**:
+  - `logic_flows.md#33`, `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion`, `docs/ui-audit.md#interactive--live`.
+
