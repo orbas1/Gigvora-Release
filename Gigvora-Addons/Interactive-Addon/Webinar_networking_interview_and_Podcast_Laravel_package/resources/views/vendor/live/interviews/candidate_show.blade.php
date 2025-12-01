@@ -19,13 +19,23 @@
     data-start-at="{{ $primarySlot?->starts_at?->toIso8601String() ?? $interview->scheduled_at?->toIso8601String() }}">
     <div class="space-y-4">
         <div class="gv-card space-y-2">
-            <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
-                {{ $interview->title }}
-            </h2>
-            <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
-                {{ $interview->scheduled_at?->format('M j • g:i A') ?? get_phrase('TBD') }}
-                • {{ $interview->duration_minutes ?? 0 }} {{ get_phrase('mins') }}
-                • {{ $primarySlot?->meeting_link ? get_phrase('Video') : ($interview->location ?? get_phrase('Virtual')) }}
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">
+                        {{ $interview->title }}
+                    </h2>
+                    <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
+                        {{ $interview->scheduled_at?->format('M j • g:i A') ?? get_phrase('TBD') }}
+                        • {{ $interview->duration_minutes ?? 0 }} {{ get_phrase('mins') }}
+                        • {{ $primarySlot?->meeting_link ? get_phrase('Video') : ($interview->location ?? get_phrase('Virtual')) }}
+                    </p>
+                </div>
+                <span class="gv-pill">
+                    {{ strtoupper($primarySlot?->status ?? get_phrase('invited')) }}
+                </span>
+            </div>
+            <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
+                {{ get_phrase('Time zone') }}: {{ $primarySlot?->starts_at?->timezoneName ?? config('app.timezone') }}
             </p>
         </div>
         <div class="gv-card space-y-2">
@@ -43,6 +53,10 @@
             <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
                 {{ $interview->description ?: get_phrase('Join 5 minutes early and test your mic.') }}
             </p>
+            <div class="flex flex-wrap gap-2 pt-2 text-xs text-[var(--gv-color-neutral-600)]">
+                <span class="gv-pill gv-pill-soft">{{ get_phrase('Countdown ready') }}</span>
+                <span class="gv-pill gv-pill-soft">{{ get_phrase('Privacy respected') }}</span>
+            </div>
         </div>
     </div>
     <aside class="space-y-4">
@@ -53,6 +67,16 @@
                 data-ready-label="{{ get_phrase('Join interview') }}">
                 {{ get_phrase('Join interview') }}
             </button>
+        </div>
+        <div class="gv-card space-y-2">
+            <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Outcome & feedback') }}</h4>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-1">
+                {{ get_phrase('Average score') }}: {{ $interview->aggregatedScores()['average'] }}
+                • {{ get_phrase('Status') }}: {{ $interview->aggregatedScores()['pass'] === null ? get_phrase('Pending') : ($interview->aggregatedScores()['pass'] ? get_phrase('Pass') : get_phrase('Hold')) }}
+            </p>
+            <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
+                {{ get_phrase('Feedback will be shared according to company policy.') }}
+            </p>
         </div>
         <div class="gv-card space-y-2">
             <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Attachments') }}</h4>

@@ -332,6 +332,7 @@ All module views should live under:
   - Joining link/button: “Join Interview”.
   - Special instructions.
   - Attachments: job description, documents.
+  - Outcome banner: aggregated score, pass/hold flag, and consent reminder aligned to privacy rules.
 
 - **JS**:
   - If within allowable window, enable “Join Waiting Room”.

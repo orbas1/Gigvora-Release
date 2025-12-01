@@ -95,6 +95,28 @@
             <div class="gv-card" data-status role="status" aria-live="polite">
                 {{ get_phrase('Scores auto-save while you edit. Locked entries are read-only.') }}
             </div>
+            <div class="gv-card space-y-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Privacy & consent') }}</p>
+                    @php $consent = $interview->consentFor('recording'); @endphp
+                    <span class="gv-pill gv-pill-soft {{ ($consent['granted'] ?? false) ? 'text-[var(--gv-color-success-700)]' : 'text-[var(--gv-color-danger-700)]' }}">
+                        {{ ($consent['granted'] ?? false) ? get_phrase('Granted') : get_phrase('Pending') }}
+                    </span>
+                </div>
+                <p class="text-xs text-[var(--gv-color-neutral-600)] mb-0">
+                    {{ get_phrase('Track consent for recording, data use, and feedback visibility.') }}
+                </p>
+            </div>
+            <div class="gv-card space-y-2">
+                <p class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Outcome sync') }}</p>
+                <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
+                    {{ get_phrase('Average') }}: {{ $interview->aggregatedScores()['average'] }} • {{ get_phrase('Pass flag') }}:
+                    {{ $interview->aggregatedScores()['pass'] === null ? get_phrase('Pending') : ($interview->aggregatedScores()['pass'] ? get_phrase('Pass') : get_phrase('Hold')) }}
+                </p>
+                <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
+                    {{ get_phrase('Outcomes are pushed to ATS and Utilities reminders for downstream workflows.') }}
+                </p>
+            </div>
         </aside>
     </div>
 </div>

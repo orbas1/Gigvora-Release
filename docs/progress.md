@@ -482,4 +482,14 @@ Last updated: 2025-11-30
 - Manual smoke: validated waiting room countdown enabling the live CTA, candidate prep page (join buttons, attachments fallback), live shell status pill, and scoring autosave status messaging.
 - `npm run build` (Mix) ✅
 
+### 4. Outcome, consent, and ATS sync (2025-12-01 refresh)
+
+- Added `InterviewOutcomeService` to aggregate per-criteria scores, persist pass/hold flags, and log ATS/Utilities sync metadata directly on `Interview->metadata` for analytics + auditability.
+- Controller scoring endpoint now captures optional consent payloads (recording/data use), writes structured history, and keeps downstream updates transactional.
+- Candidate + interviewer Blade views surface aggregated scores, consent state, and outcome sync messaging using Gigvora pills/cards for accessibility and production readiness.
+
+### QA / Testing
+
+- Manual smoke: exercised scoring submission with recommendation + consent payload, verified metadata aggregation, and visual outcome/consent banners on candidate/interviewer views.
+
 

@@ -207,8 +207,9 @@ Last updated: 2025-11-30
   - Waiting room countdown unlocking the new `wnip.interviews.live` route + status pill state change.
   - Candidate prep view pulling real interview/slot metadata and attachment list; join buttons reflect schedule.
   - Live shell status pill/timestamp rendering; interviewer scoring panel autosave to `wnip.interviews.score` with CSRF + error handling.
+  - Consent capture + aggregated scoring persistence via `InterviewOutcomeService` writing ATS/Utilities metadata.
 - **Findings**:
-  - Manual smoke passed for the flows above; no defects opened. `npm run build` succeeded after adding the interview JS bundles to Mix.
+  - Manual smoke passed for the flows above; no defects opened. `npm run build` succeeded after adding the interview JS bundles to Mix. Aggregated score/consent banners render on candidate + interviewer views; ATS/Utilities metadata logged in `metadata`.
 - **QA references**:
   - `logic_flows.md#33`, `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion`, `docs/ui-audit.md#interactive--live`.
 

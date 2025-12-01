@@ -8,7 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\View\View;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\Interview;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\InterviewSlot;
-use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
+use Jobi\WebinarNetworkingInterviewPodcast\Services\InterviewOutcomeService;
 
 class InterviewPageController extends Controller
 {
@@ -64,21 +64,20 @@ class InterviewPageController extends Controller
             'criteria' => 'required|array',
             'scores' => 'required|array',
             'comments' => 'nullable|string',
+            'recommendation' => 'nullable|string',
+            'consent' => 'sometimes|array:granted,type,source,timestamp,region',
         ]);
 
-        $interview->scores()->create([
-            'interview_slot_id' => $interviewSlot->id,
-            'interviewer_id' => $request->user()->getAuthIdentifier(),
-            'criteria' => $validated['criteria'],
-            'scores' => $validated['scores'],
-            'comments' => $validated['comments'] ?? null,
-        ]);
+        if (! empty($validated['consent'])) {
+            app(InterviewOutcomeService::class)->captureConsent($interview, $validated['consent']);
+        }
 
-        Analytics::track('interview_scored', [
-            'interview_id' => $interview->id,
-            'interview_slot_id' => $interviewSlot->id,
-            'interviewer_id' => $request->user()->getAuthIdentifier(),
-        ]);
+        app(InterviewOutcomeService::class)->recordScore(
+            $interview,
+            $interviewSlot,
+            $request->user()->getAuthIdentifier(),
+            $validated
+        );
 
         return back()->with('status', 'Score submitted');
     }
