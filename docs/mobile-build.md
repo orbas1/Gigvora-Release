@@ -44,6 +44,12 @@ Run these from `Gigvora Flutter Mobile App/App` after configuring base URLs/toke
 
 Ensure the app entrypoint reads `BASE_URL` (or your preferred define) and passes it into the navigation/quick tools/addon clients above so every route hits the live Laravel endpoints.
 
+## Pre-release verification
+
+- Run `flutter analyze` with all addon packages present to confirm there are no analyzer warnings.
+- Mirror backend readiness by running `php artisan test` and `npm run build` on the Laravel side before shipping a new mobile build to verify API compatibility.
+- Execute persona smoke tests from `logic_flows.md#5` (feed, comments, stories/reels/long video uploads, live streaming with donations/goals/chat, jobs/freelance/ads/talent-ai/utilities) to validate parity and ensure no flows rely on mock data when offline.
+
 ## Push notifications
 
 Use the Utilities addon push/notification pipeline from the web stack. Register the device token after sign-in and send it to the Laravel notifications service; the same auth token used for content APIs should be used for notification registration. Keep platform-specific setup (APNs/FCM) in your native runner and avoid storing keys in the Dart layer.

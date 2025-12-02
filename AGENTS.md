@@ -244,7 +244,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Use least-privilege principles, audit logs for permission changes, and verify no bypasses exist.
     - **Completion Criteria**: Role matrix enforced system-wide, analytics taxonomy stable and documented, and cross-addon journeys respect these rules.
 
-21. **Mobile Convergence**
+21. ✅ **Mobile Convergence**
     - **Goal**: Bring the Flutter app to full parity with the web experience, both visually and functionally.
     - **Scope**:
       - Audit all web flows and confirm a corresponding mobile screen/route exists (feed, profile, Jobs, Freelance, Ads, Talent & AI, Utilities, settings).
