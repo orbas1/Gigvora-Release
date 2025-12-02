@@ -16,9 +16,15 @@ return new class extends Migration
         Schema::create('gig_faqs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id')->index();
-            $table->text('question')->fullText();
+            $table->text('question');
             $table->text('answer');
             $table->timestamps();
+        });
+
+        Schema::table('gig_faqs', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('question');
+            }
         });
     }
 

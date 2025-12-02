@@ -726,3 +726,18 @@ Last updated: 2025-12-01
 - `npm run build` (Mix) ✅
 
 
+
+## Snapshot – 2025-12-03 – Task 23 (Data Layer & Environment Readiness)
+
+### Schema and migrations
+- Added a base `users` table and guarded addon migrations (media/story/live/posts) plus freelance full-text fallbacks so sqlite/MySQL builds no longer fail when optional tables are missing.
+- Introduced environment-readiness indexes for jobs, interactive events, ads, and audit logs to align hot query paths.
+- Synced installer state by dumping the fresh schema and seeds into `public/assets/install.sql` from a clean `migrate:fresh --seed` run.
+
+### Seeders and configuration
+- Hardened Advertisement, Jobs, Interactive, and Talent AI seeders for idempotence, structure-aware configs, and seeded a default admin user for host-dependent demo data.
+- Refreshed `.env.example` with addon/env keys (streaming, escrow, AI, payments, utilities) and added optional demo seed flag; config cache now succeeds after updates.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite test harness)
+- `php artisan config:cache` ✅

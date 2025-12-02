@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Advertisement\Models\KeywordPrice;
 use Advertisement\Models\Placement;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AdvertisementSeeder extends Seeder
 {
@@ -12,14 +13,22 @@ class AdvertisementSeeder extends Seeder
     {
         $placements = config('advertisement.placements', ['feed', 'profile', 'search', 'jobs', 'gigs']);
 
-        foreach ($placements as $placement) {
-            Placement::firstOrCreate([
-                'name' => $placement,
-                'channel' => $placement,
-            ], [
-                'description' => ucfirst($placement) . ' placement imported from Sngine baseline.',
-                'is_active' => true,
-            ]);
+        foreach ($placements as $key => $placement) {
+            $slug = is_string($key) ? $key : (is_string($placement) ? $placement : Str::slug($placement['label'] ?? 'placement'));
+            $label = is_array($placement) ? ($placement['label'] ?? Str::headline($slug)) : Str::headline($placement);
+            $channel = is_array($placement) ? ($placement['channel'] ?? $slug) : $placement;
+            $description = is_array($placement)
+                ? ($placement['description'] ?? $label . ' placement')
+                : ucfirst($placement) . ' placement imported from Sngine baseline.';
+
+            Placement::updateOrCreate(
+                ['name' => $slug],
+                [
+                    'channel' => $channel,
+                    'description' => $description,
+                    'is_active' => true,
+                ]
+            );
         }
 
         $keywords = [

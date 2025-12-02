@@ -274,7 +274,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Lock admin routes tightly, require strong auth, document security settings, and regularly review logs.
     - **Completion Criteria**: Admin experiences complete and intuitive, GDPR operations verified, monitoring dashboards show healthy system behavior.
 
-23. **Data Layer & Environment Readiness**
+23. ✅ **Data Layer & Environment Readiness**
     - **Goal**: Make it safe and repeatable to bring up/down environments and keep schemas consistent.
     - **Scope**:
       - Clean up and order migrations, add missing indexes, and reconcile addon tables with core schema.

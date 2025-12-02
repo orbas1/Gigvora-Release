@@ -16,8 +16,16 @@ return new class extends Migration
         Schema::create('gig_tags', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id')->index();
-            $table->string('tag_name')->fullText();
+            $table->string('tag_name');
             $table->timestamps();
+        });
+
+        Schema::table('gig_tags', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('tag_name');
+            } else {
+                $table->index('tag_name');
+            }
         });
     }
 

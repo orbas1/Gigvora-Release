@@ -17,7 +17,7 @@ class TalentAiSeeder extends Seeder
                 ['slug' => $slug],
                 [
                     'name' => $plan['name'] ?? Str::headline($slug),
-                    'limits' => $plan['tokens'] ?? null,
+                    'limits' => json_encode($plan['tokens'] ?? []),
                     'price' => $plan['price'] ?? 0,
                     'updated_at' => now(),
                     'created_at' => now(),
