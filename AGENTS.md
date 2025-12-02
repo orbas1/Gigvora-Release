@@ -260,7 +260,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Validate secure token storage, correct use of HTTPS/CORS, and safe handling of secrets/config.
     - **Completion Criteria**: Mobile app passes a parity checklist against `logic_flows.md#5`, analyzer/status clean, and `docs/mobile-build.md` describes final build process.
 
-22. **Admin, Compliance & Security Hardening**
+22. ✅ **Admin, Compliance & Security Hardening**
     - **Goal**: Provide a robust command center for admins with strong security and compliance guarantees.
     - **Scope**:
       - Finish admin dashboards for each addon: KPIs, filters, exports, troubleshooting panels.

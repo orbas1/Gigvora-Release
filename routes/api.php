@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\GdprController;
+use App\Http\Controllers\Admin\IncidentController;
 use App\Http\Controllers\Api\FreelanceWorkspaceController;
 use App\Http\Controllers\Api\NavigationController as NavigationApiController;
 use App\Http\Controllers\Api\UtilitiesQuickToolsController;
@@ -28,6 +32,18 @@ Route::middleware('auth:sanctum')->get('/utilities/quick-tools', UtilitiesQuickT
 Route::middleware('auth:sanctum')->get('/utilities/composer/assets', [UtilitiesComposerController::class, 'assets'])->name('api.utilities.composer.assets');
 Route::middleware('auth:sanctum')->get('/utilities/composer/gifs', [UtilitiesComposerController::class, 'gifs'])->name('api.utilities.composer.gifs');
 Route::middleware(['auth:sanctum', 'verified'])->get('/freelance/workspace', FreelanceWorkspaceController::class)->name('api.freelance.workspace');
+
+Route::middleware(['auth:sanctum', 'verified', 'admin', 'throttle:60,1'])
+    ->prefix('admin')
+    ->as('api.admin.')
+    ->group(function () {
+        Route::get('/overview', [AdminDashboardController::class, 'overview'])->name('overview');
+        Route::get('/addons', [AdminDashboardController::class, 'addons'])->name('addons');
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/gdpr/users/{user}/export', [GdprController::class, 'export'])->name('gdpr.export');
+        Route::post('/gdpr/users/{user}/erase', [GdprController::class, 'erase'])->name('gdpr.erase');
+        Route::post('/incidents', [IncidentController::class, 'store'])->name('incidents.store');
+    });
 
 Route::get('/data', [ApiController::class,'userdata']);
 
