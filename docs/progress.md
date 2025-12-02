@@ -509,10 +509,12 @@ Last updated: 2025-12-02
 ### 2. Access, pairing + waitlist protections
 
 - Reused participant guards inside the new exchange flow to prevent waitlisted or unregistered users from accessing live handshakes. Networking controllers continue to enforce capacity, coupons, and rotation tracking while exposing the new contact API over both Sanctum API routes and Blade-powered AJAX.
+- Added `NetworkingPairingService` and `/api/live/networking/{session}/pairings` to generate repeat-avoidant round plans for speed and group formats, persist pairings, and emit analytics. Waitlist promotions are now exposed via `/promote-waitlist` and triggered automatically when capacity increases so seats backfill quickly.
 
 ### QA / Testing
 
 - Manual verification: exercised live shell contact button (star toggle + follow-up time + notes persistence) against validation errors (missing partner, rate-limit message) and confirmed reminders are emitted through the Utilities calendar service metadata. Confirmed waitlisted users are blocked from the exchange endpoint.
+- Manual verification: seeded multi-attendee sessions, ran pairing generation for consecutive rounds to confirm partner rotation without repeats and observed waitlist promotion calls refill seats when capacity increased. Exercised refreshed Flutter networking catalogue/detail/waiting/live/recap screens (filters, coupons, countdown join gating, notes + star toggles) for parity with the Blade flows.
 - Automated: not run (Mix/yargs + environment setup still blocking `php artisan test`/`npm run build`/Flutter analyzer); rerun before release to cover the new migration, controllers, and JS fetch hooks.
 
 

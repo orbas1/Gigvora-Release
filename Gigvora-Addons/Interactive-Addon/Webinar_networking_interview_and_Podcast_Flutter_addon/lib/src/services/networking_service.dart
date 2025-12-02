@@ -16,7 +16,7 @@ class NetworkingService {
     return apiClient.fetchNetworkingSession(id);
   }
 
-  Future<NetworkingParticipant> register(int id) {
-    return apiClient.registerForNetworking(id);
+  Future<NetworkingParticipant> register(int id, {String? coupon}) {
+    return apiClient.registerForNetworking(id, coupon: coupon);
   }
 }

@@ -210,6 +210,7 @@ Last updated: 2025-11-30
   - Live shell rotation timer/progress, partner card contact exchange CTA, local notes persistence (Utilities recap sync), and new follow-up picker/star toggle verified in browser; AJAX call hits secured exchange endpoint and rejects missing partner/rate-limit cases.
 - **Findings**:
   - Manual smoke passes for the flows above. No blocking defects captured; waitlist promotion logic beyond initial registration still depends on a future seat-change hook. Contact exchanges now persist to `networking_contact_exchanges` with reminder scheduling via Utilities calendar service.
+  - Post-update verification added pairing runs across consecutive rounds (repeat avoidance) and explicit waitlist promotion calls when capacity increases; Flutter catalogue/detail/waiting/live/recap screens exercised for filter/coupon/join gating parity.
   - **Risks**: Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) not re-run here due to previously documented Mix/yargs + env setup blockers; rerun before release to cover the new migration, controller endpoints, and JS fetch logic.
 - **QA references**:
   - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-12-01-–-task-19-networking-sessions-completion`, `docs/ui-audit.md#live/networking-polish-–-task-19`.

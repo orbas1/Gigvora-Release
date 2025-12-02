@@ -55,6 +55,15 @@ class NetworkingSession {
           .toList(),
     );
   }
+
+  bool get isLive => status == 'in_rotation' || status == 'live';
+
+  bool get isJoinable {
+    if (isLive) return true;
+    return DateTime.now().isAfter(startsAt);
+  }
+
+  bool get isFree => !isPaid || (price ?? 0) <= 0;
 }
 
 class NetworkingSessionPayload {

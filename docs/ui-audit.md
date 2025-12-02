@@ -116,7 +116,8 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 7. **Utilities Surfaces (Task 5)**:
    - Expose quick tools via `components.utilities.quick-tools` on feed, profile, Jobs (index + detail), Freelance shell, Live hub, and admin dashboard. Each instance queries `App\Services\UtilitiesQuickToolsService` so CTAs stay context-aware without duplicating arrays inside Blade.
    - Floating Utilities bubble (`components.utilities.chat-bubble` + `resources/js/utilities/bubble.js`) calls `/api/utilities/quick-tools` to hydrate the same actions while also showing chat conversations/requests.
-   - Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter networking catalogue/detail/waiting/live/recap screens now align with the Gigvora shell: filter chips and search fields reuse token spacing, countdown/join CTAs use `GigvoraThemeData` buttons, and recap cards surface follow-up chips that mirror the web recap/footer actions.
 8. **Documentation & Governance**:
    - Document tokens and usage rules in `/docs/design-system.md`.
    - Enforce linting (Stylelint / Dart analyzer) tied to token usage where possible.

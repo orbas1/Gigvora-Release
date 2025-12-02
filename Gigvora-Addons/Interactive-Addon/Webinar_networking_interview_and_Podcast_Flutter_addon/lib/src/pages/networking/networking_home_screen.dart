@@ -16,6 +16,9 @@ class NetworkingHomeScreen extends StatefulWidget {
 class _NetworkingHomeScreenState extends State<NetworkingHomeScreen> with SingleTickerProviderStateMixin {
   late final NetworkingState _state;
   late final TabController _controller;
+  String _typeFilter = 'all';
+  String _priceFilter = 'all';
+  String _search = '';
 
   @override
   void initState() {
@@ -37,6 +40,9 @@ class _NetworkingHomeScreenState extends State<NetworkingHomeScreen> with Single
   @override
   Widget build(BuildContext context) {
     final sessions = _state.sessions.data ?? [];
+    final upcoming = sessions.where((e) => e.startsAt.isAfter(DateTime.now())).toList();
+    final past = sessions.where((e) => e.startsAt.isBefore(DateTime.now())).toList();
+    final mine = sessions.where((e) => (e.participants).isNotEmpty).toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Networking'),
@@ -45,12 +51,19 @@ class _NetworkingHomeScreenState extends State<NetworkingHomeScreen> with Single
           tabs: const [Tab(text: 'Upcoming'), Tab(text: 'My Sessions'), Tab(text: 'Past')],
         ),
       ),
-      body: TabBarView(
-        controller: _controller,
+      body: Column(
         children: [
-          _buildList(sessions),
-          _buildList(sessions.where((e) => e.isLive).toList()),
-          _buildList(const []),
+          _buildFilters(context),
+          Expanded(
+            child: TabBarView(
+              controller: _controller,
+              children: [
+                _buildList(_applyFilters(upcoming)),
+                _buildList(_applyFilters(mine)),
+                _buildList(_applyFilters(past)),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -67,11 +80,68 @@ class _NetworkingHomeScreenState extends State<NetworkingHomeScreen> with Single
         return LiveEventCard(
           title: session.title,
           subtitle: session.host?['name']?.toString() ?? 'Host',
-          meta: '${session.startsAt} • ${session.type}',
-          trailing: InfoChip(label: session.isLive ? 'Live' : 'Scheduled'),
+          meta: '${session.startsAt} • ${(session.metadata?['template'] ?? 'speed').toString().toUpperCase()}',
+          trailing: InfoChip(label: session.isLive ? 'Live' : (session.isPaid ? 'Paid' : 'Free')),
           onTap: () => Navigator.pushNamed(context, '/live/networking/${session.id}', arguments: session.id),
         );
       },
     );
+  }
+
+  Widget _buildFilters(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            decoration: const InputDecoration(labelText: 'Search topics or host'),
+            onChanged: (value) => setState(() => _search = value.toLowerCase()),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: [
+              ChoiceChip(
+                label: const Text('All'),
+                selected: _typeFilter == 'all',
+                onSelected: (_) => setState(() => _typeFilter = 'all'),
+              ),
+              ChoiceChip(
+                label: const Text('Speed'),
+                selected: _typeFilter == 'speed',
+                onSelected: (_) => setState(() => _typeFilter = 'speed'),
+              ),
+              ChoiceChip(
+                label: const Text('Group'),
+                selected: _typeFilter == 'group',
+                onSelected: (_) => setState(() => _typeFilter = 'group'),
+              ),
+              ChoiceChip(
+                label: const Text('Free'),
+                selected: _priceFilter == 'free',
+                onSelected: (_) => setState(() => _priceFilter = 'free'),
+              ),
+              ChoiceChip(
+                label: const Text('Paid'),
+                selected: _priceFilter == 'paid',
+                onSelected: (_) => setState(() => _priceFilter = 'paid'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List _applyFilters(List sessions) {
+    return sessions.where((session) {
+      final typeMatches = _typeFilter == 'all' || (session.metadata?['template'] ?? 'speed') == _typeFilter;
+      final priceMatches = _priceFilter == 'all' || (_priceFilter == 'free' ? !session.isPaid : session.isPaid);
+      final searchTarget = '${session.title} ${session.description ?? ''} ${(session.metadata?['topics'] ?? []).join(' ')}'
+          .toLowerCase();
+      final searchMatches = _search.isEmpty || searchTarget.contains(_search);
+      return typeMatches && priceMatches && searchMatches;
+    }).toList();
   }
 }

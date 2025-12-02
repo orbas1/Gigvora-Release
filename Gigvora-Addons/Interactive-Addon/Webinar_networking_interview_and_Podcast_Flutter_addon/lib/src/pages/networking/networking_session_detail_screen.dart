@@ -16,6 +16,8 @@ class NetworkingSessionDetailScreen extends StatefulWidget {
 
 class _NetworkingSessionDetailScreenState extends State<NetworkingSessionDetailScreen> {
   late final NetworkingState _state;
+  final TextEditingController _couponController = TextEditingController();
+  bool _saving = false;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _NetworkingSessionDetailScreenState extends State<NetworkingSessionDetailS
   @override
   void dispose() {
     _state.removeListener(_onState);
+    _couponController.dispose();
     super.dispose();
   }
 
@@ -46,8 +49,22 @@ class _NetworkingSessionDetailScreenState extends State<NetworkingSessionDetailS
                 children: [
                   Text(session.title, style: Theme.of(context).textTheme.headlineSmall),
                   const SizedBox(height: 4),
-                  Text('${session.startsAt} • ${session.type}', style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    '${session.startsAt} • ${(session.metadata?['template'] ?? 'speed').toString().toUpperCase()}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Chip(label: Text((session.metadata?['template'] ?? 'speed').toString().toUpperCase())),
+                      const SizedBox(width: 8),
+                      Chip(label: Text(session.isFree ? 'Free' : '\$${session.price?.toStringAsFixed(2) ?? ''}')),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (session.metadata?['capacity'] != null)
+                    Text('Capacity: ${(session.metadata?['capacity']).toString()}'),
+                  const SizedBox(height: 8),
                   const Text('Description'),
                   Text(session.description ?? 'No description'),
                   const SizedBox(height: 16),
@@ -57,12 +74,12 @@ class _NetworkingSessionDetailScreenState extends State<NetworkingSessionDetailS
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Business card'),
-                          const SizedBox(height: 8),
-                          LiveEventCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Business card'),
+                              const SizedBox(height: 8),
+                              LiveEventCard(
                             title: 'Your Name',
                             subtitle: 'Headline',
                             meta: 'Company / Links',
@@ -70,15 +87,31 @@ class _NetworkingSessionDetailScreenState extends State<NetworkingSessionDetailS
                             trailing: const Icon(Icons.edit),
                           ),
                           const SizedBox(height: 8),
+                          TextField(
+                            controller: _couponController,
+                            decoration: const InputDecoration(labelText: 'Coupon / Deal code'),
+                          ),
+                          const SizedBox(height: 12),
                           ElevatedButton(
-                            onPressed: () async {
-                              await _state.register(widget.sessionId);
-                              if (mounted) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(content: Text('Registered for session')));
-                              }
-                            },
-                            child: Text(_state.participant == null ? 'Register / Join Waitlist' : 'Registered'),
+                            onPressed: _saving
+                                ? null
+                                : () async {
+                                    setState(() => _saving = true);
+                                    await _state.register(widget.sessionId, coupon: _couponController.text);
+                                    if (mounted) {
+                                      setState(() => _saving = false);
+                                      final message = _state.participant?.status == 'waitlisted'
+                                          ? 'Joined waitlist'
+                                          : 'Registered for session';
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(content: Text(message)));
+                                    }
+                                  },
+                            child: Text(_state.participant == null
+                                ? 'Register / Join Waitlist'
+                                : _state.participant!.status == 'waitlisted'
+                                    ? 'Waitlisted'
+                                    : 'Registered'),
                           )
                         ],
                       ),

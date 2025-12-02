@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
+use Jobi\WebinarNetworkingInterviewPodcast\Models\NetworkingParticipant;
 
 class NetworkingSession extends Model
 {
@@ -138,6 +139,37 @@ class NetworkingSession extends Model
     public function confirmedParticipants(): HasMany
     {
         return $this->participants()->whereIn('status', ['registered', 'confirmed']);
+    }
+
+    public function waitlistedParticipants(): HasMany
+    {
+        return $this->participants()->where('status', 'waitlisted');
+    }
+
+    public function promoteWaitlist(): int
+    {
+        if (! $this->capacity) {
+            return 0;
+        }
+
+        $remaining = $this->remaining_capacity;
+
+        if ($remaining < 1) {
+            return 0;
+        }
+
+        $promoted = 0;
+
+        $this->waitlistedParticipants()
+            ->orderBy('joined_at')
+            ->limit($remaining)
+            ->get()
+            ->each(function (NetworkingParticipant $participant) use (&$promoted) {
+                $participant->update(['status' => 'registered']);
+                $promoted++;
+            });
+
+        return $promoted;
     }
 
     public function host(): BelongsTo

@@ -15,6 +15,7 @@ use Jobi\WebinarNetworkingInterviewPodcast\Models\NetworkingSession;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\Ticket;
 use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
 use Jobi\WebinarNetworkingInterviewPodcast\Services\NetworkingContactService;
+use Jobi\WebinarNetworkingInterviewPodcast\Services\NetworkingPairingService;
 
 class NetworkingController extends Controller
 {
@@ -75,6 +76,8 @@ class NetworkingController extends Controller
     {
         $this->authorize('update', $networkingSession);
 
+        $previousCapacity = $networkingSession->capacity;
+
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
@@ -103,6 +106,17 @@ class NetworkingController extends Controller
         ]);
 
         $networkingSession->update($validated);
+
+        if ($networkingSession->capacity && $networkingSession->capacity > (int) ($previousCapacity ?? 0)) {
+            $promoted = $networkingSession->promoteWaitlist();
+
+            if ($promoted > 0) {
+                Analytics::track('networking_waitlist_promoted', [
+                    'session_id' => $networkingSession->id,
+                    'count' => $promoted,
+                ]);
+            }
+        }
 
         return response()->json($networkingSession);
     }
@@ -217,6 +231,48 @@ class NetworkingController extends Controller
         Analytics::track('networking_rotation_completed', ['session_id' => $networkingSession->id, 'count' => $total]);
 
         return response()->json(['message' => 'Rotation updated']);
+    }
+
+    public function pairings(
+        Request $request,
+        NetworkingSession $networkingSession,
+        NetworkingPairingService $pairings
+    ): JsonResponse {
+        $this->authorize('update', $networkingSession);
+
+        $validated = $request->validate([
+            'round' => 'nullable|integer|min:1',
+        ]);
+
+        $round = $validated['round'] ?? $pairings->nextRoundNumber($networkingSession);
+        $assignments = $pairings->generateRound($networkingSession, $round);
+
+        Analytics::track('networking_round_completed', [
+            'session_id' => $networkingSession->id,
+            'round' => $round,
+            'participants' => $assignments->unique('participant_id')->count(),
+        ]);
+
+        return response()->json([
+            'round' => $round,
+            'assignments' => $assignments->load(['participant.user', 'partner.user']),
+        ]);
+    }
+
+    public function promoteWaitlist(NetworkingSession $networkingSession): JsonResponse
+    {
+        $this->authorize('update', $networkingSession);
+
+        $promoted = $networkingSession->promoteWaitlist();
+
+        if ($promoted > 0) {
+            Analytics::track('networking_waitlist_promoted', [
+                'session_id' => $networkingSession->id,
+                'count' => $promoted,
+            ]);
+        }
+
+        return response()->json(['promoted' => $promoted]);
     }
 
     public function exchangeContact(
