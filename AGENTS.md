@@ -294,6 +294,11 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Integration & Security**: Double-check that cross-addon integrations, feature flags, and security boundaries hold under real usage.
     - **Completion Criteria**: QA matrix complete, only low-risk known issues remain, release documentation finalized, and go-live checklist signed by stakeholders.
 
+25. ✅ **Core + Addon Data Convergence, Search & Ads Intelligence**
+    - **Goal**: Align addon data with the Sociopro core, power ranked search across people/content/addons, and wire keyword-driven ad placement into all surfaces.
+    - **Scope**: Unify schema/seed ordering, build weighted ranking for followers/connections/recency/location/VIP/offering signals, expand the keyword registry with tags/hashtags/categories, and expose live ad placement APIs backed by the auction/pricing services.
+    - **Completion Criteria**: Fresh seeds converge core + addons, ranked search feeds web/mobile, keyword registry grows from live content, and ads placements pull real campaigns via the auction logic.
+
 ## Execution Rules & References
 - Always update `logic_flows.md`, `docs/ui-audit.md`, `docs/nav-structure.md`, `docs/progress.md`, and `docs/qa-bugs.md` when relevant changes occur.
 - Token work begins in `resources/css/gigvora/tokens.css`; Flutter must mirror the same palette.

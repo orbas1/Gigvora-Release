@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\TalentAiSeeder::class
         );
 
+        $this->call(KeywordRegistrySeeder::class);
+
         if (env('APP_FEATURE_DEMO_SEEDS', false)) {
             $this->call(DemoContentSeeder::class);
         }

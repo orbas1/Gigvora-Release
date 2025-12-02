@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Video;
 use App\Models\Friendships;
 use App\Services\FreelanceSearchService;
+use App\Services\SearchRankingService;
 use Illuminate\Http\Request;
 use Jobs\Support\Search\JobSearchService;
 
@@ -69,6 +70,11 @@ class SearchController extends Controller
         $page_data['freelance_projects'] = $freelanceSearch->highlightedProjects($search_param, 4);
         $page_data['freelance_gigs'] = $freelanceSearch->highlightedGigs($search_param, 4);
         $page_data['freelance_talent'] = $freelanceSearch->highlightedTalent($search_param, 4);
+
+        $ranker = app(SearchRankingService::class);
+        $viewer = auth()->user();
+        $page_data['peoples'] = $ranker->rankUsers($page_data['peoples'], $viewer, $search_param);
+        $page_data['posts'] = $ranker->rankPosts($page_data['posts'], $viewer, $search_param);
         return view('frontend.index', $page_data);
     }
   

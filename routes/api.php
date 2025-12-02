@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GdprController;
 use App\Http\Controllers\Admin\IncidentController;
 use App\Http\Controllers\Api\FreelanceWorkspaceController;
 use App\Http\Controllers\Api\NavigationController as NavigationApiController;
+use App\Http\Controllers\Api\AdsPlacementController;
 use App\Http\Controllers\Api\UtilitiesQuickToolsController;
 use App\Http\Controllers\UtilitiesComposerController;
 use App\Http\Controllers\ApiController;
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->get('/navigation', NavigationApiController::c
 Route::middleware('auth:sanctum')->get('/utilities/quick-tools', UtilitiesQuickToolsController::class)->name('api.utilities.quick-tools');
 Route::middleware('auth:sanctum')->get('/utilities/composer/assets', [UtilitiesComposerController::class, 'assets'])->name('api.utilities.composer.assets');
 Route::middleware('auth:sanctum')->get('/utilities/composer/gifs', [UtilitiesComposerController::class, 'gifs'])->name('api.utilities.composer.gifs');
+Route::middleware('auth:sanctum')->post('/ads/placements', AdsPlacementController::class)->name('api.ads.placements');
 Route::middleware(['auth:sanctum', 'verified'])->get('/freelance/workspace', FreelanceWorkspaceController::class)->name('api.freelance.workspace');
 
 Route::middleware(['auth:sanctum', 'verified', 'admin', 'throttle:60,1'])

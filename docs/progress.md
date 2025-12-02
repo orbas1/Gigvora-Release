@@ -741,3 +741,15 @@ Last updated: 2025-12-01
 ### QA / Testing
 - `php artisan migrate:fresh --seed` ✅ (sqlite test harness)
 - `php artisan config:cache` ✅
+## Snapshot – 2025-12-10 – Task 25 (Core + Addon Data Convergence, Search & Ads Intelligence)
+
+### Data convergence and keyword registry
+- Added a shared `keyword_registry` table/model plus seeder that ingests hashtags, freelance/job categories, interactive categories, and advertisement keyword prices so ads/search share the same taxonomy.
+- DatabaseSeeder now invokes `KeywordRegistrySeeder` after addon seeds to keep the registry in sync on every `migrate:fresh --seed` run.
+
+### Search ranking and ads placement
+- Introduced `SearchRankingService` with weighted signals (followers, connections, recency, location, VIP, offering match) and applied it to people/posts search results for higher relevance.
+- Added `AdsPlacementService` + `/api/ads/placements` endpoint to select live creatives via keyword/country matching and the advertisement bid strategy for feed/search/profile slots.
+
+### QA / Testing
+- Pending full suite; rerun `php artisan migrate:fresh --seed` and the ads/search API smoke tests after syncing env variables for the advertisement addon.

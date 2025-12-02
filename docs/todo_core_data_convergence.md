@@ -1,0 +1,4 @@
+- [done] Align addon data with core schema and taxonomy registry
+- [done] Implement ranked search with configurable weights and signals
+- [done] Integrate keyword registry with ads placement and surfaces
+- [done] Update docs/progress and AGENTS task state after validation
