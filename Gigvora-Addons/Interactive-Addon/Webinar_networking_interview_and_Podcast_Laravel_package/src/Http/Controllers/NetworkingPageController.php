@@ -4,6 +4,7 @@ namespace Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
@@ -14,6 +15,7 @@ use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Jobi\WebinarNetworkingInterviewPodcast\Services\NetworkingContactService;
 
 class NetworkingPageController extends Controller
 {
@@ -194,6 +196,71 @@ class NetworkingPageController extends Controller
         return view('wnip::networking.live', [
             'session' => $networkingSession,
             'participant' => $participant,
+        ]);
+    }
+
+    public function exchangeContact(
+        Request $request,
+        NetworkingSession $networkingSession,
+        NetworkingContactService $contacts
+    ): JsonResponse {
+        $this->authorize('view', $networkingSession);
+
+        $validated = $request->validate([
+            'partner_id' => 'required|integer|exists:users,id',
+            'notes' => 'nullable|string',
+            'follow_up_at' => 'nullable|date',
+            'starred' => 'boolean',
+        ]);
+
+        $userId = $request->user()->getAuthIdentifier();
+        $participant = $contacts->guardParticipant($networkingSession, $userId);
+
+        if (! $participant) {
+            throw ValidationException::withMessages([
+                'registration' => __('Only registered ticket holders can exchange contacts.'),
+            ]);
+        }
+
+        $contacts->enforceRateLimit($networkingSession, $userId);
+
+        $partnerParticipant = $networkingSession->participants()
+            ->with('user')
+            ->where('user_id', $validated['partner_id'])
+            ->first();
+
+        if (! $partnerParticipant) {
+            throw ValidationException::withMessages([
+                'partner_id' => __('Selected partner is not in this session.'),
+            ]);
+        }
+
+        $metadata = [
+            'partner_name' => optional($partnerParticipant->user)->name,
+            'session_title' => $networkingSession->title,
+        ];
+
+        $exchange = $contacts->exchange(
+            $networkingSession,
+            $userId,
+            (int) $validated['partner_id'],
+            $validated['notes'] ?? null,
+            $validated['follow_up_at'] ?? null,
+            (bool) ($validated['starred'] ?? false),
+            $metadata
+        );
+
+        Analytics::track('networking_contact_exchanged', [
+            'session_id' => $networkingSession->id,
+            'user_id' => $userId,
+            'partner_id' => $validated['partner_id'],
+            'starred' => (bool) ($validated['starred'] ?? false),
+        ]);
+
+        return response()->json([
+            'status' => 'ok',
+            'exchange' => $exchange->load(['partner']),
+            'message' => __('Contact shared and follow-up recorded.'),
         ]);
     }
 

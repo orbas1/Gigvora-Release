@@ -229,6 +229,7 @@ All module views should live under:
     - Timer countdown (2 or 5 minutes).
   - Side panel:
     - “Your partner’s card”: name, role, links, notes field.
+    - Follow-up controls: star toggle, optional follow-up date/time to push reminders into Utilities calendar.
     - “Next up” hint (optional).
   - Bottom bar:
     - Buttons: “Skip Round” (if allowed), “Report”, “Leave Session”.
@@ -238,7 +239,7 @@ All module views should live under:
     - Timer countdown per round.
     - Receive pairing info (who you’re currently matched with).
     - On round end, show “Rotating…” screen while new pairing loads.
-    - Persist per-partner notes (client-side and/or via API).
+    - Persist per-partner notes (client-side and/or via API) and post contacts to `/networking/{id}/exchange-contact` with CSRF + rate limits; successful exchanges can queue Utilities calendar reminders.
   - Websocket or polling to receive pairings and round status.
 
 ---

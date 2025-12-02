@@ -23,6 +23,8 @@ Route::group([
         ->name('wnip.networking.register');
     Route::get('/networking/{networkingSession}/waiting', [NetworkingPageController::class, 'waitingRoom'])->name('wnip.networking.waiting');
     Route::get('/networking/{networkingSession}/live', [NetworkingPageController::class, 'live'])->name('wnip.networking.live');
+    Route::post('/networking/{networkingSession}/exchange-contact', [NetworkingPageController::class, 'exchangeContact'])
+        ->name('wnip.networking.exchange');
 
     Route::get('/podcasts', [PodcastPageController::class, 'index'])->name('wnip.podcasts.index');
     Route::get('/podcasts/{podcastSeries}', [PodcastPageController::class, 'show'])->name('wnip.podcasts.series');

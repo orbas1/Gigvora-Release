@@ -207,10 +207,10 @@ Last updated: 2025-11-30
   - Index cards show ticket status, rotation counts, end times, and capacity/waitlist state; filters cover type/pricing/time windows.
   - Detail page surfaces price/ticket copy, coupon entry, capacity/waitlist alerts, rotation meta, and follow-up CTA block.
   - Waiting room countdown gate enables join CTA at start, persists intro card (headline/bio/goal) locally, reflects rotation/price pills, and disables join for waitlisted attendees.
-  - Live shell rotation timer/progress, partner card contact exchange CTA, and local notes persistence (simulating Utilities recap sync) verified in browser.
+  - Live shell rotation timer/progress, partner card contact exchange CTA, local notes persistence (Utilities recap sync), and new follow-up picker/star toggle verified in browser; AJAX call hits secured exchange endpoint and rejects missing partner/rate-limit cases.
 - **Findings**:
-  - Manual smoke passes for the flows above. No blocking defects captured; follow-up export/reminder buttons are UI-only pending Utilities hook-up, and server promotion from waitlist still depends on future seat-change hooks.
-  - **Risks**: Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) not re-run here due to previously documented Mix/yargs + env setup blockers; rerun before release to cover the new Blade/JS changes.
+  - Manual smoke passes for the flows above. No blocking defects captured; waitlist promotion logic beyond initial registration still depends on a future seat-change hook. Contact exchanges now persist to `networking_contact_exchanges` with reminder scheduling via Utilities calendar service.
+  - **Risks**: Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) not re-run here due to previously documented Mix/yargs + env setup blockers; rerun before release to cover the new migration, controller endpoints, and JS fetch logic.
 - **QA references**:
   - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-12-01-–-task-19-networking-sessions-completion`, `docs/ui-audit.md#live/networking-polish-–-task-19`.
 

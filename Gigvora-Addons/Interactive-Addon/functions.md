@@ -34,12 +34,13 @@ Core flow bullets:
 
 ### Networking Sessions
 - **Routes**
-  - `GET /events/networking` → `NetworkingPageController@index` (searchable list).
-  - `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
-  - `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
-  - `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
-  - `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
-  - API: CRUD/register/rotate at `/api/live/networking*` (configurable) via `NetworkingController`.
+- `GET /events/networking` → `NetworkingPageController@index` (searchable list).
+- `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
+- `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
+- `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
+- `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
+- `POST /events/networking/{session}/exchange-contact` → `NetworkingPageController@exchangeContact` (AJAX contact exchange, CSRF-protected, rate-limited, optional follow-up scheduling).
+- API: CRUD/register/rotate/contact-exchange at `/api/live/networking*` (configurable) via `NetworkingController`.
 - **Data**: Tracks `networking_session_created`, `networking_session_joined`, `networking_rotation_completed` analytics.
 
 ### Podcasts

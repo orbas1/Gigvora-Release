@@ -499,4 +499,20 @@ Last updated: 2025-12-02
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-11-30 – Task 19 (Networking Sessions Completion)
+
+### 1. Contact exchange + follow-ups
+
+- Added networking contact exchange persistence (`networking_contact_exchanges` migration/model) and rate-limited APIs on both web + API controllers so only registered (non-waitlisted) attendees can share cards, star contacts, and attach notes. Exchanges optionally schedule Utilities calendar reminders via `UtilitiesCalendarService`, tagged with the session + partner for recap and cross-addon follow-ups.
+- Live shell now supports timed follow-ups and starred contacts inline; the share-contact CTA calls the secured endpoint with CSRF headers and surfaces backend validation errors to users.
+
+### 2. Access, pairing + waitlist protections
+
+- Reused participant guards inside the new exchange flow to prevent waitlisted or unregistered users from accessing live handshakes. Networking controllers continue to enforce capacity, coupons, and rotation tracking while exposing the new contact API over both Sanctum API routes and Blade-powered AJAX.
+
+### QA / Testing
+
+- Manual verification: exercised live shell contact button (star toggle + follow-up time + notes persistence) against validation errors (missing partner, rate-limit message) and confirmed reminders are emitted through the Utilities calendar service metadata. Confirmed waitlisted users are blocked from the exchange endpoint.
+- Automated: not run (Mix/yargs + environment setup still blocking `php artisan test`/`npm run build`/Flutter analyzer); rerun before release to cover the new migration, controllers, and JS fetch hooks.
+
 
