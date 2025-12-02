@@ -1,21 +1,21 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-03
+Last updated: 2025-12-04
 
-## Snapshot – 2025-12-03 – Task 22 (Mobile Convergence parity audit)
+## Snapshot – 2025-12-04 – Task 22 (Mobile Convergence follow-up)
 
-### 1. Parity mapping
+### 1. Parity audit refinements
 
-- Created `docs/mobile_parity_checklist.md` to map web routes/controllers to their Flutter counterparts (feed, profile, jobs, freelance, interactive, ads, talent AI, utilities, navigation) and flagged the employer-side jobs flow for follow-up configuration.
+- Expanded `docs/mobile_parity_checklist.md` to cover comments/reactions, stories, reels/long-form video, live streaming/chat, notifications, and deep link routing alongside existing feed/profile/addon rows. Marked partial areas where editing tools, donation tiers, or deep-link cold starts still need validation against `logic_flows.md#5`.
 
-### 2. Build guidance
+### 2. Build + runtime guidance
 
-- Authored `docs/mobile-build.md` covering base URL/token wiring for `GigvoraNavigationClient`, quick tools, and addon configurators plus standard build commands and push notification guidance so mobile shells stay tied to live Laravel services.
+- Updated `docs/mobile-build.md` with required dart-defines (`BASE_URL`, push IDs), addon client forwarding rules, and deep link/offline handling expectations so Flutter shells only operate on live Laravel endpoints—no mock repositories.
 
 ### QA / Testing
 
-- Automated suites were not run in this pass; rerun `flutter analyze` and Laravel/JS suites after configuring environment credentials to validate the documented flows end-to-end.
+- Automated suites were not run in this pass; rerun `flutter analyze` and Laravel/JS suites after configuring env credentials to confirm parity coverage and live-service wiring.
 
 ## Snapshot – 2025-12-02 – Task 19 (Networking ticketing + waitlist hardening)
 
