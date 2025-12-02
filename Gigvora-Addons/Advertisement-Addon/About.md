@@ -5,7 +5,7 @@ _UI, Views & Screens Specification_
 
 Build a complete **Ads Manager** experience for:
 
-1. **Laravel web app** (Blade views + JS), and  
+1. **Laravel web app** (Blade views + JS), and
 2. **Flutter mobile addon** (`advertisement_flutter_addon`),
 
 that lets advertisers:
@@ -13,6 +13,8 @@ that lets advertisers:
 - Create and manage ad campaigns and creatives.
 - Configure targeting, budget, and schedule.
 - View performance metrics and forecasts.
+
+**Permissions & analytics:** enforce the Ads capabilities in `docs/roles_permissions.md` (`ads.manage_campaigns`, `ads.view_reports`) and emit the Ads events in `docs/analytics_events.md` for campaign creation, budget updates, and reporting views.
 - See their ads served across placements (feed, profile, search, jobs, gigs, podcasts, webinars, networking, etc.)
 
 And lets admins:

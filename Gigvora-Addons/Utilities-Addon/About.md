@@ -12,6 +12,8 @@ that together provide the **same enhanced utilities, security and analytics func
 * The **Laravel backend / web app**, and
 * The **Flutter mobile app**.
 
+**Permissions & analytics:** follow `docs/roles_permissions.md` for reminders/calendar/saved-items access (`utilities.manage_calendar`, `utilities.notifications`) and emit Utilities events from `docs/analytics_events.md` whenever reminders are created, calendars sync, or saved items are updated.
+
 These will plug into an existing **Sociopro-based social media platform**, moving it towards a **LinkedIn-style professional network**. This package is an **addon wrapper** that **extends** Sociopro without overriding or breaking core behaviour.
 
 > ⚠️ Important: **Do not copy any binary files** (e.g. images, fonts, compiled assets, `.exe`, `.dll`, `.so`, APKs, etc.).

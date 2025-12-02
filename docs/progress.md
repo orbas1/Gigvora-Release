@@ -478,3 +478,23 @@ Last updated: 2025-11-30
 - Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) remain blocked by the previously documented Mix/yargs + addon package name issues; rerun once the toolchain is unblocked to validate the new authorization + analytics plumbing.
 
 
+## Snapshot – 2025-12-02 – Task 20 (Cross-Addon Roles, Permissions & Analytics)
+
+### 1. Role matrix + enforcement
+
+- Expanded `config/permission_matrix.php` with addon-scoped permissions (Jobs/Freelance/Ads/Talent & AI/Interactive/Utilities/AI) mapped to personas, documented in `docs/roles_permissions.md`, and cross-referenced from `logic_flows.md`.
+- Applied permission guards to Freelance web + API entry points (`DashboardController@index`, `FreelanceWorkspaceController`, `SiteController` favourites/role switching) so unauthorised roles receive 403s and navigation/CTAs align.
+
+### 2. Audit logging
+
+- Added `audit_logs` table + `AuditLogger` service to capture role/permission changes; freelance role switches now create audit rows alongside analytics events.
+
+### 3. Analytics taxonomy
+
+- Authored `docs/analytics_events.md` enumerating jobs/freelance/ads/talent_ai/interactive/utilities/ai/admin events and extended config taxonomy for consistent backend + Flutter emission.
+
+### 4. QA / Risks
+
+- Added feature tests for permission matrix coverage, middleware enforcement, and audit logging; suites not executed yet because previous Mix/Yargs + addon package-name blockers still apply. Re-run PHPUnit/npm/Flutter checks once toolchain stabilises.
+
+

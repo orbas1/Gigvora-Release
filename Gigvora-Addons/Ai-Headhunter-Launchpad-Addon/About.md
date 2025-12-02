@@ -12,6 +12,8 @@ that together provide aligned functionality on both:
 * The **Laravel backend / web app**, and
 * The **Flutter mobile app**.
 
+**Permissions & analytics:** align AI/Talent search and scoring with `docs/roles_permissions.md` (`talent_ai.run_search`, `talent_ai.configure_scoring`, `ai.generators.use`) and emit the AI/Talent events in `docs/analytics_events.md` whenever searches run, candidates save, or generators process prompts.
+
 This addon plugs into an existing **Sociopro-based social media platform**, evolving it towards a **LinkedIn-style professional & talent network**. It must behave as an **addon wrapper** that **extends** Sociopro without overriding, breaking, or tightly coupling to core behaviour.
 
 The addon brings together four major pillars under a single, consistent domain model:

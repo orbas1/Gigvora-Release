@@ -5,8 +5,10 @@ _UI, Views & Screens Specification (Laravel + Flutter)_
 
 Build a complete **Freelance Marketplace** experience for:
 
-1. **Laravel web app** (Blade views + JS), and  
+1. **Laravel web app** (Blade views + JS), and
 2. **Flutter mobile addon** (`freelance_flutter_addon`),
+
+**Permissions & analytics:** enforce persona checks from `docs/roles_permissions.md` (workspace access, gig/project management, dispute moderation) and emit the freelance events in `docs/analytics_events.md` for dashboards, proposals, contracts, escrow releases, and favourites.
 
 covering:
 

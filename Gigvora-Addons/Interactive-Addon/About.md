@@ -5,8 +5,10 @@ _UI, Views & Screens Specification (Laravel + Flutter)_
 
 Build a complete **Live & Events** experience for:
 
-1. **Laravel web app** (Blade views + JS), and  
+1. **Laravel web app** (Blade views + JS), and
 2. **Flutter mobile addon** (`webinar_networking_interview_podcast_flutter_addon`),
+
+**Permissions & analytics:** gate hosting/moderation/join flows using `docs/roles_permissions.md` (e.g., `interactive.host_session`, `interactive.moderate_session`, `interactive.join_session`) and instrument sessions per `docs/analytics_events.md` for creation, join, and recording playback.
 
 covering:
 

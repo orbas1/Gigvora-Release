@@ -73,6 +73,14 @@ class PermissionMatrix
             $role = data_get(getUserRole(), 'roleName');
         }
 
-        return Str::lower($role ?: $this->config['defaults']['fallback_role'] ?? 'member');
+        $normalized = Str::lower($role ?: $this->config['defaults']['fallback_role'] ?? 'member');
+
+        $aliases = [
+            'seller' => 'freelancer',
+            'buyer' => 'company_admin',
+            'admin' => 'platform_admin',
+        ];
+
+        return $aliases[$normalized] ?? $normalized;
     }
 }

@@ -7,13 +7,18 @@ use App\Models\FavouriteItem;
 use App\Models\Role;
 use App\Models\Profile;
 use App\Support\Analytics\AnalyticsEventPublisher;
+use App\Support\Authorization\AuditLogger;
+use App\Support\Authorization\PermissionMatrix;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class SiteController extends Controller
 {
-    public function __construct(protected AnalyticsEventPublisher $analytics)
-    {
+    public function __construct(
+        protected AnalyticsEventPublisher $analytics,
+        protected AuditLogger $audit,
+        protected PermissionMatrix $permissions
+    ) {
     }
 
     public function favoriteGig(int $gigId): RedirectResponse
@@ -34,10 +39,19 @@ class SiteController extends Controller
 
         $meta = getUserRole();
         $profileId = data_get($meta, 'profileId');
+        $this->guardPermission($request, 'freelance.workspace.access');
 
         $profile = Profile::findOrFail($profileId);
         $role = Role::where('name', $request->input('role'))->firstOrFail();
         $profile->update(['role_id' => $role->id]);
+
+        $this->audit->log(
+            $request->user(),
+            'freelance.role.changed',
+            Profile::class,
+            $profile->id,
+            ['role' => $role->name]
+        );
 
         $this->analytics->publish('freelance', 'role_switched', [
             'role' => $role->name,
@@ -64,6 +78,7 @@ class SiteController extends Controller
         $profileId = data_get($meta, 'profileId');
 
         abort_unless($profileId, 403);
+        $this->guardPermission($request, 'freelance.favourites.toggle');
 
         $favourite = FavouriteItem::where([
             'user_id' => $profileId,
@@ -90,6 +105,13 @@ class SiteController extends Controller
         ], $request->user());
 
         return back()->with('status', __('Favorites updated.'));
+    }
+
+    protected function guardPermission(Request $request, string $permission): void
+    {
+        if (! $this->permissions->allowed($request->user(), $permission)) {
+            abort(403, 'You are not authorised to perform this action.');
+        }
     }
 }
 
