@@ -3,7 +3,7 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Live Networking') }}</p>
-        <h1 class="live-header__title">{{ $networkingSession->title ?? __('Live session') }}</h1>
+        <h1 class="live-header__title">{{ $session->title ?? __('Live session') }}</h1>
         <p class="live-header__subtitle">{{ __('Rotate participants, run polls, and share resources with attendees.') }}</p>
     </div>
 @endsection

@@ -80,6 +80,7 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 
 - Waiting room refreshed with countdown + CTA gating, tokenized pills for rotation/price states, and an intro card form (headline/bio/goal) that persists locally so Utilities follow-ups can hydrate once syncing is wired.
 - Live networking shell now surfaces per-rotation timers (progress + remaining seconds), partner card with contact exchange CTA, and notes persistence that mirrors the Utilities recap expectations. Flutter needs matching countdown/progress UI and local draft storage to keep parity.
+- Catalogue/detail screens now show price/capacity/waitlist badges, coupon entry, and clearer status tags (Live/Waitlist/Free/Paid) so ticket gating is visible before entering the waiting room. Flutter needs the same chips + waitlist state to align.
 
 ## 4. Recommended Token-Based Upgrade Path
 

@@ -1,7 +1,24 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-01
+Last updated: 2025-12-02
+
+## Snapshot – 2025-12-02 – Task 19 (Networking ticketing + waitlist hardening)
+
+### 1. Ticketing, capacity, and coupon enforcement (logic_flows.md#33)
+
+- `NetworkingSession` metadata now carries template type (speed/group), rounds/round duration, capacity, topics, waitlist toggle, and coupon definitions; helpers expose `round_count`, `round_duration`, `capacity`, `remaining_capacity`, and live/full state for both web and API surfaces.
+- API + page controllers enforce server-side registration rules: paid sessions create/update `Ticket` records, coupon codes validate windows/usage caps, capacity checks fall back to waitlists when enabled, and unauthorized access to waiting/live views redirects with error messaging. Registration analytics now distinguish waitlist joins vs confirmed seats.
+
+### 2. Web discovery/detail gating
+
+- Networking index gains filters (type, pricing, window) and refreshed cards showing price/capacity/waitlist badges, rotation metadata, and explicit Live/Waitlist tags so attendees understand access before opening details.
+- Detail page introduces capacity/waitlist alerts and coupon entry for paid sessions; register CTA reflects waitlist/registered states while continuing to surface follow-up/export CTAs. Waiting room join CTA now respects registration status (disables for waitlist), and live navigation enforces ticket ownership.
+
+### 3. QA / Risks
+
+- Manual smoke: registration with/without coupon, waitlist flow (capacity reached), waiting-room countdown + gating, and live-entry protection for non-registrants. UI copy verified against `logic_flows.md#33` expectations for ticketed networking.
+- Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) still blocked by repo-wide Mix/yargs + env setup; rerun when toolchain is available to cover the new ticketing + waitlist logic.
 
 ## Snapshot – 2025-12-01 – Task 19 (Networking Sessions Completion)
 

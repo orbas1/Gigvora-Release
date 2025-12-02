@@ -3,7 +3,7 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Networking Waiting Room') }}</p>
-        <h1 class="live-header__title">{{ $networkingSession->title }}</h1>
+        <h1 class="live-header__title">{{ $session->title }}</h1>
         <p class="live-header__subtitle">{{ __('Shuffle into the next rotation as soon as the host starts the room.') }}</p>
     </div>
 @endsection
@@ -29,6 +29,13 @@
             {{ $session->is_paid ? get_phrase('Ticketed') : get_phrase('Free entry') }}
         </div>
     </div>
+
+    @if(isset($participant) && $participant->status === 'waitlisted')
+        <div class="gv-alert gv-alert-warning" role="status">
+            <p class="font-semibold mb-1">{{ get_phrase('Waitlisted for this session') }}</p>
+            <p class="text-sm mb-0">{{ get_phrase('We will notify you as soon as a seat opens. Joining will stay disabled until you are promoted.') }}</p>
+        </div>
+    @endif
 
     <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
@@ -66,7 +73,10 @@
         </div>
     </form>
 
-    @php $canJoin = $session->is_joinable; @endphp
+    @php
+        $isWaitlisted = isset($participant) && $participant->status === 'waitlisted';
+        $canJoin = $session->is_joinable && ! $isWaitlisted;
+    @endphp
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="text-sm text-[var(--gv-color-neutral-600)]">
             {{ $session->ends_at ? get_phrase('Expected end :time with automatic follow-up summary.', ['time' => $session->ends_at->format('g:i A')]) : get_phrase('Host controls when rotations start.') }}
@@ -74,7 +84,7 @@
         <a id="enter-networking" href="{{ route('wnip.networking.live', $session) }}"
             class="gv-btn gv-btn-primary {{ $canJoin ? '' : 'opacity-50 pointer-events-none' }}"
             @unless($canJoin) aria-disabled="true" @endunless>
-            {{ get_phrase('Join session') }}
+            {{ $isWaitlisted ? get_phrase('Waiting for seat') : get_phrase('Join session') }}
         </a>
     </div>
 </div>

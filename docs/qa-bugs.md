@@ -204,11 +204,12 @@ Last updated: 2025-11-30
 
 - **Scope**: Finalize networking session discovery/detail, waiting room countdown + gating, live rotation shell (timers, partner cards, notes/contact exchange), and follow-up hooks per `logic_flows.md#33` / AGENTS Task 19.
 - **Checked areas**:
-  - Index cards show ticket status, rotation counts, and end times; detail page surfaces price/ticket copy, rotation meta, and follow-up CTA block.
-  - Waiting room countdown gate enables join CTA at start, persists intro card (headline/bio/goal) locally, and reflects rotation/price pills.
+  - Index cards show ticket status, rotation counts, end times, and capacity/waitlist state; filters cover type/pricing/time windows.
+  - Detail page surfaces price/ticket copy, coupon entry, capacity/waitlist alerts, rotation meta, and follow-up CTA block.
+  - Waiting room countdown gate enables join CTA at start, persists intro card (headline/bio/goal) locally, reflects rotation/price pills, and disables join for waitlisted attendees.
   - Live shell rotation timer/progress, partner card contact exchange CTA, and local notes persistence (simulating Utilities recap sync) verified in browser.
 - **Findings**:
-  - Manual smoke passes for the flows above. No blocking defects captured; follow-up export/reminder buttons are UI-only pending Utilities hook-up.
+  - Manual smoke passes for the flows above. No blocking defects captured; follow-up export/reminder buttons are UI-only pending Utilities hook-up, and server promotion from waitlist still depends on future seat-change hooks.
   - **Risks**: Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) not re-run here due to previously documented Mix/yargs + env setup blockers; rerun before release to cover the new Blade/JS changes.
 - **QA references**:
   - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-12-01-–-task-19-networking-sessions-completion`, `docs/ui-audit.md#live/networking-polish-–-task-19`.

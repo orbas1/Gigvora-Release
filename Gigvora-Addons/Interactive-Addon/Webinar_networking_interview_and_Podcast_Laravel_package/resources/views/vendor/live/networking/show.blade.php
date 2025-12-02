@@ -3,7 +3,7 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Networking Session') }}</p>
-        <h1 class="live-header__title">{{ $networkingSession->title }}</h1>
+        <h1 class="live-header__title">{{ $session->title }}</h1>
         <p class="live-header__subtitle">{{ __('Connect with peers in curated rotations and private chats.') }}</p>
     </div>
 @endsection
@@ -17,15 +17,24 @@
                 <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)]">{{ $session->title }}</h1>
                 <p class="text-sm text-[var(--gv-color-neutral-500)] mb-0">
                     {{ $session->starts_at?->format('M j • g:i A') }}
-                    • {{ $session->rotation_interval }} {{ get_phrase('second rotations') }}
-                    @if($session->rotation_count)
-                        • {{ get_phrase(':count total rotations', ['count' => $session->rotation_count]) }}
-                    @endif
+                    • {{ $session->template === 'group' ? get_phrase('Group networking') : get_phrase('Speed networking') }}
+                    • {{ $session->round_count ? get_phrase(':count rounds', ['count' => $session->round_count]) : get_phrase('Rotation cadence ready') }}
                 </p>
             </div>
             <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
                 {{ get_phrase('Hosted by :host', ['host' => optional($session->host)->name ?? get_phrase('Host')]) }}
             </p>
+            <div class="flex flex-wrap gap-2" aria-label="{{ get_phrase('Session metadata') }}">
+                <span class="gv-pill">{{ $session->rotation_interval }} {{ get_phrase('second rotations') }}</span>
+                @if($session->capacity)
+                    <span class="gv-pill">{{ get_phrase(':remaining seats left of :capacity', ['remaining' => $session->remaining_capacity ?? 0, 'capacity' => $session->capacity]) }}</span>
+                @endif
+                @if($session->topics)
+                    @foreach($session->topics as $topic)
+                        <span class="gv-pill gv-pill--muted">{{ $topic }}</span>
+                    @endforeach
+                @endif
+            </div>
         </div>
 
         <div class="gv-card space-y-3">
@@ -63,17 +72,55 @@
                 </span>
             </div>
 
+            @if($session->capacity)
+                <div class="gv-alert gv-alert-neutral" role="status">
+                    <p class="font-semibold mb-1">{{ get_phrase('Capacity & access') }}</p>
+                    <p class="text-sm mb-0">
+                        {{ get_phrase(':remaining seats left of :capacity', ['remaining' => $session->remaining_capacity ?? 0, 'capacity' => $session->capacity]) }}
+                        @if($session->is_full)
+                            • {{ get_phrase('Waitlist is enabled once seats fill.') }}
+                        @endif
+                    </p>
+                </div>
+            @endif
+
             @auth
                 <form method="post" action="{{ route('wnip.networking.register', $session) }}" class="space-y-3">
                     @csrf
+                    @if($errors->any())
+                        <div class="gv-alert gv-alert-danger" role="alert">
+                            <p class="font-semibold mb-1">{{ get_phrase('Registration issue') }}</p>
+                            <p class="text-sm mb-0">{{ $errors->first() }}</p>
+                        </div>
+                    @endif
+                    @if($participant && $participant->status === 'waitlisted')
+                        <div class="gv-alert gv-alert-warning" role="status">
+                            <p class="font-semibold mb-1">{{ get_phrase('You are on the waitlist') }}</p>
+                            <p class="text-sm mb-0">{{ get_phrase('We will auto-promote you when a seat opens; stay near your inbox for updates.') }}</p>
+                        </div>
+                    @endif
                     <div class="gv-alert gv-alert-info" role="status">
                         <div class="font-semibold">{{ get_phrase('Ticketing') }}</div>
                         <p class="text-sm mb-0">
                             {{ $session->is_paid ? get_phrase('Paid session from :amount', ['amount' => currency_format($session->price ?? 0)]) : get_phrase('Free ticket – instant confirmation') }}
                         </p>
                     </div>
+                    @if($session->is_paid)
+                        <label class="space-y-1 w-full">
+                            <span class="gv-label">{{ get_phrase('Coupon or deal code') }}</span>
+                            <input class="gv-input" type="text" name="coupon" value="{{ old('coupon') }}" placeholder="{{ get_phrase('Early bird, partner deal') }}" />
+                        </label>
+                    @endif
                     <button class="gv-btn gv-btn-primary w-full" type="submit" @if($participant) aria-disabled="true" @endif>
-                        {{ $participant ? get_phrase('Registered') : get_phrase('Register') }}
+                        @if($participant && $participant->status === 'waitlisted')
+                            {{ get_phrase('On waitlist') }}
+                        @elseif($participant)
+                            {{ get_phrase('Registered') }}
+                        @elseif($session->is_full)
+                            {{ get_phrase('Join waitlist') }}
+                        @else
+                            {{ get_phrase('Register') }}
+                        @endif
                     </button>
                 </form>
                 <a class="gv-btn gv-btn-ghost w-full" href="{{ route('wnip.networking.waiting', $session) }}">

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 
 class NetworkingSession extends Model
 {
@@ -31,6 +32,45 @@ class NetworkingSession extends Model
         'is_paid' => 'boolean',
         'price' => 'float',
     ];
+
+    public function getTemplateAttribute(): string
+    {
+        return $this->metadata['template'] ?? 'speed';
+    }
+
+    public function getTopicsAttribute(): array
+    {
+        return Arr::wrap($this->metadata['topics'] ?? []);
+    }
+
+    public function getRoundDurationAttribute(): ?int
+    {
+        return $this->metadata['round_duration'] ?? $this->rotation_interval;
+    }
+
+    public function getRoundCountAttribute(): ?int
+    {
+        if ($this->metadata['rounds'] ?? false) {
+            return (int) $this->metadata['rounds'];
+        }
+
+        return $this->rotation_count;
+    }
+
+    public function getCapacityAttribute(): ?int
+    {
+        return $this->metadata['capacity'] ?? null;
+    }
+
+    public function getMaxPerRoundAttribute(): ?int
+    {
+        return $this->metadata['max_per_round'] ?? null;
+    }
+
+    public function getWaitlistEnabledAttribute(): bool
+    {
+        return (bool) ($this->metadata['waitlist_enabled'] ?? true);
+    }
 
     public function getEndsAtAttribute(): ?Carbon
     {
@@ -68,9 +108,36 @@ class NetworkingSession extends Model
         return in_array($this->status, ['in_rotation', 'live'], true);
     }
 
+    public function getIsFullAttribute(): bool
+    {
+        if (! $this->capacity) {
+            return false;
+        }
+
+        $registered = $this->participants()->whereIn('status', ['registered', 'confirmed'])->count();
+
+        return $registered >= $this->capacity;
+    }
+
+    public function getRemainingCapacityAttribute(): ?int
+    {
+        if (! $this->capacity) {
+            return null;
+        }
+
+        $registered = $this->participants()->whereIn('status', ['registered', 'confirmed'])->count();
+
+        return max(0, $this->capacity - $registered);
+    }
+
     public function participants(): HasMany
     {
         return $this->hasMany(NetworkingParticipant::class);
+    }
+
+    public function confirmedParticipants(): HasMany
+    {
+        return $this->participants()->whereIn('status', ['registered', 'confirmed']);
     }
 
     public function host(): BelongsTo

@@ -29,11 +29,37 @@
     </div>
 
     <form method="get" class="gv-card space-y-3">
-        <label class="space-y-1 w-full md:w-1/2">
-            <span class="gv-label">{{ get_phrase('Search sessions') }}</span>
-            <input type="text" name="q" class="gv-input" value="{{ $filters['q'] ?? '' }}"
-                placeholder="{{ get_phrase('Title or topic') }}">
-        </label>
+        <div class="grid gap-3 lg:grid-cols-4">
+            <label class="space-y-1 w-full">
+                <span class="gv-label">{{ get_phrase('Search sessions') }}</span>
+                <input type="text" name="q" class="gv-input" value="{{ $filters['q'] ?? '' }}"
+                    placeholder="{{ get_phrase('Title or topic') }}">
+            </label>
+            <label class="space-y-1 w-full">
+                <span class="gv-label">{{ get_phrase('Type') }}</span>
+                <select name="type" class="gv-input">
+                    <option value="">{{ get_phrase('Any') }}</option>
+                    <option value="speed" @selected(($filters['type'] ?? '') === 'speed')>{{ get_phrase('Speed networking') }}</option>
+                    <option value="group" @selected(($filters['type'] ?? '') === 'group')>{{ get_phrase('Group networking') }}</option>
+                </select>
+            </label>
+            <label class="space-y-1 w-full">
+                <span class="gv-label">{{ get_phrase('Pricing') }}</span>
+                <select name="pricing" class="gv-input">
+                    <option value="">{{ get_phrase('Any') }}</option>
+                    <option value="free" @selected(($filters['pricing'] ?? '') === 'free')>{{ get_phrase('Free') }}</option>
+                    <option value="paid" @selected(($filters['pricing'] ?? '') === 'paid')>{{ get_phrase('Paid') }}</option>
+                </select>
+            </label>
+            <label class="space-y-1 w-full">
+                <span class="gv-label">{{ get_phrase('Window') }}</span>
+                <select name="window" class="gv-input">
+                    <option value="">{{ get_phrase('All sessions') }}</option>
+                    <option value="upcoming" @selected(($filters['window'] ?? '') === 'upcoming')>{{ get_phrase('Upcoming') }}</option>
+                    <option value="past" @selected(($filters['window'] ?? '') === 'past')>{{ get_phrase('Past') }}</option>
+                </select>
+            </label>
+        </div>
         <div class="flex justify-end">
             <button class="gv-btn gv-btn-primary" type="submit">{{ get_phrase('Filter') }}</button>
         </div>
@@ -41,27 +67,42 @@
 
     <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         @forelse($sessions as $session)
+            @php
+                $isFull = $session->is_full;
+                $tag = $isFull ? get_phrase('Waitlist') : ($session->is_paid ? get_phrase('Paid') : get_phrase('Free'));
+                $statusLabel = $session->is_live ? get_phrase('Live') : ucfirst($session->status ?? 'Scheduled');
+                $capacity = $session->capacity
+                    ? get_phrase(':taken / :capacity seats', [
+                        'taken' => $session->participants->whereIn('status', ['registered', 'confirmed'])->count(),
+                        'capacity' => $session->capacity,
+                    ])
+                    : trans_choice('{0}Be first to register|{1}1 participant|[2,*]:count participants', $session->participants->count(), ['count' => $session->participants->count()]);
+                $topics = collect($session->topics ?? [])->take(2)->implode(', ');
+            @endphp
             @include('wnip::components.event_card', [
                 'title' => $session->title,
                 'description' => Str::limit($session->description, 140),
-                'meta' => optional($session->starts_at)->format('M j • g:i A'),
-                'caption' => get_phrase('Rotations every :seconds s', ['seconds' => $session->rotation_interval ?? 60]),
-                'status' => ucfirst($session->status ?? 'Scheduled'),
-                'tag' => $session->is_paid ? get_phrase('Paid') : get_phrase('Open'),
-                'detail' => trans_choice('{0}Be first to register|{1}1 participant|[2,*]:count participants', $session->participants->count(), ['count' => $session->participants->count()]),
+                'meta' => collect([
+                    optional($session->starts_at)->format('M j • g:i A'),
+                    $session->template === 'group' ? get_phrase('Group networking') : get_phrase('Speed networking'),
+                ])->filter()->implode(' • '),
+                'caption' => $topics ?: get_phrase('Rotations every :seconds s', ['seconds' => $session->rotation_interval ?? 60]),
+                'status' => $statusLabel,
+                'tag' => $tag,
+                'detail' => $capacity,
                 'secondary' => collect([
                     $session->is_paid
                         ? get_phrase('Ticket from :amount', ['amount' => currency_format($session->price ?? 0)])
                         : get_phrase('Free to join'),
-                    $session->rotation_count
-                        ? get_phrase(':count rotations • :interval s', ['count' => $session->rotation_count, 'interval' => $session->rotation_interval])
+                    $session->capacity && $isFull
+                        ? get_phrase('Waitlist enabled')
+                        : ($session->remaining_capacity ? get_phrase(':count seats left', ['count' => $session->remaining_capacity]) : null),
+                    $session->round_count
+                        ? get_phrase(':count rotations • :interval s', ['count' => $session->round_count, 'interval' => $session->round_duration ?? $session->rotation_interval])
                         : get_phrase('Rotation ready'),
-                    $session->ends_at
-                        ? get_phrase('Ends :time', ['time' => $session->ends_at->format('g:i A')])
-                        : null,
                 ])->filter()->take(2)->implode(' • '),
                 'href' => route('wnip.networking.show', $session),
-                'cta' => get_phrase('View session'),
+                'cta' => $session->is_live ? get_phrase('Join now') : get_phrase('View session'),
             ])
         @empty
             <div class="lg:col-span-2 xl:col-span-3">
