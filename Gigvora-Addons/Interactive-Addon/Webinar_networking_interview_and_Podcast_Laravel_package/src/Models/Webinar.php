@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Jobi\WebinarNetworkingInterviewPodcast\Models\Ticket;
 
 class Webinar extends Model
 {
@@ -38,6 +39,11 @@ class Webinar extends Model
         'price' => 'float',
     ];
 
+    public function tickets(): MorphMany
+    {
+        return $this->morphMany(Ticket::class, 'ticketable');
+    }
+
     public function registrations(): HasMany
     {
         return $this->hasMany(WebinarRegistration::class);
@@ -51,6 +57,16 @@ class Webinar extends Model
     public function host(): BelongsTo
     {
         return $this->belongsTo(config('auth.providers.users.model'), 'host_id');
+    }
+
+    public function getCapacityAttribute(): ?int
+    {
+        return ($this->metadata ?? [])['capacity'] ?? null;
+    }
+
+    public function getWaitlistEnabledAttribute(): bool
+    {
+        return (bool) (($this->metadata ?? [])['waitlist_enabled'] ?? false);
     }
 }
 

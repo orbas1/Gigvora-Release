@@ -15,6 +15,8 @@ class _NetworkingLiveScreenState extends State<NetworkingLiveScreen> {
   Duration remaining = const Duration(minutes: 2);
   int round = 1;
   late Timer _timer;
+  final Map<int, String> _notes = {};
+  bool starred = false;
 
   @override
   void initState() {
@@ -49,7 +51,10 @@ class _NetworkingLiveScreenState extends State<NetworkingLiveScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Current partner'),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Round $round of 6', style: Theme.of(context).textTheme.titleMedium),
+                  const Text('Rotations auto-advance when timer ends'),
+                ]),
                 Text('Time left: $countdown', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
@@ -60,24 +65,54 @@ class _NetworkingLiveScreenState extends State<NetworkingLiveScreen> {
               decoration: BoxDecoration(
                   color: LiveMobileTheme.surfaceVariant(context),
                   borderRadius: BorderRadius.circular(LiveMobileTheme.cardRadius)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                Text('Jamie Doe', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Role: Growth Lead'),
-                Text('Links: LinkedIn, Site'),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Jamie Doe', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Role: Growth Lead'),
+                const Text('Links: LinkedIn, Site'),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    FilterChip(
+                      label: const Text('Star contact'),
+                      selected: starred,
+                      onSelected: (value) => setState(() => starred = value),
+                    ),
+                    ActionChip(
+                      label: const Text('Exchange contact'),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(content: Text('Contact exchange requested')));
+                      },
+                    ),
+                  ],
+                )
               ]),
             ),
             const SizedBox(height: 12),
             TextField(
               decoration: const InputDecoration(labelText: 'Notes'),
               maxLines: 4,
-              onChanged: (value) => {},
+              onChanged: (value) => setState(() => _notes[round] = value),
             ),
             const Spacer(),
             Row(
               children: [
-                OutlinedButton(onPressed: () {}, child: const Text('Next')),
+                OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        round += 1;
+                        remaining = const Duration(minutes: 2);
+                      });
+                    },
+                    child: const Text('Next')),
                 const SizedBox(width: 8),
-                OutlinedButton(onPressed: () {}, child: const Text('Report')),
+                OutlinedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Report submitted to moderators')));
+                    },
+                    child: const Text('Report')),
                 const Spacer(),
                 ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Leave')),
               ],

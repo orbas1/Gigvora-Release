@@ -16,6 +16,8 @@ Route::group([
     Route::put('/webinars/{webinar}', [WebinarController::class, 'update']);
     Route::delete('/webinars/{webinar}', [WebinarController::class, 'destroy']);
     Route::post('/webinars/{webinar}/register', [WebinarController::class, 'register']);
+    Route::post('/webinars/{webinar}/unregister', [WebinarController::class, 'unregister']);
+    Route::post('/webinars/{webinar}/attend', [WebinarController::class, 'attend']);
     Route::post('/webinars/{webinar}/toggle-live', [WebinarController::class, 'toggleLive']);
 
     Route::get('/networking', [NetworkingController::class, 'index']);
@@ -24,13 +26,22 @@ Route::group([
     Route::put('/networking/{networkingSession}', [NetworkingController::class, 'update']);
     Route::post('/networking/{networkingSession}/register', [NetworkingController::class, 'register']);
     Route::post('/networking/{networkingSession}/rotate', [NetworkingController::class, 'rotate']);
+    Route::post('/networking/{networkingSession}/pairings', [NetworkingController::class, 'pairings']);
+    Route::post('/networking/{networkingSession}/promote-waitlist', [NetworkingController::class, 'promoteWaitlist']);
+    Route::post('/networking/{networkingSession}/exchange-contact', [NetworkingController::class, 'exchangeContact']);
 
     Route::get('/podcasts', [PodcastController::class, 'index']);
     Route::post('/podcast-series', [PodcastController::class, 'storeSeries']);
     Route::get('/podcast-series/{podcastSeries}', [PodcastController::class, 'showSeries']);
     Route::put('/podcast-series/{podcastSeries}', [PodcastController::class, 'updateSeries']);
+    Route::post('/podcast-series/{podcastSeries}/follow', [PodcastController::class, 'toggleFollow']);
     Route::post('/podcast-series/{podcastSeries}/episodes', [PodcastController::class, 'storeEpisode']);
+    Route::get('/podcast-series/{podcastSeries}/episodes/{episode}', [PodcastController::class, 'showEpisode']);
     Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/publish', [PodcastController::class, 'publishEpisode']);
+    Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/playback', [PodcastController::class, 'recordPlayback']);
+    Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/transcripts', [PodcastController::class, 'storeTranscript']);
+    Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/highlights', [PodcastController::class, 'storeHighlight']);
+    Route::post('/podcast-series/{podcastSeries}/episodes/{episode}/entitlements', [PodcastController::class, 'grantEntitlement']);
 
     Route::get('/interviews', [InterviewController::class, 'index']);
     Route::post('/interviews', [InterviewController::class, 'store']);

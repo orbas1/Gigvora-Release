@@ -1,6 +1,6 @@
 # Gigvora UI Audit
 
-Last updated: 2025-11-30 (Task 14 – Talent & AI / Headhunter / Launchpad)
+Last updated: 2025-11-30 (Task 17 – Webinars Experience Completion)
 
 This document captures the current state of the Gigvora (Sociopro) UI across the host Laravel app, all Laravel addons, and the Flutter mobile shell. It highlights the design system gaps and proposes a pathway toward a unified, token-driven reskin.
 
@@ -33,7 +33,7 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 | Advertisement | `advertisement::layouts.app` now emits `.gv-ad-shell`, `.gv-card`, `.gv-table`, `.gv-input`, `.gv-btn` helpers powered by `resources/css/advertisement/addon.css` (token-backed). | Dashboards, campaigns, wizard, keyword planner, forecast, billing now reuse Gigvora tokens + ad-specific components (hero banner, metrics grid, placement cards). |
 | Talent & AI | Tokenized Gigvora shell (`gv-card`, `gv-btn`, updated `resources/css/addons/talent_ai/talent_ai.css` for headhunters/launchpad/volunteering/AI workspace) plus feed/profile summary card (`gv-talent-ai`). | Remaining gap: ensure OpenAI/BYOK env keys are set before running the AI workspace; legacy Bootstrap remnants have been removed. |
 | Freelance | Tokenised Gigvora shell (`freelance::layouts.freelance`), sidebar menu component, and shared CSS in `resources/css/freelance/app.css`; JS modules bundled via `resources/js/freelance/app.js`. | Typography/spacing now align with tokens; remaining gap is payment gateway UI (still uses placeholder copy while backend wiring finishes). |
-| Interactive / Live | Live hub, webinars, networking, podcasts, and interviews now use `wnip::layouts.live` + `.gv-card`/`.gv-pill` tokens, quick tools, and shared components (`event_card`, `waiting_room_header`, `live_chat_panel`, `notes_sidebar`, `calendar_widget`). Waiting rooms + live shells share timers, Utilities CTAs, and advertisement slots. | Monitor for additional admin view parity + future animations, but primary surfaces are tokenized. |
+| Interactive / Live | Live hub, webinars, networking, podcasts, and interviews now use `wnip::layouts.live` + `.gv-card`/`.gv-pill` tokens, quick tools, and shared components (`event_card`, `waiting_room_header`, `live_chat_panel`, `notes_sidebar`, `calendar_widget`). Waiting rooms + live shells share timers, Utilities CTAs, and advertisement slots. Webinar catalogue now highlights live/up-next states, detail view adds schedule/ticket/safety cards + calendar export, and the Flutter detail screen mirrors readiness checklists + chips. | Monitor for additional admin view parity + future animations, but primary surfaces are tokenized. |
 | Jobs (Task 8) | Tokenized Gigvora shell (`resources/views/vendor/jobs/*.blade.php`) + `.gv-card`/`.gv-btn` patterns; employer portal moves to `EmployerPortalController`. | Job search/detail/apply, saved jobs, and employer dashboards/ATS/billing/interviews now share quick tools + nav config; Bootstrap remnants removed. |
 | Utilities (Task 5) | Notifications, saved list, calendar, and quick tools now share Gigvora shells + `components.utilities.quick-tools` fed by `App\Services\UtilitiesQuickToolsService`. | Floating bubble + inline panels consume `/api/utilities/quick-tools`; contexts wired on feed, profile, Jobs, Freelance, Live, admin, and Flutter (`GigvoraQuickToolsPanel`). |
 
@@ -41,7 +41,7 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 - **Advertisement add-on**: Ads home screen now mirrors the Gigvora hero + metrics grid (gradient header, metric cards, refreshed top campaigns list) using the shared theme exposed via `GigvoraThemeData`; keyword planner and forecast routes stay reachable via the action buttons.
 - **Talent & AI add-on**: Individual `ChangeNotifier` providers per module; UI still uses Material defaults but the package has been renamed to `talent_ai_flutter_addon` so the host app (`addons_integration.dart`) can import the routes/menu without workaround.
 - **Freelance add-on**: Rich set of screens (gigs, projects, contracts) with bespoke theme; buttons differ from Gigvora standard.
-- **Interactive add-on**: Live events screens use their own color constants and typography.
+- **Interactive add-on**: Live events screens now inherit Gigvora tokens; podcast catalogue/series/episode players surface follower counts, AJAX follow buttons, playback progress (web `podcastPlayer.js` + Flutter `PodcastEpisodePlayerScreen`), and host live shells use `podcastLive.js` timers. Error/loading states are present on Flutter catalogue/series/episode screens.
 - **Jobs add-on (planned)**: Needs full theme alignment and shared navigation gating.
 
 ## 1. Existing Design System Inventory
@@ -77,6 +77,12 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 6. **Feed/Search Integration**: Jobs, Freelance, Live, and Ads appear sporadically (or not at all) in the core feed/search, reducing discoverability.
 7. **CSS Debt**: Inline styles and repeated selectors (`.tk-serviesbann`, `.gigvora-ad`) without shared tokens make reskinning labor-intensive.
 
+### Live/Networking polish – Task 19
+
+- Waiting room refreshed with countdown + CTA gating, tokenized pills for rotation/price states, and an intro card form (headline/bio/goal) that persists locally so Utilities follow-ups can hydrate once syncing is wired.
+- Live networking shell now surfaces per-rotation timers (progress + remaining seconds), partner card with contact exchange CTA, starred/follow-up controls, and notes persistence that mirrors the Utilities recap expectations. Flutter needs matching countdown/progress UI, star + follow-up inputs, and local draft storage to keep parity.
+- Catalogue/detail screens now show price/capacity/waitlist badges, coupon entry, and clearer status tags (Live/Waitlist/Free/Paid) so ticket gating is visible before entering the waiting room. Flutter needs the same chips + waitlist state to align.
+
 ## 4. Recommended Token-Based Upgrade Path
 
 1. **Create Token Layer** (`resources/css/gigvora/tokens.css`):
@@ -111,7 +117,8 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 7. **Utilities Surfaces (Task 5)**:
    - Expose quick tools via `components.utilities.quick-tools` on feed, profile, Jobs (index + detail), Freelance shell, Live hub, and admin dashboard. Each instance queries `App\Services\UtilitiesQuickToolsService` so CTAs stay context-aware without duplicating arrays inside Blade.
    - Floating Utilities bubble (`components.utilities.chat-bubble` + `resources/js/utilities/bubble.js`) calls `/api/utilities/quick-tools` to hydrate the same actions while also showing chat conversations/requests.
-   - Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter networking catalogue/detail/waiting/live/recap screens now align with the Gigvora shell: filter chips and search fields reuse token spacing, countdown/join CTAs use `GigvoraThemeData` buttons, and recap cards surface follow-up chips that mirror the web recap/footer actions.
 8. **Documentation & Governance**:
    - Document tokens and usage rules in `/docs/design-system.md`.
    - Enforce linting (Stylelint / Dart analyzer) tied to token usage where possible.

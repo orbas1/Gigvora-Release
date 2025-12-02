@@ -86,6 +86,9 @@ All module views should live under:
     - If registered:
       - Status: “You’re registered”.
       - “Join Waiting Room” button (when time is near).
+    - Respect capacity + waitlist flags (metadata-driven) and surface “On waitlist” when the webinar is full.
+    - Paid replays remain gated unless the viewer has a valid ticket/registration or host role.
+    - Registration schedules Utilities calendar reminders (7d/1h defaults) and renders Ads addon sponsorship CTAs in the detail side rail.
   - Social sharing links (optional).
   - Past recordings list (if series).
 
@@ -231,6 +234,7 @@ All module views should live under:
     - Timer countdown (2 or 5 minutes).
   - Side panel:
     - “Your partner’s card”: name, role, links, notes field.
+    - Follow-up controls: star toggle, optional follow-up date/time to push reminders into Utilities calendar.
     - “Next up” hint (optional).
   - Bottom bar:
     - Buttons: “Skip Round” (if allowed), “Report”, “Leave Session”.
@@ -240,7 +244,7 @@ All module views should live under:
     - Timer countdown per round.
     - Receive pairing info (who you’re currently matched with).
     - On round end, show “Rotating…” screen while new pairing loads.
-    - Persist per-partner notes (client-side and/or via API).
+    - Persist per-partner notes (client-side and/or via API) and post contacts to `/networking/{id}/exchange-contact` with CSRF + rate limits; successful exchanges can queue Utilities calendar reminders.
   - Websocket or polling to receive pairings and round status.
 
 ---

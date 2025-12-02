@@ -183,7 +183,8 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Protect live session access, recordings, ticket data, and interview scores; enforce role-based access for hosts, interviewers, attendees.
     - **Completion Criteria**: All event types and sub-flows in `logic_flows.md#33-#55` function smoothly across web and mobile with Gigvora UI.
 
-16. **Interviews Experience Completion**
+16. ✅ **Interviews Experience Completion**
+   - **Status**: Completed 2025-12-01 – see `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion` for evidence.
    - **Goal**: Deliver the full end-to-end interviews journey (scheduling → waiting rooms → live shells → scoring) defined in `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews`, mirroring the Laravel + Flutter specs in `Gigvora-Addons/Interactive-Addon/About.md#14-interviews`.
    - **Scope**:
      - Backend: finalize slot creation, interviewer panel orchestration, scoring matrices, structured notes, consent tracking, and ATS callbacks so Jobs (`logic_flows.md#31-jobs-addon`) always reflects interview outcomes.
@@ -195,7 +196,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
    - **Security & Privacy**: Enforce interviewer/candidate permissions, encrypt recordings and scoring artifacts at rest, honor consent + regional retention policies, and ensure GDPR export/delete covers interview notes.
    - **Completion Criteria**: Candidate and interviewer personas complete every sub-flow without gaps on web/mobile, ATS + Utilities data stay in sync, analytics fire per taxonomy, and docs (`docs/progress.md`, `docs/qa-bugs.md`, addon `about.md/functions.md`) capture implementation + QA evidence.
 
-17. **Webinars Experience Completion**
+17. ✅ **Webinars Experience Completion**
    - **Goal**: Ship the webinars host/attendee lifecycle (catalogue → detail → registration → waiting room → live → replay) as defined in `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews` and `Gigvora-Addons/Interactive-Addon/About.md#11-webinars`, ensuring parity across Laravel and Flutter.
    - **Scope**:
      - Backend: lock down event creation APIs, ticket tiers (free/paid/donation), coupon + seating logic, reminders, recording lifecycles, and sponsorship hooks exposed via `Gigvora-Addons/Interactive-Addon/functions.md`.
@@ -207,7 +208,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
    - **Security & Privacy**: Enforce ticket/role checks server-side, protect paid replay URLs, capture host/attendee consent and moderation logs, and monitor abuse via admin dashboard.
    - **Completion Criteria**: Hosting, attending, and replay flows run end-to-end on web/mobile; recordings pipeline stable; analytics + monetization hooks verified; documentation + QA notes updated with evidence and open risks.
 
-18. **Podcasts Experience Completion**
+18. ✅ **Podcasts Experience Completion**
    - **Goal**: Complete the podcasts ecosystem (series management, live recordings, on-demand listening, monetization) per `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews` and `Gigvora-Addons/Interactive-Addon/About.md#13-podcasts`, keeping web/Flutter parity.
    - **Scope**:
      - Backend: finish series + episode CRUD, scheduling, guest workflows, paid episode entitlements, donation/ads hooks, and transcript/highlight generation APIs shared with feed/profile surfaces.
@@ -219,7 +220,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
    - **Security & Privacy**: Guard paid content URLs, validate guest consent + release forms, enforce DRM/lightweight watermarking for premium audio, and ensure audio uploads respect storage quotas.
    - **Completion Criteria**: Series creation, live recording, publishing, listening, and monetization loops validated across platforms; analytics verified; docs + QA artifacts updated with references to `logic_flows.md` and addon specs.
 
-19. **Networking Sessions Completion**
+19. ✅ **Networking Sessions Completion**
    - **Goal**: Finalize speed/group networking experiences (discovery → registration → waiting room → live rotations → follow-ups) specified in `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews` and `Gigvora-Addons/Interactive-Addon/About.md#12-networking`.
    - **Scope**:
      - Ticket purchase - Free/or priced - price setting - deals - coupons etc. 

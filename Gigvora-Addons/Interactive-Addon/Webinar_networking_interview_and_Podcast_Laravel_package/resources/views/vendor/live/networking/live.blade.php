@@ -3,7 +3,7 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Live Networking') }}</p>
-        <h1 class="live-header__title">{{ $networkingSession->title ?? __('Live session') }}</h1>
+        <h1 class="live-header__title">{{ $session->title ?? __('Live session') }}</h1>
         <p class="live-header__subtitle">{{ __('Rotate participants, run polls, and share resources with attendees.') }}</p>
     </div>
 @endsection
@@ -14,13 +14,54 @@
         <div class="gv-card space-y-3">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Current partner') }}</h3>
-                <span class="gv-pill">{{ get_phrase('Rotation :seconds s', ['seconds' => $session->rotation_interval ?? 60]) }}</span>
+                <span class="gv-pill" id="rotation-label" data-interval="{{ $session->rotation_interval ?? 60 }}">
+                    {{ get_phrase('Rotation :seconds s', ['seconds' => $session->rotation_interval ?? 60]) }}
+                </span>
             </div>
-            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">
-                {{ get_phrase('Rotations automatically advance every :seconds seconds. Share quick intros and capture notes below.', ['seconds' => $session->rotation_interval ?? 60]) }}
-            </p>
-            <textarea class="gv-input min-h-[140px]" placeholder="{{ get_phrase('Notes about this connection...') }}"></textarea>
-            <button class="gv-btn gv-btn-primary w-full">{{ get_phrase('Save notes') }}</button>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between text-sm text-[var(--gv-color-neutral-600)]">
+                    <span>{{ get_phrase('Rotations automatically advance every :seconds seconds.', ['seconds' => $session->rotation_interval ?? 60]) }}</span>
+                    <span id="rotation-timer" class="font-semibold text-[var(--gv-color-neutral-900)]">--</span>
+                </div>
+                <div class="w-full h-2 bg-[var(--gv-color-neutral-100)] rounded" aria-hidden="true">
+                    <div id="rotation-progress" class="h-2 bg-[var(--gv-color-primary-500)] rounded transition-[width]" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="gv-card bg-[var(--gv-color-neutral-25)] border border-[var(--gv-color-neutral-100)]">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <p class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-0">{{ get_phrase('Partner seat') }} #<span id="partner-seat">{{ optional($session->participants->first())->rotation_position ?? '—' }}</span></p>
+                        <p class="text-xs text-[var(--gv-color-neutral-600)] mb-0" id="partner-meta">
+                            {{ get_phrase('Swaps every :seconds seconds • tap to exchange cards', ['seconds' => $session->rotation_interval ?? 60]) }}
+                        </p>
+                    </div>
+                    <button class="gv-btn gv-btn-secondary" type="button" id="exchange-contact"
+                        data-endpoint="{{ route('wnip.networking.exchange', $session) }}"
+                        data-partner-id="{{ $participant->current_partner_id ?? optional($session->participants->firstWhere('user_id', '!=', $participant->user_id))->user_id }}">
+                        {{ get_phrase('Share contact') }}
+                    </button>
+                </div>
+            </div>
+
+            <textarea class="gv-input min-h-[140px]" id="partner-notes" placeholder="{{ get_phrase('Notes about this connection...') }}"></textarea>
+            <div class="grid gap-3 md:grid-cols-2">
+                <label class="space-y-1">
+                    <span class="gv-label">{{ get_phrase('Follow-up time (optional)') }}</span>
+                    <input class="gv-input" type="datetime-local" id="follow-up-at" aria-label="{{ get_phrase('Schedule follow-up') }}" />
+                </label>
+                <label class="space-y-1">
+                    <span class="gv-label">{{ get_phrase('Important contact') }}</span>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="star-contact" class="gv-checkbox" />
+                        <span class="text-sm text-[var(--gv-color-neutral-700)]">{{ get_phrase('Star for recap & bulk follow-ups') }}</span>
+                    </div>
+                </label>
+            </div>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <button class="gv-btn gv-btn-primary w-full sm:w-auto" id="save-notes">{{ get_phrase('Save notes') }}</button>
+                <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0" id="notes-status">{{ get_phrase('Notes sync locally and appear in your Utilities recap.') }}</p>
+            </div>
         </div>
     </div>
 
@@ -62,3 +103,108 @@
     </aside>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const rotationLabel = document.getElementById('rotation-label');
+    const rotationTimer = document.getElementById('rotation-timer');
+    const rotationProgress = document.getElementById('rotation-progress');
+    const notes = document.getElementById('partner-notes');
+    const notesStatus = document.getElementById('notes-status');
+    const exchangeButton = document.getElementById('exchange-contact');
+    const followUpInput = document.getElementById('follow-up-at');
+    const starContact = document.getElementById('star-contact');
+    const storageKey = 'gv_networking_notes_{{ $session->id }}';
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    const rotationInterval = Number(rotationLabel?.dataset.interval || {{ $session->rotation_interval ?? 60 }});
+    let remaining = rotationInterval;
+
+    const hydrateNotes = () => {
+        if (!notes) return;
+        try {
+            const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            if (saved.text) {
+                notes.value = saved.text;
+                notesStatus.textContent = '{{ get_phrase('Restored from your last save') }}';
+            }
+        } catch (e) {
+            /* noop */
+        }
+    };
+
+    const persistNotes = () => {
+        if (!notes) return;
+        localStorage.setItem(storageKey, JSON.stringify({ text: notes.value, saved_at: new Date().toISOString() }));
+        notesStatus.textContent = '{{ get_phrase('Saved locally; will sync to Utilities after the session') }}';
+    };
+
+    const tickRotation = () => {
+        if (!rotationTimer || !rotationProgress) return;
+        remaining -= 1;
+        if (remaining <= 0) {
+            remaining = rotationInterval;
+        }
+        rotationTimer.textContent = `${remaining}s`;
+        rotationProgress.style.width = `${Math.max(0, Math.min(100, (remaining / rotationInterval) * 100))}%`;
+    };
+
+    hydrateNotes();
+    tickRotation();
+    setInterval(tickRotation, 1000);
+
+    if (notes) {
+        notes.addEventListener('input', () => {
+            notesStatus.textContent = '{{ get_phrase('Drafting…') }}';
+        });
+    }
+
+    document.getElementById('save-notes')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        persistNotes();
+    });
+
+    exchangeButton?.addEventListener('click', async () => {
+        const partnerId = exchangeButton.dataset.partnerId;
+        const endpoint = exchangeButton.dataset.endpoint;
+
+        if (!partnerId || !endpoint) {
+            notesStatus.textContent = '{{ get_phrase('No active partner assigned yet.') }}';
+            return;
+        }
+
+        const payload = {
+            partner_id: Number(partnerId),
+            notes: notes?.value || '',
+            starred: Boolean(starContact?.checked),
+        };
+
+        if (followUpInput?.value) {
+            payload.follow_up_at = followUpInput.value;
+        }
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf || '',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                const message = result?.message || Object.values(result?.errors || {})?.[0] || '{{ get_phrase('Unable to exchange contact right now.') }}';
+                notesStatus.textContent = message;
+                return;
+            }
+
+            notesStatus.textContent = result?.message || '{{ get_phrase('Contact card shared. Follow-up reminder queued.') }}';
+        } catch (error) {
+            notesStatus.textContent = '{{ get_phrase('Unable to exchange contact right now.') }}';
+        }
+    });
+</script>
+@endpush

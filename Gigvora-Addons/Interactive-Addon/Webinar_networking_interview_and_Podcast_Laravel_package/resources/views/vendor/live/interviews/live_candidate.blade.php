@@ -9,10 +9,21 @@
 @endsection
 
 @section('live-content')
-<div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_320px]" id="interview-live" data-session-id="{{ $interview['id'] ?? 1 }}">
+@php
+    $primarySlot = $primarySlot ?? $interview->slots->sortBy('starts_at')->first();
+@endphp
+<div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_320px]" id="interview-live"
+    data-session-id="{{ $interview->id }}"
+    data-start-at="{{ $primarySlot?->starts_at?->toIso8601String() ?? $interview->scheduled_at?->toIso8601String() }}"
+    data-meeting-link="{{ $primarySlot?->meeting_link }}">
     <div class="gv-card p-0 overflow-hidden">
-        <div class="bg-[var(--gv-color-neutral-900)] text-white flex items-center justify-center min-h-[360px]">
-            {{ get_phrase('Video container') }}
+        <div class="bg-[var(--gv-color-neutral-900)] text-white flex flex-col items-center justify-center min-h-[360px] gap-3">
+            <span class="gv-pill" data-live-status data-live-label="{{ get_phrase('Live') }}">{{ get_phrase('Preparing') }}</span>
+            <p class="mb-0 font-semibold">{{ optional($primarySlot?->interviewer)->name ?? get_phrase('Interviewer joining') }}</p>
+            <p class="mb-0 text-sm text-[var(--gv-color-neutral-200)]">
+                {{ $primarySlot?->starts_at?->format('M j • g:i A') ?? $interview->scheduled_at?->format('M j • g:i A') }}
+            </p>
+            <p class="mb-0 text-xs text-[var(--gv-color-neutral-300)]">{{ get_phrase('Video container') }}</p>
         </div>
     </div>
     <aside class="space-y-4">

@@ -31,23 +31,32 @@ Core flow bullets:
   - `GET /events/webinars/{webinar}/live` → `WebinarPageController@live` (host/attendee shell).
   - API: CRUD + register + toggle live via `WebinarController` under `/api/live/webinars*` (configurable prefix, Sanctum + verified).
 - **Data**: Eager-load host/registrations, enforce policies, analytics events `webinar_created`, `webinar_started/ended`, `webinar_registered`.
+  - Filters supported: upcoming, past, host-owned (`mine`), paid/free, reminders, replays, and start date range. Recordings are gated for paid sessions unless the viewer has a valid registration/role.
+  - Registration service enforces capacity + waitlist flags (stored in `metadata`), validates ticket tiers for paid webinars, schedules Utilities calendar reminders on successful registration, and exposes `/api/live/webinars/{webinar}/unregister` + `/api/live/webinars/{webinar}/attend` for attendance tracking.
+  - Ads addon sponsorship placements are available in detail/waiting/live/replay side rails via `Support\Ads\AdsBridge::placementsFor('live_overlay')`.
 
 ### Networking Sessions
 - **Routes**
-  - `GET /events/networking` → `NetworkingPageController@index` (searchable list).
-  - `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
-  - `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
-  - `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
-  - `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
-  - API: CRUD/register/rotate at `/api/live/networking*` (configurable) via `NetworkingController`.
+- `GET /events/networking` → `NetworkingPageController@index` (searchable list).
+- `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
+- `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
+- `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
+- `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
+- `POST /events/networking/{session}/exchange-contact` → `NetworkingPageController@exchangeContact` (AJAX contact exchange, CSRF-protected, rate-limited, optional follow-up scheduling).
+- API: CRUD/register/rotate/contact-exchange at `/api/live/networking*` (configurable) via `NetworkingController`, plus pairing orchestration (`POST /networking/{session}/pairings`) and waitlist promotion (`POST /networking/{session}/promote-waitlist`).
 - **Data**: Tracks `networking_session_created`, `networking_session_joined`, `networking_rotation_completed` analytics.
 
 ### Podcasts
 - **Routes**
   - `GET /events/podcasts` → `PodcastPageController@index` (catalogue with latest episodes per series).
-  - `GET /events/podcasts/{series}` → `PodcastPageController@show` (episode list + playback links).
+  - `GET /events/podcasts/{series}` → `PodcastPageController@show` (episode list + playback links + follower counts; episodes filtered for viewers based on publish/privacy state).
+  - `GET /events/podcasts/{series}/episodes/{episode}` → `PodcastPageController@episode` (episode player + playback analytics endpoint `wnip.podcasts.playback`).
+  - `POST /events/podcasts/{series}/follow` → `PodcastPageController@toggleFollow` (AJAX follow/unfollow, updates follower counts).
+  - `GET /events/podcasts/{series}/live` → `PodcastPageController@live` (host-only live shell powered by `podcastLive.js`).
   - API: series CRUD + episodes create/publish under `/api/live/podcast-series*` and `/api/live/podcasts` (configurable prefix).
-- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`.
+  - API extras: `GET /api/live/podcast-series/{series}/episodes/{episode}`, `POST /podcast-series/{series}/follow`, `POST /podcast-series/{series}/episodes/{episode}/playback` for mobile follow + analytics parity.
+  - Content APIs: `POST /podcast-series/{series}/episodes/{episode}/transcripts` and `/highlights` for host-managed transcripts and highlight reels; `/entitlements` records purchases/subscriptions/donor unlocks used by paid episodes.
+- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`, `podcast_series_followed`/`_unfollowed`, `podcast_episode_played` (progress + completion). Paid episodes additionally check `podcast_episode_entitlements` server-side before playback/download.
 
 ### Interviews
 - **Routes**
@@ -65,13 +74,13 @@ Core flow bullets:
 ## Functions & Features (Flutter)
 - **Screens**
   - Webinars: `webinars_home_screen.dart` (tabs for upcoming/my/recordings), `webinar_detail_screen.dart` (register + navigate to waiting room), `webinar_waiting_room_screen.dart` (real countdown), `webinar_live_screen.dart`, `webinar_recording_player_screen.dart`.
-  - Networking: `networking_home_screen.dart`, `networking_session_detail_screen.dart` (register + waiting room), `networking_waiting_room_screen.dart` (start-aware countdown), `networking_live_screen.dart`.
+- Networking: `networking_home_screen.dart`, `networking_session_detail_screen.dart` (register + waitlist/coupon copy), `networking_waiting_room_screen.dart` (start-aware countdown + editable card), `networking_live_screen.dart` (round timer + star/exchange/notes), `networking_recap_screen.dart` (bulk follow-ups across Jobs/Freelance/Talent & AI hand-offs).
   - Podcasts: `podcast_catalogue_screen.dart`, `podcast_series_detail_screen.dart`, `podcast_episode_player_screen.dart`, `podcast_live_recording_screen.dart`.
   - Interviews: `interview_schedule_screen.dart`, `interview_detail_screen.dart`, `interview_waiting_room_screen.dart`, `interviewer_panel_screen.dart`, `interview_live_screen.dart`.
 - **Services/State**
   - `wnip_api_client.dart` consumes Laravel endpoints with auth headers, structured error handling, and a configurable `apiPrefix` (default `api/live`) plus 20s timeout to match host HTTP patterns.
   - Service wrappers (`webinar_service.dart`, `networking_service.dart`, `podcast_service.dart`, `interview_service.dart`) provide typed methods that populate view states.
-  - States (`webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart`) expose loading/error/empty/data patterns for the screens.
+  - States (`webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart`) expose loading/error/empty/data patterns for the screens. Podcast state now includes episode-level loading for `/live/podcasts/episode/:id` deep links and updates `nowPlaying` for persistent playback controls.
 - **Navigation**
   - `menu.dart` registers `/live/...` routes. Waiting room routes now accept maps containing `title`, `startsAt` (DateTime), optional `message`, and `isLive` to render real-time countdowns. Use `buildLiveEventsMenu()` for the main Live & Events tab and place `buildCandidateInterviewMenu()`/`buildEmployerInterviewMenu()` items inside Jobs/HR areas instead of the primary nav.
 

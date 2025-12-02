@@ -23,6 +23,7 @@ class Webinar {
   final List<WebinarRegistration> registrations;
   final List<Recording> recordings;
   final Map<String, dynamic>? host;
+  final bool canReplay;
 
   Webinar({
     required this.id,
@@ -45,6 +46,7 @@ class Webinar {
     this.registrations = const [],
     this.recordings = const [],
     this.host,
+    this.canReplay = false,
   });
 
   factory Webinar.fromJson(Map<String, dynamic> json) {
@@ -74,6 +76,7 @@ class Webinar {
           .map((item) => Recording.fromJson(Map<String, dynamic>.from(item as Map)))
           .toList(),
       host: json['host'] == null ? null : Map<String, dynamic>.from(json['host'] as Map),
+      canReplay: json['can_replay'] as bool? ?? false,
     );
   }
 }

@@ -32,6 +32,7 @@ export 'src/pages/networking/networking_home_screen.dart';
 export 'src/pages/networking/networking_session_detail_screen.dart';
 export 'src/pages/networking/networking_waiting_room_screen.dart';
 export 'src/pages/networking/networking_live_screen.dart';
+export 'src/pages/networking/networking_recap_screen.dart';
 export 'src/pages/podcasts/podcast_catalogue_screen.dart';
 export 'src/pages/podcasts/podcast_series_detail_screen.dart';
 export 'src/pages/podcasts/podcast_episode_player_screen.dart';
