@@ -1,7 +1,23 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-04
+Last updated: 2025-12-05
+
+## Snapshot – 2025-12-05 – Task 22 (Mobile Convergence parity wiring)
+
+### 1. Live comments + reactions
+
+- Added `GigvoraCommentsClient` in the Flutter shell to hit `/api/post_comment`, `/api/get_comment/{postId}`, and `/api/comment_delete/{comment_id}` with bearer tokens so composer threads, nested replies, and reaction toggles stay in lockstep with the Laravel controllers.
+- Comment parsing now keeps reaction counts, user reactions, and replies intact for feed sheets without any mock data paths.
+
+### 2. Deep link resolution aligned to nav/addons
+
+- Introduced `GigvoraDeepLinkRouter` to translate cold-start URIs into the same routes delivered by `/api/navigation` and addon route maps (profile, jobs, freelance, live/media), ensuring Flutter honors the live IA for deep links.
+- Exported the new router + comments client via `addons_integration.dart` so addon packages can reuse the shared wiring.
+
+### QA / Testing
+
+- Not run in this pass; run `flutter analyze` and the Laravel API smoke covering comments/deep links after configuring env creds.
 
 ## Snapshot – 2025-12-04 – Task 22 (Mobile Convergence follow-up)
 
