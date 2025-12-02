@@ -41,6 +41,43 @@ Last updated: 2025-12-02
 - `logic_flows.md#3.3` documents the updated waiting-room gating, rotation timers, and follow-up/CRM expectations for networking sessions.
 - `docs/ui-audit.md` adds a Live/Networking polish note calling out the refreshed waiting room and live shell plus Flutter parity requirements.
 - `docs/qa-bugs.md#section-–-task-19-networking-sessions-completion` logs manual smoke coverage (index/detail/waiting/live) and reiterates the outstanding build/test blockers (Mix/yargs + env setup). Automated suites remain pending and must run before release.
+Last updated: 2025-12-01
+
+## Todo – Task 18 (Podcasts Experience Completion)
+- [done] Web podcast experience: fix Blade views, routes, and playback/follow telemetry for catalogue → series → episode → live shells.
+- [done] Flutter podcast parity: refresh catalogue, series detail, episode player, and live recording screens with resilient loading/controls.
+- [done] Documentation & QA: align `logic_flows.md`, `docs/ui-audit.md`, and `docs/qa-bugs.md` with the completed podcast experience.
+
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### 1. Web & API
+- Added podcast follower persistence (`podcast_series_followers`), follow/unfollow APIs (`/api/live/podcast-series/{series}/follow`) and web routes (`wnip.podcasts.follow`), and surfaced follower counts on catalogue + series detail. Episode lists now filter unpublished/private items for non-host viewers.
+- Extended podcast episode routes (`wnip.podcasts.episode`) with HTML5 audio controls, playback speed/seek UI, local progress persistence, and analytics posts to `wnip.podcasts.playback`. Live shells use the new `podcastLive.js` controls for record/mute/timer plus Utilities notes sidebar.
+- API now exposes episode detail and playback endpoints for mobile parity; series detail responses include follower counts and `is_followed` flags. Added playback/follow analytics events.
+
+### 2. Flutter Parity
+- Catalogue/series/episode screens now show loading/error/empty states, follower counts, and refreshed cards. Series detail adds follow toggles; episode player hydrates deep links via new API calls and records playback progress with completion tracking.
+- `podcast_state` gains episode-level loading and `PodcastService` now wraps follow/playback endpoints so Flutter mirrors web telemetry and state handling.
+
+### 3. Docs & QA
+- Updated `logic_flows.md` (podcast catalogue/episode/live behaviors), `docs/ui-audit.md` (Interactive add-on token + podcast parity), `docs/qa-bugs.md` (Task 18 QA notes), and `Gigvora-Addons/Interactive-Addon/functions.md` (routes, analytics, Flutter parity).
+- Manual smoke tests covered web catalogue/series/episode/live shells and Flutter catalogue/series/episode flows; noted risk about Flutter’s simulated audio timer pending real stream validation.
+
+### 4. Tests
+- `npm run build` (Mix production) to compile new podcast assets and confirm bundle health. 【bdf652†L1-L86】
+
+## Snapshot – 2025-11-30 – Task 17 (Webinars Experience Completion)
+
+### 1. Webinar catalogue, detail, waiting room, and live shell (web)
+- Refined webinar catalogue (`wnip::webinars.index`) with a live/up-next hero band, reminder/replay filters, and CTA logic that routes directly to detail, waiting room, or live shells based on start state. Event cards now inherit the CTA label from the same logic used by the Live hub sections so hosts/attendees always land on the right surface.
+- Enriched webinar detail with schedule/ticket/safety blocks, calendar export link, readiness checklist, and trust/safety messaging while keeping registration + waiting room CTAs alongside Utilities quick tools. Waiting room gained device/reminder/etiquette tiles, and the live shell now shows attendee counts plus an engagement/moderation card for hosts.
+
+### 2. Flutter parity
+- Updated the webinar detail screen in `webinar_networking_interview_and_Podcast_Flutter_addon` to mirror the new readiness/storytelling cues: status chip, overview card, readiness checklist, and replay list with the existing waiting-room registration flow.
+
+### 3. Documentation & QA notes
+- `logic_flows.md#3.3` documents the live/up-next CTA routing, schedule/ticket/safety blocks, and calendar/export readiness parity for web + Flutter. `docs/ui-audit.md` records the refreshed webinar catalogue/detail experience.
+- Manual smoke on webinar catalogue → detail → waiting room → live shell (web) and webinar detail → register → waiting room navigation (Flutter). No automated suites executed this round; schedule phpunit/build/analyzer before release once addon dependencies stabilise.
 
 ## Snapshot – 2025-11-30 – Task 15 (Interactive / Live Addon Alignment)
 
@@ -516,5 +553,57 @@ Last updated: 2025-12-02
 - Manual verification: exercised live shell contact button (star toggle + follow-up time + notes persistence) against validation errors (missing partner, rate-limit message) and confirmed reminders are emitted through the Utilities calendar service metadata. Confirmed waitlisted users are blocked from the exchange endpoint.
 - Manual verification: seeded multi-attendee sessions, ran pairing generation for consecutive rounds to confirm partner rotation without repeats and observed waitlist promotion calls refill seats when capacity increased. Exercised refreshed Flutter networking catalogue/detail/waiting/live/recap screens (filters, coupons, countdown join gating, notes + star toggles) for parity with the Blade flows.
 - Automated: not run (Mix/yargs + environment setup still blocking `php artisan test`/`npm run build`/Flutter analyzer); rerun before release to cover the new migration, controllers, and JS fetch hooks.
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### Backend + security
+
+- Added podcast monetization + entitlement scaffolding: new episode columns (`is_paid`, `entitlement_type`, `price_cents`, `donation_suggested_cents`) plus `podcast_episode_entitlements` to gate premium streams/downloads. Controllers now block unpaid viewers on paid episodes and require publish dates to be in the past for non-hosts.
+- Implemented transcript and highlight storage via dedicated tables and host-only API endpoints, surfacing structured transcripts/highlights in API + Blade responses for feed/profile embedding and player scrubbing. Playback analytics continue to fire while respecting entitlement checks.
+
+### Web UI
+
+- Episode player now renders premium/free pills, transcript accordion, and highlight scrub buttons wired into `podcastPlayer.js` seeking controls. Paid episodes enforce entitlement gating before rendering content.
+
+### QA notes
+
+- Manual check: verified paid episode gating (403 for unauthenticated), transcript rendering, and highlight seek actions on the web player. Added content/entitlement routes to `functions.md` for parity tracking. Automated suites still pending while existing repository-wide build blockers are addressed; rerun `php artisan test` and `npm run build` after dependency fixes.
+## Snapshot – 2025-12-01 – Task 17 (Webinars experience hardening)
+
+### 1. Registration, capacity, and gating
+
+- Added a shared `WebinarRegistrationService` to enforce ticket tier validation, capacity + waitlist metadata, and attendance tracking across Blade + API controllers. Registration now fails for mismatched tickets, automatically waitlists when full (if enabled), and captures `webinar_attended` analytics when participants enter the live room.
+- API expanded with `mine`/date/reminder/replay filters and new `/api/live/webinars/{id}/unregister` + `/attend` endpoints so mobile + web can cancel or mark attendance consistently. Paid replays are now gated to registered/host viewers on Blade detail pages.
+- Registration now schedules Utilities reminders (7d/1h offsets) and mirrors Ads addon sponsorship placements via the new `AdsBridge` so detail/waiting/live surfaces expose compliant sponsor CTAs without leaking replay URLs.
+
+### 2. UI updates
+
+- Webinar catalogue filters now include "My webinars" and date range inputs; detail pages surface seat availability/waitlist state, disable registration when full, and show replay gating messaging for paid sessions.
+- Waiting room and Flutter detail screens mirror countdown/join states, replay gating hints, and registration CTA text for paid vs free tickets while keeping accessibility states intact.
+
+### QA / Testing
+
+- Manual verification: registration panel state (available, full, waitlist) on `wnip::webinars.show`, replay gating for paid webinars, and filter parameters on `wnip::webinars.index` + `/api/live/webinars` (via query inspection).
+- Automated suites **not run** yet; toolchain issues from previous snapshots remain (Mix/Yargs + DB credentials). Re-run `php artisan test` and `npm run build` once the environment is ready to validate the new service + endpoints.
+## Snapshot – 2025-11-30 – Task 16 (Interviews Experience Completion)
+
+### 1. Routing + CTA gating
+
+- Added a dedicated live route (`wnip.interviews.live`) and wired waiting room/candidate views to slot timestamps (with scheduled-at fallback) so CTAs unlock only when the countdown completes or immediately when no start time is available; status pills now expose `data-live-label` for accessibility + parity with Flutter timers.
+- Candidate prep view now renders real interview metadata (title, schedule, duration, location/meeting link, interviewer from slot) and attachment lists pulled from `metadata.attachments`, removing placeholder arrays.
+- Live candidate shell surfaces slot timing + interviewer context with a live-status pill driven by JS timers.
+
+### 2. Scoring workflow hardening
+
+- Interviewer scoring panel now hydrates criteria from interview metadata (with sensible defaults), supports overall comments, and uses a CSRF-protected fetch to `wnip.interviews.score` for autosave + explicit saves; autosave status is announced in a tokenized status card.
+- Waiting room and candidate join buttons share the same countdown utilities, keeping accessibility attributes/focus states in sync with Gigvora tokens.
+
+### 3. Build & bundling
+
+- `webpack.mix.js` now compiles `interviewDashboard.js` + `interviewerScoring.js` alongside other Live assets so countdowns, join CTAs, and scoring persistence ship in production builds.
+
+### QA / Testing
+
+- Manual smoke: validated waiting room countdown enabling the live CTA, candidate prep page (join buttons, attachments fallback), live shell status pill, and scoring autosave status messaging.
+- `npm run build` (Mix) ✅
 
 

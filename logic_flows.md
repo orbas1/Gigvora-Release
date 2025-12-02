@@ -223,6 +223,9 @@ This document is the canonical map of end-to-end flows across the Gigvora platfo
   - Live shell tracks rotation timers (progress + remaining seconds), per-partner notes saved locally for Utilities sync, and explicit contact exchange/follow-up prompts (reminders + roster export) to keep CRM handoffs consistent across Jobs/Freelance/Talent & AI.
 - **Podcasts**:
   - Series/editor management, episode scheduling, guest intake, recording (live/upload), monetization (ads, donations, paid episodes), catalog filters, donation widgets.
+  - Catalogue + series detail now surface follower counts and follow/unfollow controls that respect permissions (`wnip.podcasts.follow`), while episode lists only expose published/public items to non-hosts.
+  - Episode player (`wnip.podcasts.episode`) persists playback progress locally, emits `podcast_episode_played` analytics via `wnip.podcasts.playback`, and provides speed/seek controls; follow state syncs via AJAX for parity with Utilities bookmarks.
+  - Live recording shell (`wnip.podcasts.live`) uses tokenized host tools (`podcastLive.js`) for record/mute/timer and inherits Utilities notes sidebar for real-time collaboration.
 - **Interviews**:
   - Slot offering, interviewer panel, scoring forms, structured notes, candidate join assistance, fallback dial-in, scoring consensus, feedback distribution.
   - Slots now push Utilities calendar entries + notifications for interviewers/interviewees, and cancellation/reschedule events immediately update Utilities timelines.
@@ -233,6 +236,7 @@ This document is the canonical map of end-to-end flows across the Gigvora platfo
 - **Experience orchestration & hub**:
   - `App\Services\LiveEventsExperienceService` aggregates upcoming webinars, networking sessions, podcast episodes, and interviews (with counts, status pills, and ad slots) for the Live hub (`resources/views/live/hub.blade.php`), recommendation lanes (`FeedRecommendationService`), and Utilities quick tools so the Interactive addon reuses the same tokenized layout everywhere.
   - Waiting rooms (`wnip::webinars.waiting_room`, `wnip::networking.waiting_room`, `wnip::interviews.waiting_room`) expose countdowns, status pills, and CTA enablement logic via shared Blade components (`wnip::components.waiting_room_header`) plus JS timers, ensuring web + Flutter stay in sync with interview/webinar/networking start states.
+  - Webinar catalogue and detail flows highlight live/up-next states with CTA routing to detail/waiting/live shells, expose schedule/ticket/safety blocks, calendar export links, and readiness checklists mirrored in the Flutter detail screen so attendees can prep devices and reminders consistently.
   - Live shells (`wnip::webinars.live`, `wnip::networking.live`, `wnip::podcasts.live`, `wnip::interviews.live_candidate`) rely on `.gv-card`/`.gv-pill` tokens, Utilities quick tools, advertisement slots, and shared partials (`live_chat_panel`, `notes_sidebar`, `host_tools_toolbar`, `calendar_widget`) so all Interactive sessions feel consistent with the Gigvora design system and support Utilities reactions/notes.
 
 ### 3.4 Advertisement Addon

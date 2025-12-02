@@ -23,9 +23,11 @@
                 {{ get_phrase('Browse live recordings, series, and latest episodes.') }}
             </p>
         </div>
-        <a class="gv-btn gv-btn-primary" href="{{ route('wnip.podcasts.index', ['create' => 1]) }}">
-            {{ get_phrase('Create series') }}
-        </a>
+        @can('create', Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastSeries::class)
+            <a class="gv-btn gv-btn-primary" href="{{ route('wnip.podcasts.index', ['create' => 1]) }}">
+                {{ get_phrase('Create series') }}
+            </a>
+        @endcan
     </div>
 
     <form method="get" class="gv-card space-y-3">
@@ -51,7 +53,8 @@
                             {{ $item->title }}
                         </h3>
                         <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
-                            {{ trans_choice('{1}1 episode|[2,*]:count episodes', $item->episodes->count(), ['count' => $item->episodes->count()]) }}
+                            {{ trans_choice('{1}1 episode|[2,*]:count episodes', $item->episodes->count(), ['count' => $item->episodes->count()]) }} •
+                            {{ trans_choice('{1}1 follower|[2,*]:count followers', $item->followers_count ?? 0, ['count' => $item->followers_count ?? 0]) }}
                         </p>
                     </div>
                 </div>

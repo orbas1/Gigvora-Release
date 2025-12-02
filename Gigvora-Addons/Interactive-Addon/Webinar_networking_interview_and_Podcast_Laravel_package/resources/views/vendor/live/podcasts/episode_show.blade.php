@@ -3,21 +3,14 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Podcast Episode') }}</p>
-        <h1 class="live-header__title">{{ $episode['title'] ?? __('Episode Player') }}</h1>
+        <h1 class="live-header__title">{{ $episode->title ?? __('Episode Player') }}</h1>
         <p class="live-header__subtitle">{{ __('Listen live, scrub through bookmarks, and review show notes.') }}</p>
     </div>
 @endsection
 
 @section('live-content')
-@php
-    $episodeData = $episode ?? [
-        'title' => 'Episode 1: Shipping fast',
-        'description' => 'Conversation on agile shipping.',
-        'guests' => 'Kim & Lee',
-        'show_notes' => 'Links and resources go here.',
-    ];
-@endphp
-<div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_320px]" id="podcast-episode" data-episode-id="{{ $episodeData['id'] ?? 1 }}">
+<div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_320px]" id="podcast-episode" data-episode-id="{{ $episode->id }}"
+    data-analytics-endpoint="{{ route('wnip.podcasts.playback', [$series, $episode]) }}">
     <div class="gv-card space-y-4">
         <div class="flex items-center gap-3">
             <button class="gv-btn gv-btn-primary" id="audio-toggle">{{ get_phrase('Play') }}</button>
@@ -30,21 +23,96 @@
                 <option value="1.5">1.5x</option>
             </select>
         </div>
+        <audio id="podcast-audio" preload="metadata" @if($episode->audio_path) src="{{ $episode->audio_path }}" @endif></audio>
         <div>
-            <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ $episodeData['title'] }}</h1>
-            <p class="text-sm text-[var(--gv-color-neutral-500)] mb-3">{{ get_phrase('Guests: :guests', ['guests' => $episodeData['guests'] ?? get_phrase('TBD')]) }}</p>
-            <p class="text-sm text-[var(--gv-color-neutral-700)] mb-4">{{ $episodeData['description'] }}</p>
-            <div>
-                <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-2">{{ get_phrase('Show notes') }}</h3>
-                <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ $episodeData['show_notes'] }}</p>
+            <div class="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wide text-[var(--gv-color-neutral-500)] mb-1">{{ $series->title }}</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ $episode->title }}</h1>
+                        @if($episode->is_paid)
+                            <span class="gv-pill gv-pill-strong">{{ get_phrase('Premium') }}</span>
+                        @else
+                            <span class="gv-pill">{{ get_phrase('Free') }}</span>
+                        @endif
+                    </div>
+                    <p class="text-xs text-[var(--gv-color-neutral-500)] mb-3">{{ $episode->published_at?->format('M j, Y • g:i A') ?? get_phrase('Draft') }}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="gv-pill">{{ get_phrase('Duration: :minutes min', ['minutes' => $episode->duration ?? get_phrase('TBD')]) }}</span>
+                    <a class="gv-btn gv-btn-ghost" href="{{ route('wnip.podcasts.series', $series) }}">{{ get_phrase('Back to series') }}</a>
+                </div>
             </div>
+            <p class="text-sm text-[var(--gv-color-neutral-700)] mb-4">{{ $episode->description }}</p>
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-2">{{ get_phrase('Guests') }}</h3>
+                    <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ data_get($episode->metadata, 'guests', get_phrase('TBD')) }}</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-2">{{ get_phrase('Show notes') }}</h3>
+                    <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ data_get($episode->metadata, 'show_notes', get_phrase('Links and resources go here.')) }}</p>
+                </div>
+            </div>
+            @if($episode->transcripts->isNotEmpty())
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Transcript') }}</h3>
+                        <button class="gv-btn gv-btn-ghost text-xs" data-transcript-toggle>{{ get_phrase('Collapse/Expand') }}</button>
+                    </div>
+                    <div class="space-y-3" id="transcript-panel">
+                        @foreach($episode->transcripts as $transcript)
+                            <article class="gv-card gv-card-subtle">
+                                <div class="flex items-center justify-between mb-2 text-xs text-[var(--gv-color-neutral-500)]">
+                                    <span>{{ strtoupper($transcript->language) }}</span>
+                                    @if($transcript->source)
+                                        <span>{{ $transcript->source }}</span>
+                                    @endif
+                                </div>
+                                <p class="text-sm whitespace-pre-line leading-relaxed">{{ $transcript->content }}</p>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            @if($episode->highlights->isNotEmpty())
+                <div class="mt-4">
+                    <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)] mb-2">{{ get_phrase('Highlights') }}</h3>
+                    <ul class="space-y-2" id="highlight-list">
+                        @foreach($episode->highlights as $highlight)
+                            <li>
+                                <button class="gv-card gv-card-ghost w-full text-left" data-seek="{{ $highlight->starts_at_seconds }}">
+                                    <div class="flex items-center justify-between text-xs text-[var(--gv-color-neutral-500)] mb-1">
+                                        <span>{{ gmdate('i:s', $highlight->starts_at_seconds) }}</span>
+                                        @if($highlight->ends_at_seconds)
+                                            <span>{{ get_phrase('Until :time', ['time' => gmdate('i:s', $highlight->ends_at_seconds)]) }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ $highlight->title }}</div>
+                                    @if($highlight->description)
+                                        <p class="text-sm text-[var(--gv-color-neutral-700)] mb-0">{{ $highlight->description }}</p>
+                                    @endif
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </div>
     <aside class="gv-card space-y-2">
         <h4 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('More episodes') }}</h4>
         <ul class="space-y-1 text-sm" id="related-episodes">
-            <li><a href="#" class="text-[var(--gv-color-primary-600)]">{{ get_phrase('Episode 2: Growth') }}</a></li>
-            <li><a href="#" class="text-[var(--gv-color-primary-600)]">{{ get_phrase('Episode 3: Hiring') }}</a></li>
+            @forelse($relatedEpisodes as $related)
+                <li>
+                    <a href="{{ route('wnip.podcasts.episode', [$series, $related]) }}" class="text-[var(--gv-color-primary-600)]">
+                        {{ $related->title }}
+                    </a>
+                </li>
+            @empty
+                <li class="text-[var(--gv-color-neutral-500)]">{{ get_phrase('No other episodes yet.') }}</li>
+            @endforelse
         </ul>
     </aside>
 </div>

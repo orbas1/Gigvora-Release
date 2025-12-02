@@ -84,6 +84,9 @@ All module views should live under:
     - If registered:
       - Status: “You’re registered”.
       - “Join Waiting Room” button (when time is near).
+    - Respect capacity + waitlist flags (metadata-driven) and surface “On waitlist” when the webinar is full.
+    - Paid replays remain gated unless the viewer has a valid ticket/registration or host role.
+    - Registration schedules Utilities calendar reminders (7d/1h defaults) and renders Ads addon sponsorship CTAs in the detail side rail.
   - Social sharing links (optional).
   - Past recordings list (if series).
 

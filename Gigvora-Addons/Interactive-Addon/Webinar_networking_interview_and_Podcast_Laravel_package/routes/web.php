@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\InterviewPageController;
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\NetworkingPageController;
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\PodcastPageController;
+use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\PodcastController as PodcastApiController;
 use Jobi\WebinarNetworkingInterviewPodcast\Http\Controllers\WebinarPageController;
 
 Route::group([
@@ -28,10 +29,22 @@ Route::group([
 
     Route::get('/podcasts', [PodcastPageController::class, 'index'])->name('wnip.podcasts.index');
     Route::get('/podcasts/{podcastSeries}', [PodcastPageController::class, 'show'])->name('wnip.podcasts.series');
+    Route::get('/podcasts/{podcastSeries}/episodes/{podcastEpisode}', [PodcastPageController::class, 'episode'])
+        ->name('wnip.podcasts.episode');
+    Route::get('/podcasts/{podcastSeries}/live', [PodcastPageController::class, 'live'])
+        ->name('wnip.podcasts.live')
+        ->middleware('auth');
+    Route::post('/podcasts/{podcastSeries}/follow', [PodcastPageController::class, 'toggleFollow'])
+        ->name('wnip.podcasts.follow')
+        ->middleware('auth');
+    Route::post('/podcasts/{podcastSeries}/episodes/{podcastEpisode}/playback', [PodcastApiController::class, 'recordPlayback'])
+        ->name('wnip.podcasts.playback')
+        ->middleware('auth');
 
     Route::get('/interviews', [InterviewPageController::class, 'index'])->name('wnip.interviews.index');
     Route::get('/interviews/{interview}', [InterviewPageController::class, 'show'])->name('wnip.interviews.show');
     Route::get('/interviews/{interview}/waiting-room', [InterviewPageController::class, 'waitingRoom'])->name('wnip.interviews.waiting');
+    Route::get('/interviews/{interview}/live', [InterviewPageController::class, 'live'])->name('wnip.interviews.live');
     Route::post('/interviews/{interview}/slots/{interviewSlot}/score', [InterviewPageController::class, 'score'])
         ->name('wnip.interviews.score');
 });

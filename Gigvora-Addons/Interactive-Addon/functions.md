@@ -31,6 +31,9 @@ Core flow bullets:
   - `GET /events/webinars/{webinar}/live` → `WebinarPageController@live` (host/attendee shell).
   - API: CRUD + register + toggle live via `WebinarController` under `/api/live/webinars*` (configurable prefix, Sanctum + verified).
 - **Data**: Eager-load host/registrations, enforce policies, analytics events `webinar_created`, `webinar_started/ended`, `webinar_registered`.
+  - Filters supported: upcoming, past, host-owned (`mine`), paid/free, reminders, replays, and start date range. Recordings are gated for paid sessions unless the viewer has a valid registration/role.
+  - Registration service enforces capacity + waitlist flags (stored in `metadata`), validates ticket tiers for paid webinars, schedules Utilities calendar reminders on successful registration, and exposes `/api/live/webinars/{webinar}/unregister` + `/api/live/webinars/{webinar}/attend` for attendance tracking.
+  - Ads addon sponsorship placements are available in detail/waiting/live/replay side rails via `Support\Ads\AdsBridge::placementsFor('live_overlay')`.
 
 ### Networking Sessions
 - **Routes**
@@ -46,9 +49,14 @@ Core flow bullets:
 ### Podcasts
 - **Routes**
   - `GET /events/podcasts` → `PodcastPageController@index` (catalogue with latest episodes per series).
-  - `GET /events/podcasts/{series}` → `PodcastPageController@show` (episode list + playback links).
+  - `GET /events/podcasts/{series}` → `PodcastPageController@show` (episode list + playback links + follower counts; episodes filtered for viewers based on publish/privacy state).
+  - `GET /events/podcasts/{series}/episodes/{episode}` → `PodcastPageController@episode` (episode player + playback analytics endpoint `wnip.podcasts.playback`).
+  - `POST /events/podcasts/{series}/follow` → `PodcastPageController@toggleFollow` (AJAX follow/unfollow, updates follower counts).
+  - `GET /events/podcasts/{series}/live` → `PodcastPageController@live` (host-only live shell powered by `podcastLive.js`).
   - API: series CRUD + episodes create/publish under `/api/live/podcast-series*` and `/api/live/podcasts` (configurable prefix).
-- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`.
+  - API extras: `GET /api/live/podcast-series/{series}/episodes/{episode}`, `POST /podcast-series/{series}/follow`, `POST /podcast-series/{series}/episodes/{episode}/playback` for mobile follow + analytics parity.
+  - Content APIs: `POST /podcast-series/{series}/episodes/{episode}/transcripts` and `/highlights` for host-managed transcripts and highlight reels; `/entitlements` records purchases/subscriptions/donor unlocks used by paid episodes.
+- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`, `podcast_series_followed`/`_unfollowed`, `podcast_episode_played` (progress + completion). Paid episodes additionally check `podcast_episode_entitlements` server-side before playback/download.
 
 ### Interviews
 - **Routes**
@@ -72,7 +80,7 @@ Core flow bullets:
 - **Services/State**
   - `wnip_api_client.dart` consumes Laravel endpoints with auth headers, structured error handling, and a configurable `apiPrefix` (default `api/live`) plus 20s timeout to match host HTTP patterns.
   - Service wrappers (`webinar_service.dart`, `networking_service.dart`, `podcast_service.dart`, `interview_service.dart`) provide typed methods that populate view states.
-  - States (`webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart`) expose loading/error/empty/data patterns for the screens.
+  - States (`webinar_state.dart`, `networking_state.dart`, `podcast_state.dart`, `interview_state.dart`) expose loading/error/empty/data patterns for the screens. Podcast state now includes episode-level loading for `/live/podcasts/episode/:id` deep links and updates `nowPlaying` for persistent playback controls.
 - **Navigation**
   - `menu.dart` registers `/live/...` routes. Waiting room routes now accept maps containing `title`, `startsAt` (DateTime), optional `message`, and `isLive` to render real-time countdowns. Use `buildLiveEventsMenu()` for the main Live & Events tab and place `buildCandidateInterviewMenu()`/`buildEmployerInterviewMenu()` items inside Jobs/HR areas instead of the primary nav.
 
