@@ -33,6 +33,11 @@ class GigvoraDeepLinkRouter {
       return DeepLinkResolution(routeName: navMatch, uri: uri, arguments: uri.queryParameters);
     }
 
+    final parameterizedMatch = _matchParameterized(normalizedPath, uri, availableRoutes);
+    if (parameterizedMatch != null) {
+      return parameterizedMatch;
+    }
+
     final dynamicMatch = _resolveDynamic(uri, availableRoutes);
     if (dynamicMatch != null) {
       return dynamicMatch;
@@ -70,6 +75,36 @@ class GigvoraDeepLinkRouter {
         .where((route) => route != '/' && path.startsWith(route))
         .toList();
     return partial.isNotEmpty ? partial.first : null;
+  }
+
+  DeepLinkResolution? _matchParameterized(String path, Uri uri, List<String> availableRoutes) {
+    final pathSegments = path.split('/')..removeWhere((segment) => segment.isEmpty);
+
+    for (final route in availableRoutes.where((route) => route.contains(':'))) {
+      final routeSegments = route.split('/')..removeWhere((segment) => segment.isEmpty);
+      if (routeSegments.length != pathSegments.length) continue;
+
+      final arguments = {...uri.queryParameters};
+      var matched = true;
+
+      for (var i = 0; i < routeSegments.length; i++) {
+        final pattern = routeSegments[i];
+        final value = pathSegments[i];
+
+        if (pattern.startsWith(':')) {
+          arguments[pattern.substring(1)] = value;
+        } else if (pattern != value) {
+          matched = false;
+          break;
+        }
+      }
+
+      if (matched) {
+        return DeepLinkResolution(routeName: route, uri: uri, arguments: arguments);
+      }
+    }
+
+    return null;
   }
 
   DeepLinkResolution? _resolveDynamic(Uri uri, List<String> availableRoutes) {
@@ -133,6 +168,17 @@ class GigvoraDeepLinkRouter {
           return DeepLinkResolution(routeName: liveRoute, uri: uri, arguments: uri.queryParameters);
         }
         break;
+      case 'posts':
+      case 'post':
+        final feedRoute = _matchNavigationRoute('/', availableRoutes) ?? _matchNavigationRoute('/feed', availableRoutes);
+        if (feedRoute != null) {
+          return DeepLinkResolution(
+            routeName: feedRoute,
+            uri: uri,
+            arguments: {'postId': segments.length > 1 ? segments[1] : null, ...uri.queryParameters},
+          );
+        }
+        break;
       case 'videos':
       case 'reels':
       case 'stories':
@@ -142,6 +188,10 @@ class GigvoraDeepLinkRouter {
         );
         if (mediaRoute.isNotEmpty) {
           return DeepLinkResolution(routeName: mediaRoute, uri: uri, arguments: uri.queryParameters);
+        }
+        final feedRoute = _matchNavigationRoute('/', availableRoutes);
+        if (feedRoute != null) {
+          return DeepLinkResolution(routeName: feedRoute, uri: uri, arguments: uri.queryParameters);
         }
         break;
       default:

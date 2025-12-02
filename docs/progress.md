@@ -1,7 +1,28 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-05
+Last updated: 2025-12-06
+
+## Snapshot – 2025-12-06 – Task 22 (Mobile Convergence live comments + deep links)
+
+### 1. Mobile comment threads wired to Laravel
+
+- Added `GigvoraCommentThread` to render live comment/reply stacks with reaction pickers, pull-to-refresh, and delete hooks using `GigvoraCommentsClient` against `/api/get_comment/{postId}`, `/api/post_comment`, and `/api/comment_delete/{comment_id}`.
+- Composer now clears reply state after post and reloads from the API to keep reaction counts/user reactions aligned with Laravel without mock data.
+
+### 2. Parameterized deep links for addons and feed
+
+- Enhanced `GigvoraDeepLinkRouter` with parameterized route matching so `/jobs/123`, `/freelance/42`, `/post/99`, and media/live slugs resolve into the live navigation/addon routes delivered by `/api/navigation` plus addon maps.
+- Feed fallbacks ensure posts/media deep links land on the authenticated feed when no specific addon route is present.
+
+### 3. Docs
+
+- Updated `docs/mobile_parity_checklist.md` to reflect the live `GigvoraCommentThread` surface and the parameterized deep link coverage.
+- Refreshed `docs/mobile-build.md` with the new comments client/thread wiring and deep link router expectations (no stubs; offline retries required).
+
+### QA / Testing
+
+- Not run in this pass; run `flutter analyze` after wiring env/base URLs to confirm the new widgets integrate cleanly.
 
 ## Snapshot – 2025-12-05 – Task 22 (Mobile Convergence parity wiring)
 

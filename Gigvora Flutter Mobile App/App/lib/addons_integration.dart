@@ -22,6 +22,7 @@ export 'utilities_quick_tools.dart';
 export 'inbox_shell.dart';
 export 'comments_api.dart';
 export 'deep_link_router.dart';
+export 'comments_thread.dart';
 
 /// Shared token provider signature reused by both addons.
 typedef AuthTokenProvider = Future<String?> Function();

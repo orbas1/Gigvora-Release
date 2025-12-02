@@ -14,6 +14,7 @@ This guide explains how to configure and build the Flutter mobile shell so it re
    - Supply the host API base URL and bearer token provider when constructing the shared clients:
      - `GigvoraNavigationClient(baseUrl: ..., tokenProvider: ...)` for `/api/navigation`.
      - `GigvoraQuickToolsClient(baseUrl: ..., tokenProvider: ...)` for `/utilities/quick-tools`.
+     - `GigvoraCommentsClient(baseUrl: ..., tokenProvider: ...)` for `/api/get_comment/{postId}`, `/api/post_comment`, and `/api/comment_delete/{comment_id}`; render threads with `GigvoraCommentThread` so composer/reaction/delete flows stay live-service backed.
      - Addon configurators in `GigvoraAddonNavigation.routes` accept `baseUrl` and token providers for Jobs, Freelance, Ads, Interactive, and Talent & AI so every screen calls live services.
    - Keep tokens in secure storage on the host app before passing them into these constructors; do not hard-code secrets.
 
@@ -29,6 +30,7 @@ This guide explains how to configure and build the Flutter mobile shell so it re
 3. **Addons**
    - Dependencies live in the monorepo and are referenced via relative paths in `Gigvora Flutter Mobile App/App/pubspec.yaml`. Keep the monorepo layout intact so `flutter pub get` can locate advertisement, jobs, freelance, live (webinar/networking/interview/podcast), talent AI, and utilities addons.
    - The same HTTP clients used in the host shell are forwarded into addon constructors (see `GigvoraAddonNavigation.routes`). Do not substitute mock repositories; all screens should hit the Laravel endpoints listed in `logic_flows.md` and addon `functions.md` files.
+   - Deep links should pass through `GigvoraDeepLinkRouter`, which now resolves navigation/addon routes (including parameterized IDs such as `/jobs/:id`, `/freelance/:id`, `/live/{room}`, `/post/{id}`) using the live `/api/navigation` payload plus addon route map.
 
 ## Build commands
 
@@ -49,4 +51,4 @@ Use the Utilities addon push/notification pipeline from the web stack. Register 
 ## Deep links & offline states
 
 - **Deep links**: Wire your `onGenerateRoute` to the combined route map from `GigvoraAddonNavigation.routes` plus nav API outputs so links to feed posts, profiles, jobs, freelance projects, live events, stories/reels, and utilities all land on live-backed screens. Validate both cold-start and warm-path behavior.
-- **Offline handling**: The feed/comments/jobs/freelance clients expect live responses; add retry/backoff at the app layer and surface offline indicators. Do not return placeholder data—if offline, block the action and retry once connectivity resumes.
+- **Offline handling**: The feed/comments/jobs/freelance clients expect live responses; add retry/backoff at the app layer and surface offline indicators. Do not return placeholder data—if offline, block the action and retry once connectivity resumes. Comment composer/reaction actions should queue retries rather than emitting stubbed UI.
