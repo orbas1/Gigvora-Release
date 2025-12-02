@@ -224,4 +224,15 @@ Last updated: 2025-11-30
 - Reminders: Registration creates Utilities calendar entries with 7d/1h offsets; unregister cancels them. Validate reminder creation via database entries once credentials are available.
 - Ads: Sponsored blocks render in webinar detail side rail and should reflect `AdvertisementSurfaceService` placements.
 - **Risks**: Automated suites still blocked by Mix/Yargs + DB credential gaps. Run `php artisan test` and `npm run build` once the environment is fixed to cover the new service and API routes.
+## Section – Task 16 Interviews Experience Completion
+
+- **Scope**: Close gaps on interview waiting rooms, live shells, candidate prep, and interviewer scoring so CTA gating, timers, and scoring persistence match `logic_flows.md#33` and the Interactive addon specs.
+- **Checked areas**:
+  - Waiting room countdown unlocking the new `wnip.interviews.live` route + status pill state change.
+  - Candidate prep view pulling real interview/slot metadata and attachment list; join buttons reflect schedule.
+  - Live shell status pill/timestamp rendering; interviewer scoring panel autosave to `wnip.interviews.score` with CSRF + error handling.
+- **Findings**:
+  - Manual smoke passed for the flows above; no defects opened. `npm run build` succeeded after adding the interview JS bundles to Mix.
+- **QA references**:
+  - `logic_flows.md#33`, `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion`, `docs/ui-audit.md#interactive--live`.
 
