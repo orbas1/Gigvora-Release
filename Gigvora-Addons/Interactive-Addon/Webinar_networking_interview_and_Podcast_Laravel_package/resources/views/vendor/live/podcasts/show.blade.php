@@ -3,7 +3,7 @@
 @section('live-header')
     <div>
         <p class="text-sm uppercase tracking-wide text-indigo-500 font-semibold mb-2">{{ __('Podcast Series') }}</p>
-        <h1 class="live-header__title">{{ $podcastSeries->title }}</h1>
+        <h1 class="live-header__title">{{ ($series ?? $podcastSeries)->title }}</h1>
         <p class="live-header__subtitle">{{ __('Browse episodes, guest bios, and livestream recordings in one view.') }}</p>
     </div>
 @endsection
@@ -14,12 +14,12 @@
         <div class="gv-card space-y-3">
             <div class="flex items-center gap-3">
                 <div class="w-16 h-16 rounded-2xl bg-[var(--gv-color-neutral-100)] flex items-center justify-center text-lg font-semibold text-[var(--gv-color-neutral-400)]">
-                    {{ \Illuminate\Support\Str::substr($series->title, 0, 2) }}
+                    {{ \Illuminate\Support\Str::substr(($series ?? $podcastSeries)->title, 0, 2) }}
                 </div>
                 <div>
-                    <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ $series->title }}</h1>
+                    <h1 class="text-2xl font-semibold text-[var(--gv-color-neutral-900)] mb-1">{{ ($series ?? $podcastSeries)->title }}</h1>
                     <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
-                        {{ trans_choice('{1}1 episode|[2,*]:count episodes', $series->episodes->count(), ['count' => $series->episodes->count()]) }}
+                        {{ trans_choice('{1}1 episode|[2,*]:count episodes', ($series ?? $podcastSeries)->episodes->count(), ['count' => ($series ?? $podcastSeries)->episodes->count()]) }}
                     </p>
                 </div>
             </div>

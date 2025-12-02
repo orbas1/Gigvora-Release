@@ -208,7 +208,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
    - **Security & Privacy**: Enforce ticket/role checks server-side, protect paid replay URLs, capture host/attendee consent and moderation logs, and monitor abuse via admin dashboard.
    - **Completion Criteria**: Hosting, attending, and replay flows run end-to-end on web/mobile; recordings pipeline stable; analytics + monetization hooks verified; documentation + QA notes updated with evidence and open risks.
 
-18. **Podcasts Experience Completion**
+18. ✅ **Podcasts Experience Completion**
    - **Goal**: Complete the podcasts ecosystem (series management, live recordings, on-demand listening, monetization) per `logic_flows.md#33-interactive-addon-live--webinars--networking--podcasts--interviews` and `Gigvora-Addons/Interactive-Addon/About.md#13-podcasts`, keeping web/Flutter parity.
    - **Scope**:
      - Backend: finish series + episode CRUD, scheduling, guest workflows, paid episode entitlements, donation/ads hooks, and transcript/highlight generation APIs shared with feed/profile surfaces.

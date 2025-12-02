@@ -40,7 +40,7 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 - **Advertisement add-on**: Ads home screen now mirrors the Gigvora hero + metrics grid (gradient header, metric cards, refreshed top campaigns list) using the shared theme exposed via `GigvoraThemeData`; keyword planner and forecast routes stay reachable via the action buttons.
 - **Talent & AI add-on**: Individual `ChangeNotifier` providers per module; UI still uses Material defaults but the package has been renamed to `talent_ai_flutter_addon` so the host app (`addons_integration.dart`) can import the routes/menu without workaround.
 - **Freelance add-on**: Rich set of screens (gigs, projects, contracts) with bespoke theme; buttons differ from Gigvora standard.
-- **Interactive add-on**: Live events screens use their own color constants and typography.
+- **Interactive add-on**: Live events screens now inherit Gigvora tokens; podcast catalogue/series/episode players surface follower counts, AJAX follow buttons, playback progress (web `podcastPlayer.js` + Flutter `PodcastEpisodePlayerScreen`), and host live shells use `podcastLive.js` timers. Error/loading states are present on Flutter catalogue/series/episode screens.
 - **Jobs add-on (planned)**: Needs full theme alignment and shared navigation gating.
 
 ## 1. Existing Design System Inventory

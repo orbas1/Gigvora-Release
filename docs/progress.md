@@ -1,7 +1,30 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-11-30
+Last updated: 2025-12-01
+
+## Todo – Task 18 (Podcasts Experience Completion)
+- [done] Web podcast experience: fix Blade views, routes, and playback/follow telemetry for catalogue → series → episode → live shells.
+- [done] Flutter podcast parity: refresh catalogue, series detail, episode player, and live recording screens with resilient loading/controls.
+- [done] Documentation & QA: align `logic_flows.md`, `docs/ui-audit.md`, and `docs/qa-bugs.md` with the completed podcast experience.
+
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### 1. Web & API
+- Added podcast follower persistence (`podcast_series_followers`), follow/unfollow APIs (`/api/live/podcast-series/{series}/follow`) and web routes (`wnip.podcasts.follow`), and surfaced follower counts on catalogue + series detail. Episode lists now filter unpublished/private items for non-host viewers.
+- Extended podcast episode routes (`wnip.podcasts.episode`) with HTML5 audio controls, playback speed/seek UI, local progress persistence, and analytics posts to `wnip.podcasts.playback`. Live shells use the new `podcastLive.js` controls for record/mute/timer plus Utilities notes sidebar.
+- API now exposes episode detail and playback endpoints for mobile parity; series detail responses include follower counts and `is_followed` flags. Added playback/follow analytics events.
+
+### 2. Flutter Parity
+- Catalogue/series/episode screens now show loading/error/empty states, follower counts, and refreshed cards. Series detail adds follow toggles; episode player hydrates deep links via new API calls and records playback progress with completion tracking.
+- `podcast_state` gains episode-level loading and `PodcastService` now wraps follow/playback endpoints so Flutter mirrors web telemetry and state handling.
+
+### 3. Docs & QA
+- Updated `logic_flows.md` (podcast catalogue/episode/live behaviors), `docs/ui-audit.md` (Interactive add-on token + podcast parity), `docs/qa-bugs.md` (Task 18 QA notes), and `Gigvora-Addons/Interactive-Addon/functions.md` (routes, analytics, Flutter parity).
+- Manual smoke tests covered web catalogue/series/episode/live shells and Flutter catalogue/series/episode flows; noted risk about Flutter’s simulated audio timer pending real stream validation.
+
+### 4. Tests
+- `npm run build` (Mix production) to compile new podcast assets and confirm bundle health. 【bdf652†L1-L86】
 
 ## Snapshot – 2025-11-30 – Task 17 (Webinars Experience Completion)
 
@@ -473,6 +496,20 @@ Last updated: 2025-11-30
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### Backend + security
+
+- Added podcast monetization + entitlement scaffolding: new episode columns (`is_paid`, `entitlement_type`, `price_cents`, `donation_suggested_cents`) plus `podcast_episode_entitlements` to gate premium streams/downloads. Controllers now block unpaid viewers on paid episodes and require publish dates to be in the past for non-hosts.
+- Implemented transcript and highlight storage via dedicated tables and host-only API endpoints, surfacing structured transcripts/highlights in API + Blade responses for feed/profile embedding and player scrubbing. Playback analytics continue to fire while respecting entitlement checks.
+
+### Web UI
+
+- Episode player now renders premium/free pills, transcript accordion, and highlight scrub buttons wired into `podcastPlayer.js` seeking controls. Paid episodes enforce entitlement gating before rendering content.
+
+### QA notes
+
+- Manual check: verified paid episode gating (403 for unauthenticated), transcript rendering, and highlight seek actions on the web player. Added content/entitlement routes to `functions.md` for parity tracking. Automated suites still pending while existing repository-wide build blockers are addressed; rerun `php artisan test` and `npm run build` after dependency fixes.
 ## Snapshot – 2025-12-01 – Task 17 (Webinars experience hardening)
 
 ### 1. Registration, capacity, and gating
