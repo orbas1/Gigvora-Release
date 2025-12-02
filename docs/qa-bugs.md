@@ -209,4 +209,5 @@ Last updated: 2025-11-30
 - **Findings**:
   - No blocking regressions observed during manual smoke tests; follow toggles respect auth and analytics events fire on publish/playback.
   - **Risk**: Flutter episode player uses a simulated timer (no audio plugin); verify against real audio streams before release to ensure progress reporting matches actual playback.
+  - Added entitlement/transcript/highlight APIs; manual checks confirmed 403 for unpaid listeners on premium episodes and transcript rendering on web. Automated regression still pending (same toolchain block as elsewhere).
 

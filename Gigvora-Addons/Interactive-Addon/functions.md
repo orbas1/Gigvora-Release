@@ -51,7 +51,8 @@ Core flow bullets:
   - `GET /events/podcasts/{series}/live` → `PodcastPageController@live` (host-only live shell powered by `podcastLive.js`).
   - API: series CRUD + episodes create/publish under `/api/live/podcast-series*` and `/api/live/podcasts` (configurable prefix).
   - API extras: `GET /api/live/podcast-series/{series}/episodes/{episode}`, `POST /podcast-series/{series}/follow`, `POST /podcast-series/{series}/episodes/{episode}/playback` for mobile follow + analytics parity.
-- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`, `podcast_series_followed`/`_unfollowed`, `podcast_episode_played` (progress + completion).
+  - Content APIs: `POST /podcast-series/{series}/episodes/{episode}/transcripts` and `/highlights` for host-managed transcripts and highlight reels; `/entitlements` records purchases/subscriptions/donor unlocks used by paid episodes.
+- **Data**: Analytics events `podcast_series_created`, `podcast_episode_created`, `podcast_episode_published`, `podcast_series_followed`/`_unfollowed`, `podcast_episode_played` (progress + completion). Paid episodes additionally check `podcast_episode_entitlements` server-side before playback/download.
 
 ### Interviews
 - **Routes**

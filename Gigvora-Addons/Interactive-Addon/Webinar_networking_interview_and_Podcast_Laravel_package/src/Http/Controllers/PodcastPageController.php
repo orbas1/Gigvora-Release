@@ -77,7 +77,19 @@ class PodcastPageController extends Controller
 
         $this->authorize('view', $podcastSeries);
 
-        $podcastEpisode->load(['series', 'recordings']);
+        $canManage = request()->user()?->can('update', $podcastSeries) ?? false;
+
+        if (!$canManage) {
+            if (!$podcastEpisode->is_public || !$podcastEpisode->published_at || $podcastEpisode->published_at->isFuture()) {
+                abort(403, 'Episode not yet available');
+            }
+
+            if ($podcastEpisode->is_paid && !$podcastEpisode->isAccessibleTo(request()->user())) {
+                abort(403, 'Entitlement required');
+            }
+        }
+
+        $podcastEpisode->load(['series', 'recordings', 'transcripts', 'highlights']);
 
         $relatedEpisodes = $podcastSeries->episodes()
             ->where('id', '!=', $podcastEpisode->id)
@@ -95,6 +107,7 @@ class PodcastPageController extends Controller
             'episode' => $podcastEpisode,
             'series' => $podcastSeries,
             'relatedEpisodes' => $relatedEpisodes,
+            'canManage' => $canManage,
         ]);
     }
 

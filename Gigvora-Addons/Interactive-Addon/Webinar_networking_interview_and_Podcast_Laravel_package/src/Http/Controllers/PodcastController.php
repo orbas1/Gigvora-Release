@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastEpisode;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastSeries;
+use Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastEpisodeEntitlement;
+use Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastEpisodeHighlight;
+use Jobi\WebinarNetworkingInterviewPodcast\Models\PodcastEpisodeTranscript;
 use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
 
 class PodcastController extends Controller
@@ -21,6 +24,7 @@ class PodcastController extends Controller
             ->with(['episodes' => function ($query) {
                 $query->where('is_public', true)
                     ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
                     ->latest('published_at')
                     ->limit(3);
             }])
@@ -74,7 +78,7 @@ class PodcastController extends Controller
                 $query->orderByDesc('published_at');
 
                 if (!$canManage) {
-                    $query->where('is_public', true)->whereNotNull('published_at');
+                    $query->where('is_public', true)->whereNotNull('published_at')->where('published_at', '<=', now());
                 }
             }]);
 
@@ -117,6 +121,10 @@ class PodcastController extends Controller
             'duration' => 'nullable|integer|min:1',
             'metadata' => 'array',
             'is_public' => 'boolean',
+            'is_paid' => 'boolean',
+            'entitlement_type' => 'nullable|string',
+            'price_cents' => 'nullable|integer|min:0',
+            'donation_suggested_cents' => 'nullable|integer|min:0',
         ]);
 
         $episode = $podcastSeries->episodes()->create($validated);
@@ -155,7 +163,22 @@ class PodcastController extends Controller
 
         $this->authorize('view', $podcastSeries);
 
-        return response()->json($episode->load('series'));
+        $canManage = $request->user()?->can('update', $podcastSeries) ?? false;
+
+        if (!$canManage) {
+            if (!$episode->is_public || !$episode->published_at || $episode->published_at->isFuture()) {
+                abort(403, 'Episode not yet available');
+            }
+
+            if ($episode->is_paid && !$episode->isAccessibleTo($request->user())) {
+                abort(403, 'Entitlement required');
+            }
+        }
+
+        return response()->json(
+            $episode
+                ->load(['series', 'transcripts', 'highlights'])
+        );
     }
 
     public function toggleFollow(Request $request, PodcastSeries $podcastSeries): JsonResponse
@@ -202,6 +225,10 @@ class PodcastController extends Controller
 
         $this->authorize('view', $podcastSeries);
 
+        if ($episode->is_paid && !$episode->isAccessibleTo($request->user())) {
+            abort(403, 'Entitlement required');
+        }
+
         $validated = $request->validate([
             'progress_seconds' => 'nullable|integer|min:0',
             'completed' => 'boolean',
@@ -216,6 +243,78 @@ class PodcastController extends Controller
         ]);
 
         return response()->json(['status' => 'ok']);
+    }
+
+    public function storeTranscript(Request $request, PodcastSeries $series, PodcastEpisode $episode): JsonResponse
+    {
+        $this->authorize('update', $series);
+
+        if ($episode->podcast_series_id !== $series->getKey()) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'language' => 'nullable|string|max:8',
+            'source' => 'nullable|string|max:255',
+            'metadata' => 'array',
+        ]);
+
+        $transcript = $episode->transcripts()->create($validated);
+
+        return response()->json($transcript, 201);
+    }
+
+    public function storeHighlight(Request $request, PodcastSeries $series, PodcastEpisode $episode): JsonResponse
+    {
+        $this->authorize('update', $series);
+
+        if ($episode->podcast_series_id !== $series->getKey()) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'starts_at_seconds' => 'required|integer|min:0',
+            'ends_at_seconds' => 'nullable|integer|min:0',
+            'metadata' => 'array',
+        ]);
+
+        $highlight = $episode->highlights()->create($validated);
+
+        return response()->json($highlight, 201);
+    }
+
+    public function grantEntitlement(Request $request, PodcastSeries $series, PodcastEpisode $episode): JsonResponse
+    {
+        $this->authorize('update', $series);
+
+        if ($episode->podcast_series_id !== $series->getKey()) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'user_id' => 'required|integer',
+            'entitlement_type' => 'required|string',
+            'expires_at' => 'nullable|date',
+            'source' => 'nullable|string',
+            'metadata' => 'array',
+        ]);
+
+        $entitlement = $episode->entitlements()->updateOrCreate(
+            [
+                'user_id' => $validated['user_id'],
+                'entitlement_type' => $validated['entitlement_type'],
+            ],
+            [
+                'source' => $validated['source'] ?? null,
+                'expires_at' => $validated['expires_at'] ?? null,
+                'metadata' => $validated['metadata'] ?? [],
+            ]
+        );
+
+        return response()->json($entitlement, 201);
     }
 }
 

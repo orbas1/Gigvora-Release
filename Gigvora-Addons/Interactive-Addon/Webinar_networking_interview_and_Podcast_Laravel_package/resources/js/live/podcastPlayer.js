@@ -16,6 +16,9 @@ if (playerRoot) {
     const timeLabel = document.getElementById('audio-time');
     const speedSelect = document.getElementById('audio-speed');
     const audio = document.getElementById('podcast-audio');
+    const transcriptToggle = document.querySelector('[data-transcript-toggle]');
+    const transcriptPanel = document.getElementById('transcript-panel');
+    const highlightList = document.getElementById('highlight-list');
     const analyticsEndpoint = playerRoot.dataset.analyticsEndpoint;
     const storageKey = `podcast-${playerRoot.dataset.episodeId}-progress`;
 
@@ -92,6 +95,21 @@ if (playerRoot) {
     speedSelect?.addEventListener('change', () => {
         if (!audio) return;
         audio.playbackRate = Number(speedSelect.value);
+    });
+
+    transcriptToggle?.addEventListener('click', () => {
+        if (!transcriptPanel) return;
+        transcriptPanel.classList.toggle('hidden');
+    });
+
+    highlightList?.addEventListener('click', (event) => {
+        if (!audio) return;
+        const target = event.target.closest('[data-seek]');
+        if (!target) return;
+        const seekTo = Number(target.dataset.seek || 0);
+        audio.currentTime = seekTo;
+        audio.play().catch(() => undefined);
+        renderTime();
     });
 
     renderTime();

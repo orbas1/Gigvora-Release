@@ -483,4 +483,19 @@ Last updated: 2025-12-01
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
+
+### Backend + security
+
+- Added podcast monetization + entitlement scaffolding: new episode columns (`is_paid`, `entitlement_type`, `price_cents`, `donation_suggested_cents`) plus `podcast_episode_entitlements` to gate premium streams/downloads. Controllers now block unpaid viewers on paid episodes and require publish dates to be in the past for non-hosts.
+- Implemented transcript and highlight storage via dedicated tables and host-only API endpoints, surfacing structured transcripts/highlights in API + Blade responses for feed/profile embedding and player scrubbing. Playback analytics continue to fire while respecting entitlement checks.
+
+### Web UI
+
+- Episode player now renders premium/free pills, transcript accordion, and highlight scrub buttons wired into `podcastPlayer.js` seeking controls. Paid episodes enforce entitlement gating before rendering content.
+
+### QA notes
+
+- Manual check: verified paid episode gating (403 for unauthenticated), transcript rendering, and highlight seek actions on the web player. Added content/entitlement routes to `functions.md` for parity tracking. Automated suites still pending while existing repository-wide build blockers are addressed; rerun `php artisan test` and `npm run build` after dependency fixes.
+
 
