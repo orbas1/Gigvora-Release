@@ -2,9 +2,10 @@
 
 namespace App\Listeners;
 
+use App\Events\AnalyticsEvent as CoreAnalyticsEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Jobs\Events\AnalyticsEvent;
+use Jobs\Events\AnalyticsEvent as JobsAnalyticsEvent;
 use ProNetwork\Services\AnalyticsService;
 
 class ForwardJobsAnalyticsEvent implements ShouldQueue
@@ -17,9 +18,9 @@ class ForwardJobsAnalyticsEvent implements ShouldQueue
     {
     }
 
-    public function handle(AnalyticsEvent $event): void
+    public function handle(JobsAnalyticsEvent|CoreAnalyticsEvent $event): void
     {
-        if (! config('jobs.features.enabled')) {
+        if ($event instanceof JobsAnalyticsEvent && ! config('jobs.features.enabled')) {
             return;
         }
 

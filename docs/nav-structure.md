@@ -2,6 +2,8 @@
 
 This document captures the canonical navigation model that must match across the web app, responsive drawer, and Flutter shell. All menus are sourced from `config/navigation.php` and built via `App\Support\Navigation\NavigationBuilder`.
 
+- Permissions are enforced via the shared matrix in `config/permission_matrix.php`; `NavigationBuilder` filters Ads/Talent & AI/Admin/Moderation entries when the caller lacks the mapped permission slug and the API controller (`NavigationController`) emits `analytics.navigation.rendered` to track which sections render for each persona.
+
 ## 1. Primary Navigation (Top Header & Flutter Tabs)
 
 | Order | Label     | Route/Screen                    | Roles      | Notes                                                |

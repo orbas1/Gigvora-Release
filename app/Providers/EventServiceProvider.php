@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\AnalyticsEvent as CoreAnalyticsEvent;
 use App\Listeners\ForwardJobsAnalyticsEvent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -20,6 +21,9 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         AnalyticsEvent::class => [
+            ForwardJobsAnalyticsEvent::class,
+        ],
+        CoreAnalyticsEvent::class => [
             ForwardJobsAnalyticsEvent::class,
         ],
     ];

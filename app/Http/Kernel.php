@@ -72,5 +72,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'module-enabled' => \App\Http\Middleware\ModuleEnabled::class,
         'verify-payment-gateway' => \App\Http\Middleware\VerfiyPaymentGateway::class,
+        'permission' => \App\Support\Authorization\PermissionMiddleware::class,
     ];
 }

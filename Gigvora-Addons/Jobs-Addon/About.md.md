@@ -23,6 +23,8 @@ Everything must stay **fully aligned with the Sociopro/Gigvora host platform**: 
 
 This plugs into an existing **social media / LinkedIn-style platform** and must feel fully integrated.
 
+**Permissions & analytics**: follow `docs/roles_permissions.md` for role/capability checks (e.g., `jobs.create_posting`, `jobs.manage_applicants`) and emit the Jobs taxonomy from `docs/analytics_events.md` for posting, applying, shortlisting, and offers.
+
 > ⚠️ Do **not** add or touch any binary files (images, fonts, compiled bundles, `.exe`, `.dll`, `.so`, `.apk`, `.ipa`, etc.). Only templates, Dart/JS/TS, CSS/SCSS.
 
 ---
