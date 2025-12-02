@@ -9,6 +9,9 @@
 @endsection
 
 @section('live-content')
+@php
+    $attendeeCount = $webinar->registrations()->count();
+@endphp
 <div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_360px]">
     <div class="space-y-4">
         <div class="gv-card p-0 overflow-hidden">
@@ -41,7 +44,7 @@
                 {{ $webinar->waiting_room_message ?? get_phrase('Stay engaged and participate in the Q&A.') }}
             </p>
             <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">
-                {{ trans_choice('{0}No attendees yet|{1}1 attendee|[2,*]:count attendees', $webinar->registrations()->count(), ['count' => $webinar->registrations()->count()]) }}
+                {{ trans_choice('{0}No attendees yet|{1}1 attendee|[2,*]:count attendees', $attendeeCount, ['count' => $attendeeCount]) }}
             </p>
         </div>
 
@@ -57,6 +60,12 @@
                     {{ get_phrase('RTMP: :endpoint', ['endpoint' => $webinar->rtmp_endpoint]) }}
                 </p>
             @endif
+        </div>
+
+        <div class="gv-card space-y-2">
+            <h3 class="text-sm font-semibold text-[var(--gv-color-neutral-900)]">{{ get_phrase('Engagement & moderation') }}</h3>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ trans_choice('{0}No registrants yet|{1}1 registered attendee|[2,*]:count registered attendees', $attendeeCount, ['count' => $attendeeCount]) }}</p>
+            <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0">{{ get_phrase('Use the host toolbar to pin Q&A, drop resources, and pause chat if needed.') }}</p>
         </div>
 
         @include('wnip::components.notes_sidebar')

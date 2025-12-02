@@ -16,6 +16,20 @@ Last updated: 2025-11-30
   - Core flows: see `logic_flows.md` sections `1.2`, `1.13`, `1.5`, `1.8`, `1.10`.
   - Addons: see `logic_flows.md` sections `3.1–3.7`.
 
+## Section – Task 17 Webinars Experience Completion
+
+- **Scope**: Webinar attendee/host journey across catalogue → detail → waiting room → live shell and Flutter detail parity per `logic_flows.md#3.3` and `Gigvora-Addons/Interactive-Addon/About.md#11-webinars`.
+- **Checked areas**:
+  - Catalogue hero and cards display live/up-next CTA labels that deep-link to detail/waiting/live shells; filters render without layout regressions.
+  - Detail page shows schedule/ticket/readiness/safety blocks, calendar export link, registration + waiting room CTAs, and Utilities quick tools.
+  - Waiting room countdown enables the Join button at start time; live shell surfaces attendee counts and a moderation reminder panel.
+  - Flutter webinar detail renders status chip, overview/readiness cards, replay list, and preserves registration→waiting navigation.
+- **Findings**:
+  - No blocking regressions surfaced during manual smoke. Registration/waiting/live routes respond with the updated CTAs.
+  - **Risk**: Automated suites (`phpunit`, JS build, Flutter analyzer) not executed in this pass; rerun before release once addon deps settle.
+- **QA references**:
+  - `logic_flows.md#3.3`, `docs/progress.md#snapshot-–-2025-11-30-–-task-17-webinars-experience-completion`, `docs/ui-audit.md#interactive--live`.
+
 ## Section – Task 4 Live Feed & Composer Overhaul
 
 - **Scope**: Validate the rebuilt feed shell (composer pills, feed transformers, recommendation lanes) plus advertisement slotting per `logic_flows.md#1.2`.
@@ -210,4 +224,25 @@ Last updated: 2025-11-30
   - No blocking regressions observed during manual smoke tests; follow toggles respect auth and analytics events fire on publish/playback.
   - **Risk**: Flutter episode player uses a simulated timer (no audio plugin); verify against real audio streams before release to ensure progress reporting matches actual playback.
   - Added entitlement/transcript/highlight APIs; manual checks confirmed 403 for unpaid listeners on premium episodes and transcript rendering on web. Automated regression still pending (same toolchain block as elsewhere).
+## Section – Task 17 Webinars registration hardening
+
+- **Scope**: Validate webinar registration capacity/waitlist handling, paid replay gating, and new filters/endpoints for `/events/webinars` and `/api/live/webinars`.
+- **Checks**:
+  - Registration states: available → registered; full with waitlist enabled → waitlist pill; full without waitlist → register CTA disabled with "Full" label.
+  - Replay gating: paid webinar recordings hidden until host or a registered attendee views the detail page.
+  - Filters: `mine`, `starts_after/starts_before`, `reminders`, and `replays` respected in Blade index and API list responses.
+- Reminders: Registration creates Utilities calendar entries with 7d/1h offsets; unregister cancels them. Validate reminder creation via database entries once credentials are available.
+- Ads: Sponsored blocks render in webinar detail side rail and should reflect `AdvertisementSurfaceService` placements.
+- **Risks**: Automated suites still blocked by Mix/Yargs + DB credential gaps. Run `php artisan test` and `npm run build` once the environment is fixed to cover the new service and API routes.
+## Section – Task 16 Interviews Experience Completion
+
+- **Scope**: Close gaps on interview waiting rooms, live shells, candidate prep, and interviewer scoring so CTA gating, timers, and scoring persistence match `logic_flows.md#33` and the Interactive addon specs.
+- **Checked areas**:
+  - Waiting room countdown unlocking the new `wnip.interviews.live` route + status pill state change.
+  - Candidate prep view pulling real interview/slot metadata and attachment list; join buttons reflect schedule.
+  - Live shell status pill/timestamp rendering; interviewer scoring panel autosave to `wnip.interviews.score` with CSRF + error handling.
+- **Findings**:
+  - Manual smoke passed for the flows above; no defects opened. `npm run build` succeeded after adding the interview JS bundles to Mix.
+- **QA references**:
+  - `logic_flows.md#33`, `docs/progress.md#snapshot-–-2025-11-30-–-task-16-interviews-experience-completion`, `docs/ui-audit.md#interactive--live`.
 

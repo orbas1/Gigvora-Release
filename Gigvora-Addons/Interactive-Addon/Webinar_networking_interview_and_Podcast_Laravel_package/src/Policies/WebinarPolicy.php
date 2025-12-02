@@ -12,7 +12,19 @@ class WebinarPolicy
 
     public function view(?Authenticatable $user, Webinar $webinar): bool
     {
-        return $webinar->is_paid === false || $this->hasRole($user, 'admin') || $this->hasRole($user, 'host') || $this->hasRole($user, 'attendee');
+        if ($this->hasRole($user, 'admin') || $this->hasRole($user, 'host')) {
+            return true;
+        }
+
+        if ($webinar->is_paid === false) {
+            return true;
+        }
+
+        $isRegistered = $user
+            ? $webinar->registrations()->where('user_id', $user->getAuthIdentifier())->exists()
+            : false;
+
+        return $isRegistered || $this->hasRole($user, 'attendee');
     }
 
     public function create(?Authenticatable $user): bool
@@ -28,6 +40,27 @@ class WebinarPolicy
     public function delete(?Authenticatable $user, Webinar $webinar): bool
     {
         return $this->update($user, $webinar);
+    }
+
+    public function accessReplay(?Authenticatable $user, Webinar $webinar): bool
+    {
+        if ($this->hasRole($user, 'admin') || $webinar->host_id === optional($user)->getAuthIdentifier()) {
+            return true;
+        }
+
+        $registration = $user
+            ? $webinar->registrations()->where('user_id', $user->getAuthIdentifier())->first()
+            : null;
+
+        if (! $registration) {
+            return false;
+        }
+
+        if ($webinar->is_paid && ($webinar->price ?? 0) > 0) {
+            return (bool) $registration->ticket_id;
+        }
+
+        return true;
     }
 }
 

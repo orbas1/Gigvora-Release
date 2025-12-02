@@ -98,7 +98,8 @@ class WnipApiClient {
     final uri = _buildUri('webinars/' + id.toString());
     final response = await _send(() => _httpClient.get(uri, headers: await _headers()));
     final body = await _handleResponse(response) as Map<String, dynamic>;
-    return Webinar.fromJson(body);
+    final payload = body['data'] ?? body;
+    return Webinar.fromJson(Map<String, dynamic>.from(payload as Map));
   }
 
   Future<Webinar> createWebinar(WebinarPayload payload) async {

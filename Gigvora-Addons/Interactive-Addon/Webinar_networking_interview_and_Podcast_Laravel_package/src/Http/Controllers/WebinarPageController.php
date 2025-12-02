@@ -10,15 +10,21 @@ use Illuminate\View\View;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\Ticket;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\Webinar;
 use Jobi\WebinarNetworkingInterviewPodcast\Models\WebinarRegistration;
+use Jobi\WebinarNetworkingInterviewPodcast\Services\WebinarRegistrationService;
+use Jobi\WebinarNetworkingInterviewPodcast\Support\Ads\AdsBridge;
 use Jobi\WebinarNetworkingInterviewPodcast\Support\Analytics\Analytics;
 
 class WebinarPageController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(protected WebinarRegistrationService $registrations)
+    {
+    }
+
     public function index(Request $request): View
     {
-        $query = Webinar::query()->with(['host'])->withCount('registrations');
+        $query = Webinar::query()->with(['host'])->withCount(['registrations', 'recordings']);
 
         if ($request->boolean('upcoming')) {
             $query->where('starts_at', '>=', now());
@@ -26,6 +32,10 @@ class WebinarPageController extends Controller
 
         if ($request->boolean('past')) {
             $query->where('ends_at', '<', now());
+        }
+
+        if ($request->boolean('mine') && $request->user()) {
+            $query->where('host_id', $request->user()->getAuthIdentifier());
         }
 
         if ($search = $request->string('q')->toString()) {
@@ -40,11 +50,27 @@ class WebinarPageController extends Controller
             $query->where('is_paid', $paid);
         }
 
+        if ($request->boolean('replays')) {
+            $query->whereHas('recordings');
+        }
+
+        if ($request->boolean('reminders')) {
+            $query->whereNotNull('metadata->reminder_offsets');
+        }
+
+        if ($request->date('starts_after')) {
+            $query->whereDate('starts_at', '>=', $request->date('starts_after'));
+        }
+
+        if ($request->date('starts_before')) {
+            $query->whereDate('starts_at', '<=', $request->date('starts_before'));
+        }
+
         $webinars = $query->orderBy('starts_at')->paginate()->withQueryString();
 
         return view('wnip::webinars.index', [
             'webinars' => $webinars,
-            'filters' => $request->only(['q', 'upcoming', 'past', 'paid']),
+            'filters' => $request->only(['q', 'upcoming', 'past', 'paid', 'reminders', 'replays', 'mine', 'starts_after', 'starts_before']),
         ]);
     }
 
@@ -61,7 +87,14 @@ class WebinarPageController extends Controller
                 ->first();
         }
 
-        return view('wnip::webinars.show', compact('webinar', 'registration'));
+        $canViewRecordings = $request->user()?->can('accessReplay', $webinar) ?? ! $webinar->is_paid;
+
+        return view('wnip::webinars.show', [
+            'webinar' => $webinar,
+            'registration' => $registration,
+            'canViewRecordings' => $canViewRecordings,
+            'sponsorships' => AdsBridge::placementsFor('live_overlay', $webinar->id),
+        ]);
     }
 
     public function register(Request $request, Webinar $webinar): RedirectResponse
@@ -72,13 +105,11 @@ class WebinarPageController extends Controller
             'ticket_id' => 'nullable|exists:' . (new Ticket())->getTable() . ',id',
         ]);
 
-        WebinarRegistration::firstOrCreate([
-            'webinar_id' => $webinar->id,
-            'user_id' => $request->user()->getAuthIdentifier(),
-        ], [
-            'status' => 'registered',
-            'ticket_id' => $validated['ticket_id'] ?? null,
-        ]);
+        $this->registrations->register(
+            $webinar,
+            $request->user()->getAuthIdentifier(),
+            $validated['ticket_id'] ?? null,
+        );
 
         Analytics::track('webinar_registered', ['webinar_id' => $webinar->id, 'user_id' => $request->user()->getAuthIdentifier()]);
 
@@ -88,7 +119,7 @@ class WebinarPageController extends Controller
     public function waitingRoom(Webinar $webinar): View
     {
         $this->authorize('view', $webinar);
-        $webinar->load('host');
+        $webinar->load(['host', 'registrations']);
 
         return view('wnip::webinars.waiting_room', ['webinar' => $webinar]);
     }
@@ -96,6 +127,9 @@ class WebinarPageController extends Controller
     public function live(Webinar $webinar): View
     {
         $this->authorize('view', $webinar);
+        if ($userId = optional(request()->user())->getAuthIdentifier()) {
+            $this->registrations->markAttendance($webinar, $userId);
+        }
         return view('wnip::webinars.live', ['webinar' => $webinar]);
     }
 }

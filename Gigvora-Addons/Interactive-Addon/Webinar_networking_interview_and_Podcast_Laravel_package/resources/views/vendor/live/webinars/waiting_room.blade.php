@@ -25,6 +25,9 @@
             </p>
             <div class="text-4xl font-mono text-[var(--gv-color-neutral-900)]" id="countdown"
                 data-start="{{ $webinar->starts_at?->toIso8601String() }}">--:--</div>
+            <p class="text-xs text-[var(--gv-color-neutral-500)] mb-0 mt-2">
+                {{ get_phrase('If you registered with a ticket, keep this tab open so reminders and live state stay in sync.') }}
+            </p>
         </div>
         @php $canJoin = $webinar->is_live; @endphp
         <div class="text-right">
@@ -33,6 +36,25 @@
                 @unless($canJoin) aria-disabled="true" @endunless>
                 {{ get_phrase('Enter webinar') }}
             </a>
+        </div>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-3">
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Device check') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Test audio/video so the host can pull you on stage without delay.') }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Reminders') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Keep this tab open; we will auto-enable the Join button when the host is live.') }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Etiquette') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ get_phrase('Use Q&A for questions, chat for reactions; abuse is moderated per policy.') }}</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[var(--gv-color-surface-alt)] border border-[var(--gv-color-border)]">
+            <p class="gv-eyebrow mb-1">{{ get_phrase('Seat status') }}</p>
+            <p class="text-sm text-[var(--gv-color-neutral-600)] mb-0">{{ trans_choice('{0}This session is full—stay in the tab to keep your spot|{1}One seat left—stay connected|[2,*]:count seats left—doors open soon', max(($webinar->capacity ?? 0) - ($webinar->registrations->count() ?? 0), 0), ['count' => max(($webinar->capacity ?? 0) - ($webinar->registrations->count() ?? 0), 0)]) }}</p>
         </div>
     </div>
 </div>

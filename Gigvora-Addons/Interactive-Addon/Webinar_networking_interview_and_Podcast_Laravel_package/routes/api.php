@@ -16,6 +16,8 @@ Route::group([
     Route::put('/webinars/{webinar}', [WebinarController::class, 'update']);
     Route::delete('/webinars/{webinar}', [WebinarController::class, 'destroy']);
     Route::post('/webinars/{webinar}/register', [WebinarController::class, 'register']);
+    Route::post('/webinars/{webinar}/unregister', [WebinarController::class, 'unregister']);
+    Route::post('/webinars/{webinar}/attend', [WebinarController::class, 'attend']);
     Route::post('/webinars/{webinar}/toggle-live', [WebinarController::class, 'toggleLive']);
 
     Route::get('/networking', [NetworkingController::class, 'index']);
