@@ -3,6 +3,19 @@
 
 Last updated: 2025-11-30
 
+## Snapshot – 2025-11-30 – Task 17 (Webinars Experience Completion)
+
+### 1. Webinar catalogue, detail, waiting room, and live shell (web)
+- Refined webinar catalogue (`wnip::webinars.index`) with a live/up-next hero band, reminder/replay filters, and CTA logic that routes directly to detail, waiting room, or live shells based on start state. Event cards now inherit the CTA label from the same logic used by the Live hub sections so hosts/attendees always land on the right surface.
+- Enriched webinar detail with schedule/ticket/safety blocks, calendar export link, readiness checklist, and trust/safety messaging while keeping registration + waiting room CTAs alongside Utilities quick tools. Waiting room gained device/reminder/etiquette tiles, and the live shell now shows attendee counts plus an engagement/moderation card for hosts.
+
+### 2. Flutter parity
+- Updated the webinar detail screen in `webinar_networking_interview_and_Podcast_Flutter_addon` to mirror the new readiness/storytelling cues: status chip, overview card, readiness checklist, and replay list with the existing waiting-room registration flow.
+
+### 3. Documentation & QA notes
+- `logic_flows.md#3.3` documents the live/up-next CTA routing, schedule/ticket/safety blocks, and calendar/export readiness parity for web + Flutter. `docs/ui-audit.md` records the refreshed webinar catalogue/detail experience.
+- Manual smoke on webinar catalogue → detail → waiting room → live shell (web) and webinar detail → register → waiting room navigation (Flutter). No automated suites executed this round; schedule phpunit/build/analyzer before release once addon dependencies stabilise.
+
 ## Snapshot – 2025-11-30 – Task 15 (Interactive / Live Addon Alignment)
 
 ### 1. Live hub, recommendation pipeline & tokens
@@ -460,6 +473,23 @@ Last updated: 2025-11-30
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-12-01 – Task 17 (Webinars experience hardening)
+
+### 1. Registration, capacity, and gating
+
+- Added a shared `WebinarRegistrationService` to enforce ticket tier validation, capacity + waitlist metadata, and attendance tracking across Blade + API controllers. Registration now fails for mismatched tickets, automatically waitlists when full (if enabled), and captures `webinar_attended` analytics when participants enter the live room.
+- API expanded with `mine`/date/reminder/replay filters and new `/api/live/webinars/{id}/unregister` + `/attend` endpoints so mobile + web can cancel or mark attendance consistently. Paid replays are now gated to registered/host viewers on Blade detail pages.
+- Registration now schedules Utilities reminders (7d/1h offsets) and mirrors Ads addon sponsorship placements via the new `AdsBridge` so detail/waiting/live surfaces expose compliant sponsor CTAs without leaking replay URLs.
+
+### 2. UI updates
+
+- Webinar catalogue filters now include "My webinars" and date range inputs; detail pages surface seat availability/waitlist state, disable registration when full, and show replay gating messaging for paid sessions.
+- Waiting room and Flutter detail screens mirror countdown/join states, replay gating hints, and registration CTA text for paid vs free tickets while keeping accessibility states intact.
+
+### QA / Testing
+
+- Manual verification: registration panel state (available, full, waitlist) on `wnip::webinars.show`, replay gating for paid webinars, and filter parameters on `wnip::webinars.index` + `/api/live/webinars` (via query inspection).
+- Automated suites **not run** yet; toolchain issues from previous snapshots remain (Mix/Yargs + DB credentials). Re-run `php artisan test` and `npm run build` once the environment is ready to validate the new service + endpoints.
 ## Snapshot – 2025-11-30 – Task 16 (Interviews Experience Completion)
 
 ### 1. Routing + CTA gating
