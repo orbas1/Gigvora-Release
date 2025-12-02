@@ -11,13 +11,19 @@ class CoreUserSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminPassword = env('GIGVORA_ADMIN_PASSWORD');
+
+        if (empty($adminPassword)) {
+            throw new \RuntimeException('GIGVORA_ADMIN_PASSWORD must be set to seed the admin account securely.');
+        }
+
         DB::table('users')->updateOrInsert(
             ['id' => 1],
             [
                 'name' => 'Gigvora Admin',
                 'email' => 'admin@gigvora.test',
                 'email_verified_at' => now(),
-                'password' => Hash::make('Password123!'),
+                'password' => Hash::make($adminPassword),
                 'user_role' => 'admin',
                 'username' => 'gigvora-admin',
                 'remember_token' => Str::random(10),

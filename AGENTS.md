@@ -299,6 +299,11 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Scope**: Unify schema/seed ordering, build weighted ranking for followers/connections/recency/location/VIP/offering signals, expand the keyword registry with tags/hashtags/categories, and expose live ad placement APIs backed by the auction/pricing services.
     - **Completion Criteria**: Fresh seeds converge core + addons, ranked search feeds web/mobile, keyword registry grows from live content, and ads placements pull real campaigns via the auction logic.
 
+26. ✅ **Install.sql Recovery, DB Unification & Security/GDPR Enforcement**
+    - **Goal**: Restore the canonical install SQL, unify addon/core schemas, and harden data handling with GDPR and moderation controls.
+    - **Scope**: Regenerate `install.sql` from live migrations + seeders, reconcile user/profile fields used across Sociopro code, enforce secure admin seeding, and add comment moderation with shadow-ban escalation tied to audit logs and GDPR erasure/export updates.
+    - **Completion Criteria**: `install.sql` builds the full schema without errors, migrations align with legacy fields, admin password seeding requires an env value, comment moderation blocks violations with logged bans, GDPR docs/processes updated, and evidence logged in `docs/progress.md`.
+
 ## Execution Rules & References
 - Always update `logic_flows.md`, `docs/ui-audit.md`, `docs/nav-structure.md`, `docs/progress.md`, and `docs/qa-bugs.md` when relevant changes occur.
 - Token work begins in `resources/css/gigvora/tokens.css`; Flutter must mirror the same palette.

@@ -28,7 +28,13 @@ class GdprService
                 'username',
                 'profession',
                 'job',
+                'marital_status',
+                'phone',
                 'date_of_birth',
+                'status',
+                'profile_status',
+                'shadow_banned_until',
+                'banned_reason',
                 'created_at',
                 'updated_at',
             ]),
@@ -75,6 +81,10 @@ class GdprService
             'address' => null,
             'profile_lock_reason' => 'gdpr_erasure',
             'status' => 'deleted',
+            'profile_status' => 'deleted',
+            'moderation_strikes' => 0,
+            'shadow_banned_until' => null,
+            'banned_reason' => null,
         ]);
 
         DB::transaction(function () use ($user) {

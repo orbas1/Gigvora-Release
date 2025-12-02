@@ -753,3 +753,17 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - Pending full suite; rerun `php artisan migrate:fresh --seed` and the ads/search API smoke tests after syncing env variables for the advertisement addon.
+
+## Snapshot – 2025-12-15 – Install.sql Recovery, DB Unification & Security/GDPR Enforcement
+
+### Database recovery and alignment
+- Recovered `install.sql` from the previous backup and regenerated it from the live Laravel migrations/seeders (core + addons) via SQLite to ensure schema and base data parity.
+- Added an extension migration for `users` to restore legacy Sociopro profile fields and moderation metadata (`shadow_banned_until`, `moderation_strikes`, `banned_reason`) referenced across GDPR and moderation flows.
+- Hardened the admin seeder to require `GIGVORA_ADMIN_PASSWORD` at seed time and documented the refresh steps in `docs/database.md`.
+
+### Security, GDPR, and moderation
+- Introduced `ContentModerationService` with banned-phrase detection, strike escalation, and audit logging, blocking comment submissions during shadow bans.
+- Expanded GDPR exports/erasure to include moderation fields and reset ban metadata during erasure; updated `docs/gdpr.md` and `docs/security_settings.md` with operational guidance.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite, with `GIGVORA_ADMIN_PASSWORD` provided)
