@@ -37,12 +37,13 @@ Core flow bullets:
 
 ### Networking Sessions
 - **Routes**
-  - `GET /events/networking` → `NetworkingPageController@index` (searchable list).
-  - `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
-  - `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
-  - `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
-  - `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
-  - API: CRUD/register/rotate at `/api/live/networking*` (configurable) via `NetworkingController`.
+- `GET /events/networking` → `NetworkingPageController@index` (searchable list).
+- `GET /events/networking/{session}` → `NetworkingPageController@show` (participants + register CTA).
+- `POST /events/networking/{session}/register` → `NetworkingPageController@register` (auth required).
+- `GET /events/networking/{session}/waiting` → `NetworkingPageController@waitingRoom` (countdown, join button).
+- `GET /events/networking/{session}/live` → `NetworkingPageController@live` (rotation roster & notes shell).
+- `POST /events/networking/{session}/exchange-contact` → `NetworkingPageController@exchangeContact` (AJAX contact exchange, CSRF-protected, rate-limited, optional follow-up scheduling).
+- API: CRUD/register/rotate/contact-exchange at `/api/live/networking*` (configurable) via `NetworkingController`, plus pairing orchestration (`POST /networking/{session}/pairings`) and waitlist promotion (`POST /networking/{session}/promote-waitlist`).
 - **Data**: Tracks `networking_session_created`, `networking_session_joined`, `networking_rotation_completed` analytics.
 
 ### Podcasts
@@ -73,7 +74,7 @@ Core flow bullets:
 ## Functions & Features (Flutter)
 - **Screens**
   - Webinars: `webinars_home_screen.dart` (tabs for upcoming/my/recordings), `webinar_detail_screen.dart` (register + navigate to waiting room), `webinar_waiting_room_screen.dart` (real countdown), `webinar_live_screen.dart`, `webinar_recording_player_screen.dart`.
-  - Networking: `networking_home_screen.dart`, `networking_session_detail_screen.dart` (register + waiting room), `networking_waiting_room_screen.dart` (start-aware countdown), `networking_live_screen.dart`.
+- Networking: `networking_home_screen.dart`, `networking_session_detail_screen.dart` (register + waitlist/coupon copy), `networking_waiting_room_screen.dart` (start-aware countdown + editable card), `networking_live_screen.dart` (round timer + star/exchange/notes), `networking_recap_screen.dart` (bulk follow-ups across Jobs/Freelance/Talent & AI hand-offs).
   - Podcasts: `podcast_catalogue_screen.dart`, `podcast_series_detail_screen.dart`, `podcast_episode_player_screen.dart`, `podcast_live_recording_screen.dart`.
   - Interviews: `interview_schedule_screen.dart`, `interview_detail_screen.dart`, `interview_waiting_room_screen.dart`, `interviewer_panel_screen.dart`, `interview_live_screen.dart`.
 - **Services/State**

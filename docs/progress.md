@@ -1,6 +1,46 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
+Last updated: 2025-12-02
+
+## Snapshot – 2025-12-02 – Task 19 (Networking ticketing + waitlist hardening)
+
+### 1. Ticketing, capacity, and coupon enforcement (logic_flows.md#33)
+
+- `NetworkingSession` metadata now carries template type (speed/group), rounds/round duration, capacity, topics, waitlist toggle, and coupon definitions; helpers expose `round_count`, `round_duration`, `capacity`, `remaining_capacity`, and live/full state for both web and API surfaces.
+- API + page controllers enforce server-side registration rules: paid sessions create/update `Ticket` records, coupon codes validate windows/usage caps, capacity checks fall back to waitlists when enabled, and unauthorized access to waiting/live views redirects with error messaging. Registration analytics now distinguish waitlist joins vs confirmed seats.
+
+### 2. Web discovery/detail gating
+
+- Networking index gains filters (type, pricing, window) and refreshed cards showing price/capacity/waitlist badges, rotation metadata, and explicit Live/Waitlist tags so attendees understand access before opening details.
+- Detail page introduces capacity/waitlist alerts and coupon entry for paid sessions; register CTA reflects waitlist/registered states while continuing to surface follow-up/export CTAs. Waiting room join CTA now respects registration status (disables for waitlist), and live navigation enforces ticket ownership.
+
+### 3. QA / Risks
+
+- Manual smoke: registration with/without coupon, waitlist flow (capacity reached), waiting-room countdown + gating, and live-entry protection for non-registrants. UI copy verified against `logic_flows.md#33` expectations for ticketed networking.
+- Automated suites (`php artisan test`, `npm run build`, `flutter analyze`) still blocked by repo-wide Mix/yargs + env setup; rerun when toolchain is available to cover the new ticketing + waitlist logic.
+
+## Snapshot – 2025-12-01 – Task 19 (Networking Sessions Completion)
+
+### Todo – Task 19
+
+- [in_progress] Wire Utilities sync + exports for networking notes/contact exchange and reminders after live rotations.
+- [done] Refresh waiting room with countdown gating, rotation/price pills, and intro card persistence.
+- [done] Add live rotation timer/progress, partner card CTA, and local note saves aligned with Utilities recap expectations.
+- [todo] Mirror the updated waiting/live shells in Flutter with the same countdown/progress + local draft storage.
+
+### 1. Networking surfaces (index/show/waiting/live)
+
+- Index cards now surface ticket status (free vs paid pricing), rotation counts/duration, and expected end times so hosts can sell paid seats and attendees can plan commitments before opening detail pages.
+- Detail page adds explicit ticketing copy, rotation totals, and a follow-up/reminder block (roster export + reminder buttons) to keep CRM/Utilities handoffs visible. Registration CTA keeps tokenized alerts for paid vs free states.
+- Waiting room now shows countdown with CTA gating, rotation/price pills, and a persisted intro card (headline/bio/goal) stored locally to hydrate Utilities recap once APIs are wired; join button respects start time/status via the new `NetworkingSession::is_joinable` helper.
+- Live shell introduces rotation timer/progress UI, partner card contact exchange CTA, and local note persistence so participants can capture connections during rotations and sync later. Rotation metadata and follow-ups rely on new model helpers (`ends_at`, `rotation_count`, `is_live`).
+
+### 2. Docs & QA
+
+- `logic_flows.md#3.3` documents the updated waiting-room gating, rotation timers, and follow-up/CRM expectations for networking sessions.
+- `docs/ui-audit.md` adds a Live/Networking polish note calling out the refreshed waiting room and live shell plus Flutter parity requirements.
+- `docs/qa-bugs.md#section-–-task-19-networking-sessions-completion` logs manual smoke coverage (index/detail/waiting/live) and reiterates the outstanding build/test blockers (Mix/yargs + env setup). Automated suites remain pending and must run before release.
 Last updated: 2025-12-01
 
 ## Todo – Task 18 (Podcasts Experience Completion)
@@ -496,6 +536,23 @@ Last updated: 2025-12-01
 - Manual smoke: exercised search page (new Freelance sections + ad slot), feed recommendation lanes, freelancer/client dashboards (contracts, disputes, escrows, sponsored block), `/api/freelance/workspace` (auth + verified), and Flutter dashboard provider (unit-level build with mocked snapshot).
 - **Risks / pending**: `php artisan test`, `npm run build`, and `flutter analyze` still blocked by the previously documented Mix/Yargs + addon package-name issues; rerun when toolchain is fixed to validate the new PHP/JS/Dart changes.
 
+## Snapshot – 2025-11-30 – Task 19 (Networking Sessions Completion)
+
+### 1. Contact exchange + follow-ups
+
+- Added networking contact exchange persistence (`networking_contact_exchanges` migration/model) and rate-limited APIs on both web + API controllers so only registered (non-waitlisted) attendees can share cards, star contacts, and attach notes. Exchanges optionally schedule Utilities calendar reminders via `UtilitiesCalendarService`, tagged with the session + partner for recap and cross-addon follow-ups.
+- Live shell now supports timed follow-ups and starred contacts inline; the share-contact CTA calls the secured endpoint with CSRF headers and surfaces backend validation errors to users.
+
+### 2. Access, pairing + waitlist protections
+
+- Reused participant guards inside the new exchange flow to prevent waitlisted or unregistered users from accessing live handshakes. Networking controllers continue to enforce capacity, coupons, and rotation tracking while exposing the new contact API over both Sanctum API routes and Blade-powered AJAX.
+- Added `NetworkingPairingService` and `/api/live/networking/{session}/pairings` to generate repeat-avoidant round plans for speed and group formats, persist pairings, and emit analytics. Waitlist promotions are now exposed via `/promote-waitlist` and triggered automatically when capacity increases so seats backfill quickly.
+
+### QA / Testing
+
+- Manual verification: exercised live shell contact button (star toggle + follow-up time + notes persistence) against validation errors (missing partner, rate-limit message) and confirmed reminders are emitted through the Utilities calendar service metadata. Confirmed waitlisted users are blocked from the exchange endpoint.
+- Manual verification: seeded multi-attendee sessions, ran pairing generation for consecutive rounds to confirm partner rotation without repeats and observed waitlist promotion calls refill seats when capacity increased. Exercised refreshed Flutter networking catalogue/detail/waiting/live/recap screens (filters, coupons, countdown join gating, notes + star toggles) for parity with the Blade flows.
+- Automated: not run (Mix/yargs + environment setup still blocking `php artisan test`/`npm run build`/Flutter analyzer); rerun before release to cover the new migration, controllers, and JS fetch hooks.
 ## Snapshot – 2025-12-01 – Task 18 (Podcasts Experience Completion)
 
 ### Backend + security

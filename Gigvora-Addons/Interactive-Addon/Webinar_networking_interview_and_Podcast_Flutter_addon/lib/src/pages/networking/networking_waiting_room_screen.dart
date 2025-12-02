@@ -22,6 +22,11 @@ class _NetworkingWaitingRoomScreenState extends State<NetworkingWaitingRoomScree
   late Duration remaining;
   late Timer _timer;
   bool live = false;
+  final TextEditingController _headlineController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _linksController = TextEditingController();
+  bool _saving = false;
 
   @override
   void initState() {
@@ -39,6 +44,10 @@ class _NetworkingWaitingRoomScreenState extends State<NetworkingWaitingRoomScree
   @override
   void dispose() {
     _timer.cancel();
+    _headlineController.dispose();
+    _roleController.dispose();
+    _companyController.dispose();
+    _linksController.dispose();
     super.dispose();
   }
 
@@ -64,8 +73,28 @@ class _NetworkingWaitingRoomScreenState extends State<NetworkingWaitingRoomScree
                   Text(countdown, style: Theme.of(context).textTheme.displaySmall),
                   const SizedBox(height: 12),
                   const Text('Edit card'),
-                  TextField(decoration: const InputDecoration(labelText: 'Headline')),
-                  TextField(decoration: const InputDecoration(labelText: 'Bio')),
+                  TextField(controller: _headlineController, decoration: const InputDecoration(labelText: 'Headline')),
+                  TextField(controller: _roleController, decoration: const InputDecoration(labelText: 'Role')),
+                  TextField(controller: _companyController, decoration: const InputDecoration(labelText: 'Company')),
+                  TextField(controller: _linksController, decoration: const InputDecoration(labelText: 'Links')),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _saving
+                            ? null
+                            : () {
+                                setState(() => _saving = true);
+                                Future.delayed(const Duration(milliseconds: 500), () {
+                                  if (mounted) setState(() => _saving = false);
+                                });
+                              },
+                        child: Text(_saving ? 'Saving…' : 'Save Card'),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('Shared with partners once live'),
+                    ],
+                  ),
                 ]),
               ),
             ),

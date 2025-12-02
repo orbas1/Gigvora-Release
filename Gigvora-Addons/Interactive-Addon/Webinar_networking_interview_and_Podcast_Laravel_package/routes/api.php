@@ -26,6 +26,9 @@ Route::group([
     Route::put('/networking/{networkingSession}', [NetworkingController::class, 'update']);
     Route::post('/networking/{networkingSession}/register', [NetworkingController::class, 'register']);
     Route::post('/networking/{networkingSession}/rotate', [NetworkingController::class, 'rotate']);
+    Route::post('/networking/{networkingSession}/pairings', [NetworkingController::class, 'pairings']);
+    Route::post('/networking/{networkingSession}/promote-waitlist', [NetworkingController::class, 'promoteWaitlist']);
+    Route::post('/networking/{networkingSession}/exchange-contact', [NetworkingController::class, 'exchangeContact']);
 
     Route::get('/podcasts', [PodcastController::class, 'index']);
     Route::post('/podcast-series', [PodcastController::class, 'storeSeries']);

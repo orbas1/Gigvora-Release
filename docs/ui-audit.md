@@ -76,6 +76,12 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 6. **Feed/Search Integration**: Jobs, Freelance, Live, and Ads appear sporadically (or not at all) in the core feed/search, reducing discoverability.
 7. **CSS Debt**: Inline styles and repeated selectors (`.tk-serviesbann`, `.gigvora-ad`) without shared tokens make reskinning labor-intensive.
 
+### Live/Networking polish – Task 19
+
+- Waiting room refreshed with countdown + CTA gating, tokenized pills for rotation/price states, and an intro card form (headline/bio/goal) that persists locally so Utilities follow-ups can hydrate once syncing is wired.
+- Live networking shell now surfaces per-rotation timers (progress + remaining seconds), partner card with contact exchange CTA, starred/follow-up controls, and notes persistence that mirrors the Utilities recap expectations. Flutter needs matching countdown/progress UI, star + follow-up inputs, and local draft storage to keep parity.
+- Catalogue/detail screens now show price/capacity/waitlist badges, coupon entry, and clearer status tags (Live/Waitlist/Free/Paid) so ticket gating is visible before entering the waiting room. Flutter needs the same chips + waitlist state to align.
+
 ## 4. Recommended Token-Based Upgrade Path
 
 1. **Create Token Layer** (`resources/css/gigvora/tokens.css`):
@@ -110,7 +116,8 @@ This document captures the current state of the Gigvora (Sociopro) UI across the
 7. **Utilities Surfaces (Task 5)**:
    - Expose quick tools via `components.utilities.quick-tools` on feed, profile, Jobs (index + detail), Freelance shell, Live hub, and admin dashboard. Each instance queries `App\Services\UtilitiesQuickToolsService` so CTAs stay context-aware without duplicating arrays inside Blade.
    - Floating Utilities bubble (`components.utilities.chat-bubble` + `resources/js/utilities/bubble.js`) calls `/api/utilities/quick-tools` to hydrate the same actions while also showing chat conversations/requests.
-   - Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter mirrors the feature through `GigvoraQuickToolsClient` + `GigvoraQuickToolsPanel` (see `App/lib/utilities_quick_tools.dart`), enabling tabs/drawers to render identical action chips driven by the REST payload.
+- Flutter networking catalogue/detail/waiting/live/recap screens now align with the Gigvora shell: filter chips and search fields reuse token spacing, countdown/join CTAs use `GigvoraThemeData` buttons, and recap cards surface follow-up chips that mirror the web recap/footer actions.
 8. **Documentation & Governance**:
    - Document tokens and usage rules in `/docs/design-system.md`.
    - Enforce linting (Stylelint / Dart analyzer) tied to token usage where possible.

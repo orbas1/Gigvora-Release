@@ -219,6 +219,8 @@ This document is the canonical map of end-to-end flows across the Gigvora platfo
   - Recording workflow: auto-record, trim, chapters, transcripts, gated replays with expiry.
 - **Networking sessions**:
   - Session setup (rounds, duration, topics), ticketing, AI match suggestions, timed rotations, contact exchange, follow-up scheduler, host dashboard.
+  - Waiting room enforces countdown + CTA gating per start time/status, captures intro cards (headline/bio/goals) locally, and surfaces rotation count/duration so attendees stay aligned with the session pacing.
+  - Live shell tracks rotation timers (progress + remaining seconds), per-partner notes saved locally for Utilities sync, and explicit contact exchange/follow-up prompts (reminders + roster export) to keep CRM handoffs consistent across Jobs/Freelance/Talent & AI.
 - **Podcasts**:
   - Series/editor management, episode scheduling, guest intake, recording (live/upload), monetization (ads, donations, paid episodes), catalog filters, donation widgets.
   - Catalogue + series detail now surface follower counts and follow/unfollow controls that respect permissions (`wnip.podcasts.follow`), while episode lists only expose published/public items to non-hosts.

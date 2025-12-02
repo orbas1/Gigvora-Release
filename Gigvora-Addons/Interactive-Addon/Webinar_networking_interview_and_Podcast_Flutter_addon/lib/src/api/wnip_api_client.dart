@@ -175,9 +175,10 @@ class WnipApiClient {
     return NetworkingSession.fromJson(body);
   }
 
-  Future<NetworkingParticipant> registerForNetworking(int id) async {
+  Future<NetworkingParticipant> registerForNetworking(int id, {String? coupon}) async {
     final uri = _buildUri('networking/' + id.toString() + '/register');
-    final response = await _send(() => _httpClient.post(uri, headers: await _headers()));
+    final payload = coupon == null || coupon.isEmpty ? null : jsonEncode({'coupon': coupon});
+    final response = await _send(() => _httpClient.post(uri, headers: await _headers(), body: payload));
     final body = await _handleResponse(response) as Map<String, dynamic>;
     return NetworkingParticipant.fromJson(body);
   }

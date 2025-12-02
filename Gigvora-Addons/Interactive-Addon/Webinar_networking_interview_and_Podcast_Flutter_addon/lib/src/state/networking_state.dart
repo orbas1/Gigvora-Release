@@ -39,9 +39,9 @@ class NetworkingState extends ChangeNotifier {
     }
   }
 
-  Future<void> register(int id) async {
+  Future<void> register(int id, {String? coupon}) async {
     try {
-      participant = await service.register(id);
+      participant = await service.register(id, coupon: coupon);
       notifyListeners();
     } catch (error) {
       selected.setError(error.toString());
