@@ -31,6 +31,9 @@ Core flow bullets:
   - `GET /events/webinars/{webinar}/live` → `WebinarPageController@live` (host/attendee shell).
   - API: CRUD + register + toggle live via `WebinarController` under `/api/live/webinars*` (configurable prefix, Sanctum + verified).
 - **Data**: Eager-load host/registrations, enforce policies, analytics events `webinar_created`, `webinar_started/ended`, `webinar_registered`.
+  - Filters supported: upcoming, past, host-owned (`mine`), paid/free, reminders, replays, and start date range. Recordings are gated for paid sessions unless the viewer has a valid registration/role.
+  - Registration service enforces capacity + waitlist flags (stored in `metadata`), validates ticket tiers for paid webinars, schedules Utilities calendar reminders on successful registration, and exposes `/api/live/webinars/{webinar}/unregister` + `/api/live/webinars/{webinar}/attend` for attendance tracking.
+  - Ads addon sponsorship placements are available in detail/waiting/live/replay side rails via `Support\Ads\AdsBridge::placementsFor('live_overlay')`.
 
 ### Networking Sessions
 - **Routes**
