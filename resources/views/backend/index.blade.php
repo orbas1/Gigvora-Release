@@ -23,6 +23,7 @@
     <meta name="csrf_token" content="{{ csrf_token() }}" />
     <!-- all the css files -->
     <link rel="shortcut icon" href="{{ get_system_logo_favicon($system_favicon, 'favicon') }}" />
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css"
         href="{{ asset('assets/backend/vendors/bootstrap-5.1.3/css/bootstrap.min.css') }}" />
@@ -52,7 +53,7 @@
     <script src="{{ asset('assets/backend/vendors/jquery/jquery-3.6.0.min.js') }}"></script>
 </head>
 
-<body>
+<body class="gv-body bg-[var(--gv-color-neutral-50)]">
     @include('backend.' . $folder . '.sidebar')
     <section class="home-section">
         <div class="home-content">

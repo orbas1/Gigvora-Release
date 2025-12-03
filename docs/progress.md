@@ -1,7 +1,32 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-08
+Last updated: 2025-12-09
+
+## Snapshot – 2025-12-09 – Auth & Admin entry hardening
+
+### 1. Styling & assets
+
+- Applied Gigvora token stylesheet to the admin shell (`resources/views/backend/index.blade.php`) so `/admin` inherits the same typography, colors, focus rings, and cards as auth + app layouts.
+- Restored login illustration (`public/assets/frontend/images/login.svg`) and seeded brand assets (light/dark logo + favicon under `public/storage/logo/*` with seeded filenames) to remove missing-image warnings on auth/admin.
+- Kept the auth layout on tokenized cards/inputs and ensured the login hero image is bundled with Mix output.
+
+### 2. Admin entrypoint & installer guardrails
+
+- Added `ADMIN_PREFIX` support (default `/admin`) with a dedicated entrance controller and proxy so environments can move the admin surface (e.g., `/secure-admin`) without .env hacks while still honoring the existing admin controllers.
+- Introduced middleware to redirect legacy `/admin*` hits to the configured prefix and stop accidental install-route overrides by gating installer routes behind `ENABLE_INSTALLER` + the placeholder `db_name` connection.
+- Documented the seeded admin credentials requirement (`GIGVORA_ADMIN_PASSWORD`) and kept `/admin` available by default.
+
+### QA / Testing
+
+- `php artisan migrate:fresh --seed`
+- `npm run build`
+- Screenshots captured in Codex preview:
+  - ✔ `/login` – Gigvora tokens applied with logo/illustration visible
+  - ✔ `/` – main feed loads with token shell and seeded content
+  - ✔ `/admin` – reachable via default prefix with tokenized admin shell
+  - ✔ `/freelance` dashboards (gigs/projects) – token styling intact
+  - ✔ Profile view – hero/tabs render with Gigvora cards
 
 ## Snapshot – 2025-12-08 – Task 22 (Admin, Compliance & Security Hardening)
 

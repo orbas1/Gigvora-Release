@@ -1,6 +1,8 @@
 # Gigvora UI Audit
 
-Last updated: 2025-11-30 (Task 17 – Webinars Experience Completion)
+Last updated: 2025-12-09 (Auth/Admin shell polish)
+
+Changelog: login + admin shells now pull `resources/css/app.css` (Gigvora tokens), refreshed logo assets (dark/light/favicon), and the auth hero uses a dedicated SVG illustration so CSS tokens render consistently across `/login`, `/admin`, and addon admin routes.
 
 This document captures the current state of the Gigvora (Sociopro) UI across the host Laravel app, all Laravel addons, and the Flutter mobile shell. It highlights the design system gaps and proposes a pathway toward a unified, token-driven reskin.
 

@@ -5,15 +5,18 @@ use App\Http\Controllers\LiveEngagementController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MemoriesController;
 use App\Http\Controllers\BadgeController;
+use App\Http\Controllers\AdminEntranceController;
+use App\Http\Controllers\AdminProxyController;
 use App\Http\Controllers\ModalController;
 use App\Http\Controllers\Profile;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\Updater;
 use App\Http\Controllers\UtilitiesExperienceController;
-use App\Http\Controllers\UtilitiesPortalController;
 use App\Http\Controllers\UtilitiesNotificationActionController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UtilitiesPortalController;
 use App\Models\Account_active_request;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +35,21 @@ use Illuminate\Support\Facades\Route;
 //         return 'Subdomain ' . $subdomain;
 //     });
 // });
+
+$adminPrefix = trim(config('app.admin_prefix', 'admin'), '/');
+
+Route::get('/admin', AdminEntranceController::class)->name('admin.entry');
+
+if ($adminPrefix !== 'admin') {
+    Route::prefix($adminPrefix)->group(function () {
+        Route::get('/', AdminEntranceController::class)->name('admin.entry.prefixed');
+
+        Route::middleware(['auth', 'verified', 'admin', 'prevent-back-history'])
+            ->any('{path?}', AdminProxyController::class)
+            ->where('path', '.*')
+            ->name('admin.prefixed.proxy');
+    });
+}
 
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
@@ -269,20 +287,21 @@ Route::controller(Updater::class)->middleware('auth', 'verified', 'activity')->g
 //End Updater routes
 
 //Installation routes
-Route::controller(InstallController::class)->group(function () {
-
-    Route::get('/', 'index');
-    Route::get('install/step0', 'step0')->name('step0');
-    Route::get('install/step1', 'step1')->name('step1');
-    Route::get('install/step2', 'step2')->name('step2');
-    Route::any('install/step3', 'step3')->name('step3');
-    Route::get('install/step4', 'step4')->name('step4');
-    Route::get('install/step4/{confirm_import}', 'confirmImport')->name('step4.confirm_import');
-    Route::get('install/install', 'confirmInstall')->name('confirm_install');
-    Route::post('install/validate', 'validatePurchaseCode')->name('install.validate');
-    Route::any('install/finalizing_setup', 'finalizingSetup')->name('finalizing_setup');
-    Route::get('install/success', 'success')->name('success');
-});
+if (DB::connection()->getDatabaseName() === 'db_name' && env('ENABLE_INSTALLER', false)) {
+    Route::controller(InstallController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('install/step0', 'step0')->name('step0');
+        Route::get('install/step1', 'step1')->name('step1');
+        Route::get('install/step2', 'step2')->name('step2');
+        Route::any('install/step3', 'step3')->name('step3');
+        Route::get('install/step4', 'step4')->name('step4');
+        Route::get('install/step4/{confirm_import}', 'confirmImport')->name('step4.confirm_import');
+        Route::get('install/install', 'confirmInstall')->name('confirm_install');
+        Route::post('install/validate', 'validatePurchaseCode')->name('install.validate');
+        Route::any('install/finalizing_setup', 'finalizingSetup')->name('finalizing_setup');
+        Route::get('install/success', 'success')->name('success');
+    });
+}
 //Installation routes
 
 Route::prefix('live-engagement')

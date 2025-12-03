@@ -7,7 +7,7 @@
                         <p class="gv-eyebrow">{{ get_phrase('Welcome back') }}</p>
                         <h1 class="gv-heading text-3xl">{{ get_phrase('Access your Gigvora workspace') }}</h1>
                         <p class="gv-muted">{{ get_phrase('Collaborate across feed, jobs, gigs, and live events without leaving one dashboard.') }}</p>
-                        <img class="mx-auto max-w-sm" src="{{ asset('assets/frontend/images/login.png') }}" alt="{{ get_phrase('Login illustration') }}">
+                        <img class="mx-auto max-w-sm" src="{{ asset('assets/frontend/images/login.svg') }}" alt="{{ get_phrase('Login illustration') }}">
                     </div>
                 </div>
 

@@ -679,6 +679,20 @@ if (!function_exists('get_system_logo_favicon')) {
     }
 }
 
+if (!function_exists('admin_path')) {
+    function admin_path(string $path = ''): string
+    {
+        $prefix = trim(config('app.admin_prefix', 'admin'), '/');
+
+        $prefixPath = $prefix === '' ? '' : $prefix;
+        $suffix = trim($path, '/');
+
+        $full = trim($prefixPath . '/' . $suffix, '/');
+
+        return '/' . $full;
+    }
+}
+
 // Global Settings
 if (!function_exists('set_config')) {
     function set_config($key = '', $value = '')
