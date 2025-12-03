@@ -304,6 +304,11 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Scope**: Regenerate `install.sql` from live migrations + seeders, reconcile user/profile fields used across Sociopro code, enforce secure admin seeding, and add comment moderation with shadow-ban escalation tied to audit logs and GDPR erasure/export updates.
     - **Completion Criteria**: `install.sql` builds the full schema without errors, migrations align with legacy fields, admin password seeding requires an env value, comment moderation blocks violations with logged bans, GDPR docs/processes updated, and evidence logged in `docs/progress.md`.
 
+27. ✅ **Master install.sql Unification & Full Database Build**
+    - **Goal**: Ship a unified master install SQL covering core Sociopro tables plus all addons (Jobs, Freelance, Interactive, Ads, AI, Utilities) with aligned indexes/constraints.
+    - **Scope**: Consolidate schema output from live migrations into `database/install_master.sql` (mirrored to `public/assets/install.sql`), keep user/notifications/media fields in sync with recent migrations, and ensure addon tables join against the core identity graph.
+    - **Completion Criteria**: MySQL import of `database/install_master.sql` succeeds, matches Laravel migrations, DSAR/moderation/security hooks remain compatible, and quick setup docs (`README-QUICKSTART.md`) reference the new installer location.
+
 ## Execution Rules & References
 - Always update `logic_flows.md`, `docs/ui-audit.md`, `docs/nav-structure.md`, `docs/progress.md`, and `docs/qa-bugs.md` when relevant changes occur.
 - Token work begins in `resources/css/gigvora/tokens.css`; Flutter must mirror the same palette.
