@@ -6,7 +6,7 @@
   1. Clone repo and enter: `git clone https://github.com/orbas1/Gigvora-Release.git && cd Gigvora-Release`
   2. Copy env: `cp .env.example .env` then fill DB/cache/mail/storage/queue keys.
   3. Database options:
-     - **Option A (SQL import)**: `mysql -u <user> -p <database> < database/install_master.sql`
+     - **Option A (SQL import)**: `mysql -u <user> -p <database> < database/install_master.sql` (rebuilt via `database/install/rebuild_install.sh` which concatenates `database/install/parts/*` including the recovered Sociopro core and addon overlays).
      - **Option B (Laravel migrations)**: `composer install` then `php artisan key:generate` and `php artisan migrate --seed`.
   4. Assets: `npm install` then `npm run build` (or `npm run dev` locally).
   5. Storage: `php artisan storage:link`.

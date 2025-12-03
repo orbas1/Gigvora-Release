@@ -284,7 +284,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Remove any debug seeders or env defaults that would be unsafe in production.
     - **Completion Criteria**: Fresh install (`migrate:fresh --seed`) succeeds, documentation guides new contributors through setup, and CI passes schema-related checks.
 
-24. **Build, QA & Release**
+24. ✅ **Build, QA & Release**
     - **Goal**: Ship a stable, production-ready Gigvora release across web and mobile.
     - **Scope**:
       - Verify composer/npm builds, run Flutter debug + release builds without warnings/failures.
@@ -292,7 +292,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
       - Collect and triage defects, finalize release notes, and capture lessons learned in `docs/progress.md`.
     - **UI & UX**: Validate that all previously-updated UIs behave correctly in real flows and that styling is consistent and performant.
     - **Integration & Security**: Double-check that cross-addon integrations, feature flags, and security boundaries hold under real usage.
-    - **Completion Criteria**: QA matrix complete, only low-risk known issues remain, release documentation finalized, and go-live checklist signed by stakeholders.
+    - **Completion Criteria**: QA matrix complete, only low-risk known issues remain, release documentation finalized, and go-live checklist signed by stakeholders. Installer artifacts live at `database/install_master.sql` (rebuilt from `database/install/parts/*` and mirrored to `public/assets/install.sql`), with quickstart steps in `README-QUICKSTART.md`.
 
 25. ✅ **Core + Addon Data Convergence, Search & Ads Intelligence**
     - **Goal**: Align addon data with the Sociopro core, power ranked search across people/content/addons, and wire keyword-driven ad placement into all surfaces.

@@ -767,3 +767,16 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - `php artisan migrate:fresh --seed` ✅ (sqlite, with `GIGVORA_ADMIN_PASSWORD` provided)
+
+## Snapshot – 2025-12-18 – Build, QA & Release / install.sql modular recovery
+
+### Installer and schema alignment
+- Restored the full Sociopro/Gigvora installer into `database/install/parts/001_core.sql` and added addon overlays plus modern migrations, rebuilt via `database/install/rebuild_install.sh` to generate `database/install_master.sql` and mirror it to `public/assets/install.sql`.
+- Added MySQL-safe extensions for moderation, notification metadata, ad keyword intelligence, audit logging, live stream engagement tracking, and index overlays for jobs/interactive/ads tables to keep the schema aligned with current migrations.
+
+### Docs and release hygiene
+- Updated `README-QUICKSTART.md` with the modular installer rebuild step and reinforced SQL import guidance.
+- Marked Build/QA & Release complete in `AGENTS.md` and linked installer artifacts for reviewers.
+
+### QA / Testing
+- Full build suites pending (vendor deps unavailable in this environment); rerun `php artisan migrate:fresh --seed` and mobile/web build commands once dependencies are present.
