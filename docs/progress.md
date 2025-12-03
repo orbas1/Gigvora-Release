@@ -785,3 +785,15 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - Full build suites pending (vendor deps unavailable in this environment); rerun `php artisan migrate:fresh --seed` and mobile/web build commands once dependencies are present.
+
+## Snapshot – 2025-12-20 – Installer taxonomy split and dependency bootstrap
+
+### Installer modularity
+- Introduced `database/install/parts/150_taxonomy_and_keywords.sql` to isolate placements, keyword prices, and the keyword registry with full seed coverage, keeping addon marketplace parts leaner while preserving original Sociopro data.
+- Updated `database/install/rebuild_install.sh` to consume the new taxonomy part and regenerated `database/install_master.sql` plus the mirrored `public/assets/install.sql` so MySQL imports retain taxonomy seeds.
+
+### Environment readiness
+- Ran `composer install` to restore vendor dependencies, confirming package discovery for all addons and Laravel core to unblock future artisan and build commands.
+
+### QA / Testing
+- `composer install --no-progress --no-interaction` ✅ (vendor bootstrap only; migrations and full builds still require DB configuration)
