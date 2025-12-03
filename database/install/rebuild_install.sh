@@ -6,7 +6,8 @@ output="$base_dir/../install_master.sql"
 
 cat "$parts_dir"/000_preamble.sql \
     "$parts_dir"/001_core.sql \
-    "$parts_dir"/200_addons_overlay.sql \
+    "$parts_dir"/200_addons_marketplace.sql \
+    "$parts_dir"/210_jobs_addon.sql \
     "$parts_dir"/900_modern_extensions.sql \
     "$parts_dir"/999_postamble.sql > "$output"
 

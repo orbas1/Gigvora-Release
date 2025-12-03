@@ -2365,31 +2365,6 @@ CREATE TABLE IF NOT EXISTS `headhunter_mandates` (`id` bigint unsigned NOT NULL 
 CREATE TABLE IF NOT EXISTS `headhunter_candidates` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `headhunter_profile_id` bigint unsigned not null, `user_id` bigint unsigned, `name` varchar(255) not null, `email` varchar(255), `phone` varchar(255), `skills` text, `experience` text, `created_at` datetime, `updated_at` datetime, foreign key(`headhunter_profile_id`) references `headhunter_profiles`(`id`), foreign key(`user_id`) references `users`(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `headhunter_pipeline_items` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `headhunter_mandate_id` bigint unsigned not null, `headhunter_candidate_id` bigint unsigned not null, `stage` varchar(255) not null default 'sourced', `notes` text, `moved_at` datetime, `created_at` datetime, `updated_at` datetime, foreign key(`headhunter_mandate_id`) references `headhunter_mandates`(`id`), foreign key(`headhunter_candidate_id`) references `headhunter_candidates`(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `headhunter_interviews` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `headhunter_pipeline_item_id` bigint unsigned not null, `scheduled_by` bigint unsigned not null, `scheduled_at` datetime not null, `status` varchar(255) not null default 'scheduled', `summary` text, `created_at` datetime, `updated_at` datetime, foreign key(`headhunter_pipeline_item_id`) references `headhunter_pipeline_items`(`id`), foreign key(`scheduled_by`) references `users`(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `company_profiles` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `user_id` bigint unsigned not null, `name` varchar(255) not null, `slug` varchar(255) not null, `headline` varchar(255), `description` text, `website` varchar(255), `location` varchar(255), `logo_path` varchar(255), `cover_path` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `candidate_profiles` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `user_id` bigint unsigned not null, `headline` varchar(255), `bio` text, `location` varchar(255), `skills` text, `experience_years` bigint unsigned, `resume_path` varchar(255), `portfolio_url` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `jobs` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `company_id` bigint unsigned not null, `title` varchar(255) not null, `slug` varchar(255) not null, `description` text not null, `location` varchar(255), `workplace_type` varchar(255), `employment_type` varchar(255), `salary_min` numeric, `salary_max` numeric, `currency` varchar(255), `status` varchar(255) not null default 'draft', `published_at` datetime, `expires_at` datetime, `is_featured` tinyint(1) not null default '0', `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `jobs_categories` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` varchar(255) not null, `slug` varchar(255) not null, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-INSERT INTO jobs_categories VALUES(1,'Engineering','engineering',NULL,NULL);
-INSERT INTO jobs_categories VALUES(2,'Design','design',NULL,NULL);
-INSERT INTO jobs_categories VALUES(3,'Marketing','marketing',NULL,NULL);
-INSERT INTO jobs_categories VALUES(4,'Sales','sales',NULL,NULL);
-CREATE TABLE IF NOT EXISTS `job_bookmarks` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_id` bigint unsigned not null, `user_id` bigint unsigned not null, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `cover_letters` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `candidate_id` bigint unsigned not null, `title` varchar(255) not null, `body` text not null, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `cv_templates` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `candidate_id` bigint unsigned not null, `title` varchar(255) not null, `content` text not null, `is_default` tinyint(1) not null default '0', `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `job_applications` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_id` bigint unsigned not null, `candidate_id` bigint unsigned not null, `cover_letter_id` bigint unsigned, `cv_template_id` bigint unsigned, `screening_score` bigint unsigned, `status` varchar(255) not null default 'applied', `notes` text, `resume_path` varchar(255), `applied_at` datetime, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `ats_pipelines` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `company_id` bigint unsigned not null, `name` varchar(255) not null, `is_default` tinyint(1) not null default '0', `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-INSERT INTO ats_pipelines VALUES(1,0,'Default',1,'2025-12-03 05:54:50','2025-12-03 05:54:50');
-CREATE TABLE IF NOT EXISTS `ats_stages` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `ats_pipeline_id` bigint unsigned not null, `name` varchar(255) not null, `position` bigint unsigned not null default '0', `color` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-INSERT INTO ats_stages VALUES(1,1,'Applied',1,'#2f855a','2025-12-03 05:54:50','2025-12-03 05:54:50');
-INSERT INTO ats_stages VALUES(2,1,'Phone Screen',2,'#3182ce','2025-12-03 05:54:50','2025-12-03 05:54:50');
-INSERT INTO ats_stages VALUES(3,1,'Interview',3,'#805ad5','2025-12-03 05:54:50','2025-12-03 05:54:50');
-INSERT INTO ats_stages VALUES(4,1,'Offer',4,'#dd6b20','2025-12-03 05:54:50','2025-12-03 05:54:50');
-INSERT INTO ats_stages VALUES(5,1,'Hired',5,'#38a169','2025-12-03 05:54:50','2025-12-03 05:54:50');
-CREATE TABLE IF NOT EXISTS `ats_stage_assignments` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_application_id` bigint unsigned not null, `ats_stage_id` bigint unsigned not null, `moved_by` bigint unsigned, `notes` text, `moved_at` datetime, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `screening_questions` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_id` bigint unsigned not null, `question` varchar(255) not null, `type` varchar(255) not null default 'text', `options` text, `is_required` tinyint(1) not null default '1', `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `screening_answers` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_application_id` bigint unsigned not null, `screening_question_id` bigint unsigned not null, `answer` text not null, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `subscriptions` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `company_id` bigint unsigned not null, `plan` varchar(255) not null, `job_credits` bigint unsigned not null default '0', `renews_at` datetime, `status` varchar(255) not null default 'active', `payment_reference` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE TABLE IF NOT EXISTS `interview_schedules` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `job_application_id` bigint unsigned not null, `scheduled_at` datetime not null, `location` varchar(255), `instructions` text, `meeting_link` varchar(255), `status` varchar(255) not null default 'pending', `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `pro_network_connection_caches` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `user_id` bigint unsigned not null, `connection_id` bigint unsigned not null, `degree` bigint unsigned not null, `connection_path` text, `mutual_count` bigint unsigned not null default '0', `strength` bigint unsigned not null default '0', `calculated_at` datetime, `created_at` datetime, `updated_at` datetime, foreign key(`user_id`) references `users`(`id`) on delete cascade, foreign key(`connection_id`) references `users`(`id`) on delete cascade) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `pro_network_mutual_connections` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `user_id` bigint unsigned not null, `target_user_id` bigint unsigned not null, `mutual_user_ids` text not null, `mutual_count` bigint unsigned not null, `calculated_at` datetime, `created_at` datetime, `updated_at` datetime, foreign key(`user_id`) references `users`(`id`) on delete cascade, foreign key(`target_user_id`) references `users`(`id`) on delete cascade) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `pro_network_network_metrics` (`id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY, `user_id` bigint unsigned not null, `first_degree_count` bigint unsigned not null default '0', `second_degree_count` bigint unsigned not null default '0', `third_degree_count` bigint unsigned not null default '0', `mutual_count` bigint unsigned not null default '0', `suggestions` text, `calculated_at` datetime, `created_at` datetime, `updated_at` datetime, foreign key(`user_id`) references `users`(`id`) on delete cascade) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -2544,7 +2519,6 @@ INSERT INTO sqlite_sequence VALUES('placements',24);
 INSERT INTO sqlite_sequence VALUES('keyword_prices',5);
 INSERT INTO sqlite_sequence VALUES('ats_pipelines',1);
 INSERT INTO sqlite_sequence VALUES('ats_stages',5);
-INSERT INTO sqlite_sequence VALUES('jobs_categories',4);
 INSERT INTO sqlite_sequence VALUES('webinars',3);
 INSERT INTO sqlite_sequence VALUES('networking_sessions',2);
 INSERT INTO sqlite_sequence VALUES('podcast_series',2);
@@ -2633,8 +2607,6 @@ CREATE INDEX `headhunter_pipeline_items_stage_index` on `headhunter_pipeline_ite
 CREATE INDEX `headhunter_interviews_scheduled_at_index` on `headhunter_interviews` (`scheduled_at`);
 CREATE INDEX `headhunter_interviews_status_index` on `headhunter_interviews` (`status`);
 CREATE UNIQUE INDEX `company_profiles_slug_unique` on `company_profiles` (`slug`);
-CREATE UNIQUE INDEX `jobs_slug_unique` on `jobs` (`slug`);
-CREATE UNIQUE INDEX `jobs_categories_slug_unique` on `jobs_categories` (`slug`);
 CREATE UNIQUE INDEX `pro_network_connection_caches_user_id_connection_id_unique` on `pro_network_connection_caches` (`user_id`, `connection_id`);
 CREATE UNIQUE INDEX `pro_network_mutual_connections_user_id_target_user_id_unique` on `pro_network_mutual_connections` (`user_id`, `target_user_id`);
 CREATE UNIQUE INDEX `pro_network_professional_profiles_public_url_unique` on `pro_network_professional_profiles` (`public_url`);
@@ -2716,9 +2688,6 @@ CREATE INDEX `utilities_calendar_events_status_index` on `utilities_calendar_eve
 CREATE INDEX `notifications_resource_type_index` on `notifications` (`resource_type`);
 CREATE INDEX `live_streaming_engagements_live_streaming_id_type_index` on `live_streaming_engagements` (`live_streaming_id`, `type`);
 CREATE INDEX `audit_logs_actor_id_index` on `audit_logs` (`actor_id`);
-CREATE INDEX `jobs_company_id_index` on `jobs` (`company_id`);
-CREATE INDEX `jobs_status_index` on `jobs` (`status`);
-CREATE INDEX `jobs_status_published_at_index` on `jobs` (`status`, `published_at`);
 CREATE INDEX `job_applications_job_id_index` on `job_applications` (`job_id`);
 CREATE INDEX `job_applications_candidate_id_index` on `job_applications` (`candidate_id`);
 CREATE INDEX `job_applications_status_index` on `job_applications` (`status`);
@@ -2806,6 +2775,10 @@ CREATE TABLE IF NOT EXISTS `jobs_categories` (
     `created_at` datetime NULL,
     `updated_at` datetime NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO jobs_categories VALUES(1,'Engineering','engineering',NULL,NULL);
+INSERT INTO jobs_categories VALUES(2,'Design','design',NULL,NULL);
+INSERT INTO jobs_categories VALUES(3,'Marketing','marketing',NULL,NULL);
+INSERT INTO jobs_categories VALUES(4,'Sales','sales',NULL,NULL);
 
 CREATE TABLE IF NOT EXISTS `job_bookmarks` (
     `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -2873,6 +2846,7 @@ CREATE TABLE IF NOT EXISTS `ats_pipelines` (
     INDEX `ats_pipelines_company_id_index` (`company_id`),
     CONSTRAINT `ats_pipelines_company_fk` FOREIGN KEY (`company_id`) REFERENCES `company_profiles`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO ats_pipelines VALUES(1,0,'Default',1,'2025-12-03 05:54:50','2025-12-03 05:54:50');
 
 CREATE TABLE IF NOT EXISTS `ats_stages` (
     `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -2885,6 +2859,11 @@ CREATE TABLE IF NOT EXISTS `ats_stages` (
     INDEX `ats_stages_pipeline_id_index` (`ats_pipeline_id`),
     CONSTRAINT `ats_stages_pipeline_fk` FOREIGN KEY (`ats_pipeline_id`) REFERENCES `ats_pipelines`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO ats_stages VALUES(1,1,'Applied',1,'#2f855a','2025-12-03 05:54:50','2025-12-03 05:54:50');
+INSERT INTO ats_stages VALUES(2,1,'Phone Screen',2,'#3182ce','2025-12-03 05:54:50','2025-12-03 05:54:50');
+INSERT INTO ats_stages VALUES(3,1,'Interview',3,'#805ad5','2025-12-03 05:54:50','2025-12-03 05:54:50');
+INSERT INTO ats_stages VALUES(4,1,'Offer',4,'#dd6b20','2025-12-03 05:54:50','2025-12-03 05:54:50');
+INSERT INTO ats_stages VALUES(5,1,'Hired',5,'#38a169','2025-12-03 05:54:50','2025-12-03 05:54:50');
 
 CREATE TABLE IF NOT EXISTS `ats_stage_assignments` (
     `id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,

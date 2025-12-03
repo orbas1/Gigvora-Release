@@ -778,5 +778,10 @@ Last updated: 2025-12-01
 - Updated `README-QUICKSTART.md` with the modular installer rebuild step and reinforced SQL import guidance.
 - Marked Build/QA & Release complete in `AGENTS.md` and linked installer artifacts for reviewers.
 
+### Follow-up – installer modularization and job seeds (2025-12-19)
+- Split the unified installer parts so addon marketplace tables live in `200_addons_marketplace.sql` and the Jobs addon resides in `210_jobs_addon.sql`, keeping the original Sociopro core intact in `001_core.sql`.
+- Rehydrated Jobs seeds (categories and ATS defaults) inside the jobs part to prevent future rebuilds from losing baseline data.
+- Regenerated `database/install_master.sql` and mirrored `public/assets/install.sql` via `database/install/rebuild_install.sh` to ensure MySQL imports stay lossless.
+
 ### QA / Testing
 - Full build suites pending (vendor deps unavailable in this environment); rerun `php artisan migrate:fresh --seed` and mobile/web build commands once dependencies are present.
