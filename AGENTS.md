@@ -244,7 +244,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Use least-privilege principles, audit logs for permission changes, and verify no bypasses exist.
     - **Completion Criteria**: Role matrix enforced system-wide, analytics taxonomy stable and documented, and cross-addon journeys respect these rules.
 
-21. **Mobile Convergence**
+21. ✅ **Mobile Convergence**
     - **Goal**: Bring the Flutter app to full parity with the web experience, both visually and functionally.
     - **Scope**:
       - Audit all web flows and confirm a corresponding mobile screen/route exists (feed, profile, Jobs, Freelance, Ads, Talent & AI, Utilities, settings).
@@ -260,7 +260,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Validate secure token storage, correct use of HTTPS/CORS, and safe handling of secrets/config.
     - **Completion Criteria**: Mobile app passes a parity checklist against `logic_flows.md#5`, analyzer/status clean, and `docs/mobile-build.md` describes final build process.
 
-22. **Admin, Compliance & Security Hardening**
+22. ✅ **Admin, Compliance & Security Hardening**
     - **Goal**: Provide a robust command center for admins with strong security and compliance guarantees.
     - **Scope**:
       - Finish admin dashboards for each addon: KPIs, filters, exports, troubleshooting panels.
@@ -274,7 +274,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Lock admin routes tightly, require strong auth, document security settings, and regularly review logs.
     - **Completion Criteria**: Admin experiences complete and intuitive, GDPR operations verified, monitoring dashboards show healthy system behavior.
 
-23. **Data Layer & Environment Readiness**
+23. ✅ **Data Layer & Environment Readiness**
     - **Goal**: Make it safe and repeatable to bring up/down environments and keep schemas consistent.
     - **Scope**:
       - Clean up and order migrations, add missing indexes, and reconcile addon tables with core schema.
@@ -284,7 +284,7 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
     - **Security**: Remove any debug seeders or env defaults that would be unsafe in production.
     - **Completion Criteria**: Fresh install (`migrate:fresh --seed`) succeeds, documentation guides new contributors through setup, and CI passes schema-related checks.
 
-24. **Build, QA & Release**
+24. ✅ **Build, QA & Release**
     - **Goal**: Ship a stable, production-ready Gigvora release across web and mobile.
     - **Scope**:
       - Verify composer/npm builds, run Flutter debug + release builds without warnings/failures.
@@ -292,7 +292,22 @@ Each numbered objective must be completed in order. Treat `logic_flows.md` as th
       - Collect and triage defects, finalize release notes, and capture lessons learned in `docs/progress.md`.
     - **UI & UX**: Validate that all previously-updated UIs behave correctly in real flows and that styling is consistent and performant.
     - **Integration & Security**: Double-check that cross-addon integrations, feature flags, and security boundaries hold under real usage.
-    - **Completion Criteria**: QA matrix complete, only low-risk known issues remain, release documentation finalized, and go-live checklist signed by stakeholders.
+    - **Completion Criteria**: QA matrix complete, only low-risk known issues remain, release documentation finalized, and go-live checklist signed by stakeholders. Installer artifacts live at `database/install_master.sql` (rebuilt from `database/install/parts/*` and mirrored to `public/assets/install.sql`), with quickstart steps in `README-QUICKSTART.md`.
+
+25. ✅ **Core + Addon Data Convergence, Search & Ads Intelligence**
+    - **Goal**: Align addon data with the Sociopro core, power ranked search across people/content/addons, and wire keyword-driven ad placement into all surfaces.
+    - **Scope**: Unify schema/seed ordering, build weighted ranking for followers/connections/recency/location/VIP/offering signals, expand the keyword registry with tags/hashtags/categories, and expose live ad placement APIs backed by the auction/pricing services.
+    - **Completion Criteria**: Fresh seeds converge core + addons, ranked search feeds web/mobile, keyword registry grows from live content, and ads placements pull real campaigns via the auction logic.
+
+26. ✅ **Install.sql Recovery, DB Unification & Security/GDPR Enforcement**
+    - **Goal**: Restore the canonical install SQL, unify addon/core schemas, and harden data handling with GDPR and moderation controls.
+    - **Scope**: Regenerate `install.sql` from live migrations + seeders, reconcile user/profile fields used across Sociopro code, enforce secure admin seeding, and add comment moderation with shadow-ban escalation tied to audit logs and GDPR erasure/export updates.
+    - **Completion Criteria**: `install.sql` builds the full schema without errors, migrations align with legacy fields, admin password seeding requires an env value, comment moderation blocks violations with logged bans, GDPR docs/processes updated, and evidence logged in `docs/progress.md`.
+
+27. ✅ **Master install.sql Unification & Full Database Build**
+    - **Goal**: Ship a unified master install SQL covering core Sociopro tables plus all addons (Jobs, Freelance, Interactive, Ads, AI, Utilities) with aligned indexes/constraints.
+    - **Scope**: Consolidate schema output from live migrations into `database/install_master.sql` (mirrored to `public/assets/install.sql`), keep user/notifications/media fields in sync with recent migrations, and ensure addon tables join against the core identity graph.
+    - **Completion Criteria**: MySQL import of `database/install_master.sql` succeeds, matches Laravel migrations, DSAR/moderation/security hooks remain compatible, and quick setup docs (`README-QUICKSTART.md`) reference the new installer location.
 
 ## Execution Rules & References
 - Always update `logic_flows.md`, `docs/ui-audit.md`, `docs/nav-structure.md`, `docs/progress.md`, and `docs/qa-bugs.md` when relevant changes occur.

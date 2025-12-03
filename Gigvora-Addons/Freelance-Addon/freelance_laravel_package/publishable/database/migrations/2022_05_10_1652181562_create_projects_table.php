@@ -10,20 +10,20 @@ class CreateProjectsTable extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
 
-			$table->id();
-			$table->bigInteger('author_id')->unsigned()->nullable()->index();
-			$table->bigInteger('project_category')->unsigned()->nullable()->index();
-			$table->string('project_title')->fullText();
-			$table->string('slug')->index();
-			$table->enum('project_type',['hourly','fixed'])->nullable()->index();
-			$table->enum('project_payout_type',['fixed','both','milestone','hourly'])->nullable()->comment('fixed, milestones base, both options')->index();
-			$table->text('attachments')->nullable();
-			$table->text('project_description')->nullable()->fullText();
-			$table->string('project_payment_mode',50)->nullable();
-			$table->string('project_max_hours',50)->nullable();
-			$table->double('project_min_price',10,2)->default(0)->index();
-			$table->double('project_max_price',10,2)->default(0)->index();
-			$table->string('project_country')->nullable();
+                        $table->id();
+                        $table->bigInteger('author_id')->unsigned()->nullable()->index();
+                        $table->bigInteger('project_category')->unsigned()->nullable()->index();
+                        $table->string('project_title');
+                        $table->string('slug')->index();
+                        $table->enum('project_type',['hourly','fixed'])->nullable()->index();
+                        $table->enum('project_payout_type',['fixed','both','milestone','hourly'])->nullable()->comment('fixed, milestones base, both options')->index();
+                        $table->text('attachments')->nullable();
+                        $table->text('project_description')->nullable();
+                        $table->string('project_payment_mode',50)->nullable();
+                        $table->string('project_max_hours',50)->nullable();
+                        $table->double('project_min_price',10,2)->default(0)->index();
+                        $table->double('project_max_price',10,2)->default(0)->index();
+                        $table->string('project_country')->nullable();
 			$table->string('country_zipcode')->nullable();
 			$table->mediumtext('address')->nullable();
 			$table->bigInteger('project_duration')->unsigned()->nullable()->index();
@@ -33,14 +33,28 @@ class CreateProjectsTable extends Migration
 			$table->tinyInteger('is_featured')->default(0)->index();
 			$table->datetime('featured_expiry')->nullable();
 			$table->enum('status',['draft','pending','publish','hired','completed','refunded','cancelled'])->default('draft')->index();
-			$table->softDeletes();
-			$table->timestamps();
+                        $table->softDeletes();
+                        $table->timestamps();
 
+        });
+
+        Schema::table('projects', function (Blueprint $table) {
+            if ($this->supportsFulltext()) {
+                $table->fullText('project_title');
+                $table->fullText('project_description');
+            } else {
+                $table->index('project_title');
+            }
         });
     }
 
     public function down()
     {
         Schema::dropIfExists('projects');
+    }
+
+    protected function supportsFulltext(): bool
+    {
+        return Schema::getConnection()->getDriverName() !== 'sqlite';
     }
 }

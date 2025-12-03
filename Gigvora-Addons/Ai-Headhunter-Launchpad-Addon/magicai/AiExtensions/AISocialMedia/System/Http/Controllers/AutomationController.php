@@ -19,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use OpenAI\Laravel\Facades\OpenAI;
 use Throwable;
 
@@ -205,7 +206,10 @@ class AutomationController extends Controller
             $schedule->last_run_date = now()->addDays(-1);
             $schedule->save();
         } catch (Throwable $th) {
-            // TODO: Log the error..
+            Log::error('automation.schedule: ' . $th->getMessage(), [
+                'user_id' => auth()->id(),
+                'trace'   => $th->getTraceAsString(),
+            ]);
         }
     }
 
@@ -233,7 +237,6 @@ class AutomationController extends Controller
             $item = AutomationCampaign::where('id', $id)->where('user_id', auth()->user()->id)->firstOrFail();
         }
 
-        // TODO: eski extension dosyalarinda boyle bir blade goremedim
         return view('ai-social-media::campaigns.form', compact('item'));
     }
 

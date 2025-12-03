@@ -129,6 +129,14 @@ class ChatbotService
             ->when(request('chatbot_channel'), function (Builder $query) {
                 $query->where('chatbot_channel', request('chatbot_channel'));
             })
+            ->when(request('search'), function (Builder $query) {
+                $query->where(function (Builder $builder) {
+                    $builder->where('conversation_name', 'like', '%' . request('search') . '%')
+                        ->orWhereHas('histories', function (Builder $historyQuery) {
+                            $historyQuery->where('message', 'like', '%' . request('search') . '%');
+                        });
+                });
+            })
             ->where('is_showed_on_history', true)
             ->with('chatbot:id,uuid,avatar')
             ->with(['histories', 'lastMessage'])

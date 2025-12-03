@@ -17,13 +17,22 @@ return new class extends Migration
         Schema::create('gig_categories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_id')->nullable()->index();
-            $table->string('name')->fullText();
+            $table->string('name');
             $table->text('image')->nullable();
             $table->string('slug')->index();
-            $table->text('description')->nullable()->fullText();
+            $table->text('description')->nullable();
             $table->enum('status', ['active', 'deactive'])->default('active')->index();
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('gig_categories', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('name');
+                $table->fullText('description');
+            } else {
+                $table->index('name');
+            }
         });
     }
 
