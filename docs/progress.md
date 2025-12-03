@@ -822,3 +822,12 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - `composer install --no-progress --no-interaction` ✅ (vendor bootstrap only; migrations and full builds still require DB configuration)
+
+## Snapshot – 2025-12-21 – Installer purchase check removal
+
+### Installer flow hygiene
+- Removed the legacy purchase-code validation route/controller and updated installer step 2 to link directly to database setup.
+- Pruned mirrored update packages so old installer snapshots no longer reference the removed validation endpoint.
+
+### QA / Testing
+- Not run (not requested for this installer-only cleanup).
