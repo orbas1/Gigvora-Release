@@ -142,6 +142,10 @@ class ChatbotServiceProvider extends ServiceProvider
                         // conversation
                         $route->get('conversations', 'conversations')->name('conversations');
                         $route->get('conversations-with-paginate', 'conversationsWithPaginate')->name('conversations.with.paginate');
+                        $route->get('conversations/search', 'searchConversations')->name('conversations.search');
+                        $route->post('conversations/{conversation}/rename', 'renameConversation')->name('conversations.rename');
+                        $route->post('conversations/{conversation}/hide', 'hideConversation')->name('conversations.hide');
+                        $route->post('conversations/{conversation}/summarize', 'summarizeConversation')->name('conversations.summarize');
 
                         // ended routes
                         $route->get('{chatbot}/enbed', 'enbed')->name('enbed');

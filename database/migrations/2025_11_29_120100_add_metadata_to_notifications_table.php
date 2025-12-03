@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('notifications')) {
+            return;
+        }
+
         Schema::table('notifications', function (Blueprint $table) {
             if (! Schema::hasColumn('notifications', 'resource_type')) {
                 $table->string('resource_type', 50)->nullable()->after('type')->index();
@@ -37,6 +41,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('notifications')) {
+            return;
+        }
+
         Schema::table('notifications', function (Blueprint $table) {
             if (Schema::hasColumn('notifications', 'data')) {
                 $table->dropColumn('data');

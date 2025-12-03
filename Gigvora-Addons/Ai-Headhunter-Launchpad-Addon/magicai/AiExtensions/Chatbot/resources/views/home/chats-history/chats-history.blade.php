@@ -208,6 +208,10 @@
                     chatsList: [],
                     activeChat: null,
                     fetching: true,
+                    renameEndpoint: '{{ route('dashboard.chatbot.conversations.rename', ['conversation' => '__conversation__']) }}',
+                    hideEndpoint: '{{ route('dashboard.chatbot.conversations.hide', ['conversation' => '__conversation__']) }}',
+                    summarizeEndpoint: '{{ route('dashboard.chatbot.conversations.summarize', ['conversation' => '__conversation__']) }}',
+                    searchBase: '{{ route('dashboard.chatbot.conversations.with.paginate', ['page' => 1]) }}',
                     lastTimeFetch: null,
                     currentPage: 1,
                     allLoaded: false,
@@ -319,16 +323,79 @@
                         this.scrollMessagesToBottom();
                     },
                     async handleSearch() {
-                        // TODO: Implement search logic
+                        const term = this.$refs.historySearchInput?.value?.trim() || '';
+                        this.currentPage = 1;
+                        this.allLoaded = false;
+                        this.chatsList = [];
+                        const searchParam = term ? `&search=${encodeURIComponent(term)}` : '';
+                        this.$refs.loadMore.href = `${this.searchBase}?page=1${searchParam}`;
+                        await this.fetchChats();
                     },
                     async handleChangeTitle() {
-                        // TODO: Implement change title logic
+                        if (!this.activeChat) return toastr.error('{{ __('Select a chat to rename') }}');
+
+                        const title = this.$refs.historyChatTitleInput?.value?.trim();
+                        if (!title) return toastr.error('{{ __('Title is required') }}');
+
+                        const url = this.renameEndpoint.replace('__conversation__', this.activeChat);
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                            body: JSON.stringify({ title }),
+                        });
+
+                        if (!res.ok) {
+                            const data = await res.json();
+                            return toastr.error(data.message || '{{ __('Unable to rename conversation') }}');
+                        }
+
+                        this.chatsList = this.chatsList.map(chat => chat.id == this.activeChat ? { ...chat, conversation_name: title } : chat);
+                        toastr.success('{{ __('Conversation renamed') }}');
                     },
                     async handleDelete() {
-                        // TODO: Implement delete logic
+                        if (!this.activeChat) return toastr.error('{{ __('Select a chat to remove') }}');
+                        const url = this.hideEndpoint.replace('__conversation__', this.activeChat);
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                        });
+
+                        if (!res.ok) {
+                            const data = await res.json();
+                            return toastr.error(data.message || '{{ __('Unable to delete conversation') }}');
+                        }
+
+                        this.chatsList = this.chatsList.filter(chat => chat.id != this.activeChat);
+                        this.activeChat = this.chatsList[0]?.id ?? null;
+                        this.allLoaded = this.chatsList.length === 0 ? false : this.allLoaded;
+                        toastr.success('{{ __('Conversation removed from history') }}');
                     },
                     async handleSummarize() {
-                        // TODO: Implement delete logic
+                        if (!this.activeChat) return toastr.error('{{ __('Select a chat to summarize') }}');
+                        const url = this.summarizeEndpoint.replace('__conversation__', this.activeChat);
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                        });
+                        const data = await res.json();
+
+                        if (!res.ok) {
+                            return toastr.error(data.message || '{{ __('Unable to summarize conversation') }}');
+                        }
+
+                        toastr.info(data.summary);
                     },
                     async setActiveChat(event) {
                         const triggerEl = event.currentTarget;

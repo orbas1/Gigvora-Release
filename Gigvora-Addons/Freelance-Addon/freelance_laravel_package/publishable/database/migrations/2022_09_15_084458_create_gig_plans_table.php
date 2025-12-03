@@ -16,13 +16,21 @@ return new class extends Migration
         Schema::create('gig_plans', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id')->nullable()->index();
-            $table->string('title')->fullText();
+            $table->string('title');
             $table->text('description')->nullable();
             $table->double('price',10,2)->default(0);
             $table->tinyInteger('delivery_time');
             $table->tinyInteger('is_featured')->default('0');
             $table->text('options')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('gig_plans', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('title');
+            } else {
+                $table->index('title');
+            }
         });
     }
 

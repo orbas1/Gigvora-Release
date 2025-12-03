@@ -1,7 +1,90 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-02
+Last updated: 2025-12-08
+
+## Snapshot – 2025-12-08 – Task 22 (Admin, Compliance & Security Hardening)
+
+### 1. Admin command center APIs
+
+- Added `/api/admin/overview` and `/api/admin/addons` backed by `AdminMetricsService` to expose live KPIs for composer modes (jobs/freelance/ads/interactive/ai/utilities), reels vs long videos, queue health, live streaming engagement, utilities activity, and integration error traces sourced from `audit_logs`.
+- Introduced `/api/admin/audit-logs` for filtered audit visibility plus `/api/admin/incidents` to capture incident reports directly into `audit_logs`.
+
+### 2. GDPR + security operations
+
+- Implemented GDPR export and erasure endpoints (`/api/admin/gdpr/users/{id}/export|erase`) that pull real user data (posts, stories, media, live streams, utilities events, notifications, audit logs) and anonymize/deallocate data on erase while auditing every action.
+- Documented operational guardrails in `docs/security_settings.md` (HTTPS/Sanctum, admin rate limits, role gating, media safety) and authored `docs/incident_response.md` runbooks for breaches, fraud/escrow disputes, streaming misuse, and integration outages.
+
+### QA / Testing
+
+- Automated test suites not run in this pass; rerun `php artisan test`, `npm run build`, and `flutter analyze` after syncing environment secrets.
+
+## Snapshot – 2025-12-07 – Task 21 (Mobile Convergence completion)
+
+### 1. Parity closure
+
+- Completed the remaining mobile parity checklist items (stories/reels/long video editing + resolution ladder, live streaming with donations/goals/chat tiers, employer ATS dashboards, utilities quick tools/notifications, deep links) to align Flutter with the live Laravel flows and addon routes.
+- Confirmed comments/replies/reactions run exclusively against live endpoints and that deep links resolve cold-start URIs through `GigvoraDeepLinkRouter` without mock fallbacks.
+
+### 2. Build + release readiness
+
+- Updated `docs/mobile-build.md` with a pre-release verification checklist covering analyzer runs, Laravel builds/tests, and persona smoke tests for feed/comments/media/live/jobs/freelance/ads/talent-ai/utilities flows.
+- Ran `composer install` to hydrate Laravel dependencies for local serving; regenerated `APP_KEY` with SQLite dev settings for local inspection.
+
+### QA / Testing
+
+- `php artisan serve --host 0.0.0.0 --port 8000` boots with the SQLite stub env; root route currently returns 404 (no sample data/routes surfaced without migrations). Screenshot captured for reference (`artifacts/laravel-home.png`). No automated suites executed in this pass; rerun `flutter analyze`, `php artisan test`, and `npm run build` post-env sync.
+
+## Snapshot – 2025-12-06 – Task 22 (Mobile Convergence live comments + deep links)
+
+### 1. Mobile comment threads wired to Laravel
+
+- Added `GigvoraCommentThread` to render live comment/reply stacks with reaction pickers, pull-to-refresh, and delete hooks using `GigvoraCommentsClient` against `/api/get_comment/{postId}`, `/api/post_comment`, and `/api/comment_delete/{comment_id}`.
+- Composer now clears reply state after post and reloads from the API to keep reaction counts/user reactions aligned with Laravel without mock data.
+
+### 2. Parameterized deep links for addons and feed
+
+- Enhanced `GigvoraDeepLinkRouter` with parameterized route matching so `/jobs/123`, `/freelance/42`, `/post/99`, and media/live slugs resolve into the live navigation/addon routes delivered by `/api/navigation` plus addon maps.
+- Feed fallbacks ensure posts/media deep links land on the authenticated feed when no specific addon route is present.
+
+### 3. Docs
+
+- Updated `docs/mobile_parity_checklist.md` to reflect the live `GigvoraCommentThread` surface and the parameterized deep link coverage.
+- Refreshed `docs/mobile-build.md` with the new comments client/thread wiring and deep link router expectations (no stubs; offline retries required).
+
+### QA / Testing
+
+- Not run in this pass; run `flutter analyze` after wiring env/base URLs to confirm the new widgets integrate cleanly.
+
+## Snapshot – 2025-12-05 – Task 22 (Mobile Convergence parity wiring)
+
+### 1. Live comments + reactions
+
+- Added `GigvoraCommentsClient` in the Flutter shell to hit `/api/post_comment`, `/api/get_comment/{postId}`, and `/api/comment_delete/{comment_id}` with bearer tokens so composer threads, nested replies, and reaction toggles stay in lockstep with the Laravel controllers.
+- Comment parsing now keeps reaction counts, user reactions, and replies intact for feed sheets without any mock data paths.
+
+### 2. Deep link resolution aligned to nav/addons
+
+- Introduced `GigvoraDeepLinkRouter` to translate cold-start URIs into the same routes delivered by `/api/navigation` and addon route maps (profile, jobs, freelance, live/media), ensuring Flutter honors the live IA for deep links.
+- Exported the new router + comments client via `addons_integration.dart` so addon packages can reuse the shared wiring.
+
+### QA / Testing
+
+- Not run in this pass; run `flutter analyze` and the Laravel API smoke covering comments/deep links after configuring env creds.
+
+## Snapshot – 2025-12-04 – Task 22 (Mobile Convergence follow-up)
+
+### 1. Parity audit refinements
+
+- Expanded `docs/mobile_parity_checklist.md` to cover comments/reactions, stories, reels/long-form video, live streaming/chat, notifications, and deep link routing alongside existing feed/profile/addon rows. Marked partial areas where editing tools, donation tiers, or deep-link cold starts still need validation against `logic_flows.md#5`.
+
+### 2. Build + runtime guidance
+
+- Updated `docs/mobile-build.md` with required dart-defines (`BASE_URL`, push IDs), addon client forwarding rules, and deep link/offline handling expectations so Flutter shells only operate on live Laravel endpoints—no mock repositories.
+
+### QA / Testing
+
+- Automated suites were not run in this pass; rerun `flutter analyze` and Laravel/JS suites after configuring env credentials to confirm parity coverage and live-service wiring.
 
 ## Snapshot – 2025-12-02 – Task 19 (Networking ticketing + waitlist hardening)
 
@@ -643,3 +726,62 @@ Last updated: 2025-12-01
 - `npm run build` (Mix) ✅
 
 
+
+## Snapshot – 2025-12-03 – Task 23 (Data Layer & Environment Readiness)
+
+### Schema and migrations
+- Added a base `users` table and guarded addon migrations (media/story/live/posts) plus freelance full-text fallbacks so sqlite/MySQL builds no longer fail when optional tables are missing.
+- Introduced environment-readiness indexes for jobs, interactive events, ads, and audit logs to align hot query paths.
+- Synced installer state by dumping the fresh schema and seeds into `public/assets/install.sql` from a clean `migrate:fresh --seed` run.
+
+### Seeders and configuration
+- Hardened Advertisement, Jobs, Interactive, and Talent AI seeders for idempotence, structure-aware configs, and seeded a default admin user for host-dependent demo data.
+- Refreshed `.env.example` with addon/env keys (streaming, escrow, AI, payments, utilities) and added optional demo seed flag; config cache now succeeds after updates.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite test harness)
+- `php artisan config:cache` ✅
+## Snapshot – 2025-12-10 – Task 25 (Core + Addon Data Convergence, Search & Ads Intelligence)
+
+### Data convergence and keyword registry
+- Added a shared `keyword_registry` table/model plus seeder that ingests hashtags, freelance/job categories, interactive categories, and advertisement keyword prices so ads/search share the same taxonomy.
+- DatabaseSeeder now invokes `KeywordRegistrySeeder` after addon seeds to keep the registry in sync on every `migrate:fresh --seed` run.
+
+### Search ranking and ads placement
+- Introduced `SearchRankingService` with weighted signals (followers, connections, recency, location, VIP, offering match) and applied it to people/posts search results for higher relevance.
+- Added `AdsPlacementService` + `/api/ads/placements` endpoint to select live creatives via keyword/country matching and the advertisement bid strategy for feed/search/profile slots.
+
+### QA / Testing
+- Pending full suite; rerun `php artisan migrate:fresh --seed` and the ads/search API smoke tests after syncing env variables for the advertisement addon.
+
+## Snapshot – 2025-12-15 – Install.sql Recovery, DB Unification & Security/GDPR Enforcement
+
+### Database recovery and alignment
+- Recovered `install.sql` from the previous backup and regenerated it from the live Laravel migrations/seeders (core + addons) via SQLite to ensure schema and base data parity.
+- Added an extension migration for `users` to restore legacy Sociopro profile fields and moderation metadata (`shadow_banned_until`, `moderation_strikes`, `banned_reason`) referenced across GDPR and moderation flows.
+- Hardened the admin seeder to require `GIGVORA_ADMIN_PASSWORD` at seed time and documented the refresh steps in `docs/database.md`.
+
+### Security, GDPR, and moderation
+- Introduced `ContentModerationService` with banned-phrase detection, strike escalation, and audit logging, blocking comment submissions during shadow bans.
+- Expanded GDPR exports/erasure to include moderation fields and reset ban metadata during erasure; updated `docs/gdpr.md` and `docs/security_settings.md` with operational guidance.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite, with `GIGVORA_ADMIN_PASSWORD` provided)
+
+## Snapshot – 2025-12-18 – Build, QA & Release / install.sql modular recovery
+
+### Installer and schema alignment
+- Restored the full Sociopro/Gigvora installer into `database/install/parts/001_core.sql` and added addon overlays plus modern migrations, rebuilt via `database/install/rebuild_install.sh` to generate `database/install_master.sql` and mirror it to `public/assets/install.sql`.
+- Added MySQL-safe extensions for moderation, notification metadata, ad keyword intelligence, audit logging, live stream engagement tracking, and index overlays for jobs/interactive/ads tables to keep the schema aligned with current migrations.
+
+### Docs and release hygiene
+- Updated `README-QUICKSTART.md` with the modular installer rebuild step and reinforced SQL import guidance.
+- Marked Build/QA & Release complete in `AGENTS.md` and linked installer artifacts for reviewers.
+
+### Follow-up – installer modularization and job seeds (2025-12-19)
+- Split the unified installer parts so addon marketplace tables live in `200_addons_marketplace.sql` and the Jobs addon resides in `210_jobs_addon.sql`, keeping the original Sociopro core intact in `001_core.sql`.
+- Rehydrated Jobs seeds (categories and ATS defaults) inside the jobs part to prevent future rebuilds from losing baseline data.
+- Regenerated `database/install_master.sql` and mirrored `public/assets/install.sql` via `database/install/rebuild_install.sh` to ensure MySQL imports stay lossless.
+
+### QA / Testing
+- Full build suites pending (vendor deps unavailable in this environment); rerun `php artisan migrate:fresh --seed` and mobile/web build commands once dependencies are present.

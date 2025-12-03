@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('gigs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('author_id')->index();
-            $table->string('title')->fullText();
+            $table->string('title');
             $table->string('slug')->index();
-            $table->string('country')->fullText();
+            $table->string('country');
             $table->string('zipcode',100);
             $table->text('address')->nullable();
             $table->text('description')->nullable();
@@ -29,6 +29,16 @@ return new class extends Migration
             $table->enum('status', ['publish', 'draft'])->default('publish')->index();
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('gigs', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('title');
+                $table->fullText('country');
+            } else {
+                $table->index('title');
+                $table->index('country');
+            }
         });
     }
 

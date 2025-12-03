@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('project_freelancers', function (Blueprint $table) {
+        $this->createIfMissing('project_freelancers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('freelancer');
@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_tasks', function (Blueprint $table) {
+        $this->createIfMissing('project_tasks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('title');
@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_milestones', function (Blueprint $table) {
+        $this->createIfMissing('project_milestones', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('title');
@@ -36,7 +36,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_submissions', function (Blueprint $table) {
+        $this->createIfMissing('project_submissions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('milestone_id')->nullable();
@@ -46,7 +46,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_invitations', function (Blueprint $table) {
+        $this->createIfMissing('project_invitations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('freelancer');
@@ -55,7 +55,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_time_logs', function (Blueprint $table) {
+        $this->createIfMissing('project_time_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('freelancer');
@@ -65,7 +65,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('project_reviews', function (Blueprint $table) {
+        $this->createIfMissing('project_reviews', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->decimal('rating', 2, 1);
@@ -74,7 +74,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_timeline_items', function (Blueprint $table) {
+        $this->createIfMissing('gig_timeline_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->string('title');
@@ -83,7 +83,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_faqs', function (Blueprint $table) {
+        $this->createIfMissing('gig_faqs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->text('question');
@@ -91,7 +91,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_addons', function (Blueprint $table) {
+        $this->createIfMissing('gig_addons', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->string('title');
@@ -99,7 +99,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_packages', function (Blueprint $table) {
+        $this->createIfMissing('gig_packages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->string('name');
@@ -108,14 +108,14 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_requirements', function (Blueprint $table) {
+        $this->createIfMissing('gig_requirements', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->text('prompt');
             $table->timestamps();
         });
 
-        Schema::create('gig_change_requests', function (Blueprint $table) {
+        $this->createIfMissing('gig_change_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->string('requester');
@@ -124,7 +124,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('gig_reviews', function (Blueprint $table) {
+        $this->createIfMissing('gig_reviews', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gig_id');
             $table->decimal('rating', 2, 1);
@@ -133,7 +133,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('profile_portfolios', function (Blueprint $table) {
+        $this->createIfMissing('profile_portfolios', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('title');
@@ -145,7 +145,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('profile_reviews', function (Blueprint $table) {
+        $this->createIfMissing('profile_reviews', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('reviewer')->nullable();
@@ -155,7 +155,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('profile_educations', function (Blueprint $table) {
+        $this->createIfMissing('profile_educations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('institution');
@@ -166,7 +166,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('profile_certifications', function (Blueprint $table) {
+        $this->createIfMissing('profile_certifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('name');
@@ -177,7 +177,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('custom_gigs', function (Blueprint $table) {
+        $this->createIfMissing('custom_gigs', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('buyer');
@@ -186,7 +186,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('dispute_stages', function (Blueprint $table) {
+        $this->createIfMissing('dispute_stages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('dispute_id');
             $table->string('stage');
@@ -195,7 +195,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('freelance_tags', function (Blueprint $table) {
+        $this->createIfMissing('freelance_tags', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
@@ -203,7 +203,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('freelance_tag_assignments', function (Blueprint $table) {
+        $this->createIfMissing('freelance_tag_assignments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tag_id');
             $table->unsignedBigInteger('assignable_id');
@@ -211,7 +211,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('escrow_actions', function (Blueprint $table) {
+        $this->createIfMissing('escrow_actions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('escrow_id');
             $table->string('type');
@@ -222,10 +222,17 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        if (!Schema::hasColumn('escrows', 'released_amount')) {
+        if (Schema::hasTable('escrows') && ! Schema::hasColumn('escrows', 'released_amount')) {
             Schema::table('escrows', function (Blueprint $table) {
                 $table->decimal('released_amount', 10, 2)->default(0);
             });
+        }
+    }
+
+    protected function createIfMissing(string $table, \Closure $definition): void
+    {
+        if (! Schema::hasTable($table)) {
+            Schema::create($table, $definition);
         }
     }
 

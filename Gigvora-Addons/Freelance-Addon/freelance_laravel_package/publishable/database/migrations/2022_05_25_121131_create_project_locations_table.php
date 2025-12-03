@@ -15,10 +15,18 @@ return new class extends Migration
     {
         Schema::create('project_locations', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->fullText();
+            $table->string('name');
             $table->enum('status', ['active', 'deactive'])->default('active')->index();
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('project_locations', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('name');
+            } else {
+                $table->index('name');
+            }
         });
     }
 

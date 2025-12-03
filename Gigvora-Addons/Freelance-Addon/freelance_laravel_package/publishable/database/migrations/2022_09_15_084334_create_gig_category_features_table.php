@@ -16,9 +16,17 @@ return new class extends Migration
         Schema::create('gig_category_features', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('category_id')->nullable()->index();
-            $table->string('label')->fullText();
+            $table->string('label');
             $table->text('options')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('gig_category_features', function (Blueprint $table) {
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('label');
+            } else {
+                $table->index('label');
+            }
         });
     }
 

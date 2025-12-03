@@ -38,6 +38,7 @@ use App\Models\Blog;
 use App\Models\Blogcategory;
 use App\Models\Sponsor;
 use App\Models\Share;
+use App\Services\ContentModerationService;
 use App\Models\Setting;
 use App\Models\Invite;
 use App\Models\Notification;
@@ -2666,18 +2667,37 @@ class ApiController extends Controller
             $user_id = auth('sanctum')->user()->id;
             // $form_data = $request->all();
             if ($request->comment == 'comment') {
+                $user = auth('sanctum')->user();
+                if ($user->shadow_banned_until && now()->lessThan($user->shadow_banned_until)) {
+                    return response()->json([
+                        'status' => 403,
+                        'message' => 'You are currently restricted from posting comments due to moderation findings.',
+                    ], 403);
+                }
+
+                $moderation = app(ContentModerationService::class);
+                $review = $moderation->reviewAndSanitize($request->description, $user);
+                if ($review['blocked'] ?? false) {
+                    return response()->json([
+                        'status' => 403,
+                        'message' => 'Comment blocked for policy violation.',
+                        'reason' => $review['reason'],
+                        'until' => $review['until'] ?? null,
+                    ], 403);
+                }
+
                 $data['parent_id'] = $request->parent_id;
                 $data['user_id'] = $user_id;
                 $data['is_type'] = $request->is_type;
                 $data['id_of_type'] = $request->id_of_type;
-                $data['description'] = $request->description;
+                $data['description'] = $review['clean_text'];
                 $data['user_reacts'] = json_encode(array());
                 $data['created_at'] = time();
                 $data['updated_at'] = $data['created_at'];
                 $comment_id = Comments::insertGetId($data);
                 if ($comment_id >= 0) {
                     $response['status'] = 200;
-                    $response['message'] = 'Your comment successfully publidhed';
+                    $response['message'] = 'Your comment successfully published';
                 }
             } else {
                 $comment_id = $request->comment_id; // Get the post_id from the request
