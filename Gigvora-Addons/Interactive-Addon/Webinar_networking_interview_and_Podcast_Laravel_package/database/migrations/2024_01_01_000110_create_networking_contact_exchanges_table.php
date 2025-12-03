@@ -18,8 +18,8 @@ return new class extends Migration {
             $table->json('metadata')->nullable();
             $table->timestamps();
 
-            $table->unique(['networking_session_id', 'user_id', 'partner_id']);
-            $table->index(['networking_session_id', 'user_id']);
+            $table->unique(['networking_session_id', 'user_id', 'partner_id'], 'uniq_network_contact_exchange');
+            $table->index(['networking_session_id', 'user_id'], 'ix_network_contact_session_user');
         });
     }
 
@@ -28,4 +28,3 @@ return new class extends Migration {
         Schema::dropIfExists('networking_contact_exchanges');
     }
 };
-

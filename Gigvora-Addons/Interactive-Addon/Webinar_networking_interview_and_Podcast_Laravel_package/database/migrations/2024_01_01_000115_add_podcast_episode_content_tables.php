@@ -46,7 +46,7 @@ return new class extends Migration {
             $table->json('metadata')->nullable();
             $table->timestamps();
 
-            $table->unique(['podcast_episode_id', 'user_id', 'entitlement_type']);
+            $table->unique(['podcast_episode_id', 'user_id', 'entitlement_type'], 'uniq_podcast_episode_entitlements');
         });
     }
 
@@ -61,4 +61,3 @@ return new class extends Migration {
         });
     }
 };
-

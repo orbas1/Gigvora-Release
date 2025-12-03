@@ -56,7 +56,7 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamp('moved_at')->nullable();
             $table->timestamps();
-            $table->unique(['headhunter_mandate_id', 'headhunter_candidate_id']);
+            $table->unique(['headhunter_mandate_id', 'headhunter_candidate_id'], 'headhunter_pipeline_unique');
         });
 
         Schema::create('headhunter_interviews', function (Blueprint $table) {

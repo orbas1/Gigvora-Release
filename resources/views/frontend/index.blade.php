@@ -18,6 +18,8 @@
 
     <link rel="shortcut icon" href="{{ get_system_logo_favicon($system_favicon, 'favicon') }}" />
 
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/fontawesome/all.min.css') }}">
     <!-- CSS Library -->
@@ -195,6 +197,8 @@
     @include('frontend.toaster')
 
     @include('frontend.initialize')
+
+    <script src="{{ asset('js/app.js') }}" defer></script>
 
     <script>
         "use strict";

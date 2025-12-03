@@ -263,25 +263,29 @@ return new class extends Migration {
             $table->timestamp('joined_at')->nullable();
             $table->timestamp('left_at')->nullable();
             $table->timestamps();
-            $table->unique(['live_session_id', 'user_id']);
+            $table->unique(['live_session_id', 'user_id'], 'pro_network_live_session_participants_unique');
         });
 
         Schema::create('pro_network_reactions', function (Blueprint $table) {
             $table->id();
-            $table->morphs('reactable');
+            $table->unsignedBigInteger('reactable_id');
+            $table->string('reactable_type');
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('type');
             $table->integer('weight')->default(1);
             $table->timestamps();
-            $table->unique(['reactable_id', 'reactable_type', 'user_id']);
+            $table->unique(['reactable_id', 'reactable_type', 'user_id'], 'pro_network_reactions_unique');
+            $table->index(['reactable_type', 'reactable_id'], 'pro_network_reactions_reactable_index');
         });
 
         Schema::create('pro_network_reaction_aggregates', function (Blueprint $table) {
             $table->id();
-            $table->morphs('reactable');
+            $table->unsignedBigInteger('reactable_id');
+            $table->string('reactable_type');
             $table->json('counts')->nullable();
             $table->integer('dislikes')->default(0);
             $table->timestamps();
+            $table->index(['reactable_type', 'reactable_id'], 'pro_network_reaction_aggregates_reactable_index');
         });
 
         Schema::create('pro_network_profile_reaction_scores', function (Blueprint $table) {
@@ -304,9 +308,11 @@ return new class extends Migration {
         Schema::create('pro_network_hashtaggables', function (Blueprint $table) {
             $table->id();
             $table->foreignId('hashtag_id')->constrained('pro_network_hashtags')->cascadeOnDelete();
-            $table->morphs('hashtaggable');
+            $table->unsignedBigInteger('hashtaggable_id');
+            $table->string('hashtaggable_type');
             $table->timestamps();
             $table->unique(['hashtag_id', 'hashtaggable_id', 'hashtaggable_type'], 'hashtaggable_unique');
+            $table->index(['hashtaggable_type', 'hashtaggable_id'], 'pro_network_hashtaggables_hashtaggable_index');
         });
 
         Schema::create('pro_network_music_tracks', function (Blueprint $table) {
@@ -324,7 +330,8 @@ return new class extends Migration {
 
         Schema::create('pro_network_story_metadata', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('story_id')->constrained('stories')->cascadeOnDelete();
+            $table->integer('story_id');
+            $table->foreign('story_id')->references('story_id')->on('stories')->cascadeOnDelete();
             $table->json('overlays')->nullable();
             $table->json('filters')->nullable();
             $table->json('stickers')->nullable();
@@ -348,7 +355,8 @@ return new class extends Migration {
 
         Schema::create('pro_network_moderation_queue', function (Blueprint $table) {
             $table->id();
-            $table->morphs('moderatable');
+            $table->unsignedBigInteger('moderatable_id');
+            $table->string('moderatable_type');
             $table->string('reason');
             $table->string('status')->default('pending');
             $table->json('flags')->nullable();
@@ -356,6 +364,7 @@ return new class extends Migration {
             $table->timestamp('resolved_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->index(['moderatable_type', 'moderatable_id'], 'pro_network_moderation_queue_moderatable_index');
         });
 
         Schema::create('pro_network_bad_words', function (Blueprint $table) {
@@ -467,7 +476,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('inviter_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('invitee_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('post_id')->nullable()->constrained('posts')->nullOnDelete();
+            $table->integer('post_id')->nullable();
+            $table->foreign('post_id')->references('post_id')->on('posts')->nullOnDelete();
             $table->string('role')->nullable();
             $table->string('status')->default('pending');
             $table->text('message')->nullable();
@@ -476,7 +486,8 @@ return new class extends Migration {
 
         Schema::create('pro_network_post_enhancements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
+            $table->integer('post_id');
+            $table->foreign('post_id')->references('post_id')->on('posts')->cascadeOnDelete();
             $table->string('type');
             $table->json('payload')->nullable();
             $table->timestamps();

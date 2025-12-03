@@ -11,11 +11,15 @@ return new class () extends Migration {
     {
         Schema::create('launchpad_application_task_progress', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('launchpad_application_id')->constrained('launchpad_applications');
-            $table->foreignId('launchpad_task_id')->constrained('launchpad_tasks');
+            $table->unsignedBigInteger('launchpad_application_id');
+            $table->unsignedBigInteger('launchpad_task_id');
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
-            $table->unique(['launchpad_application_id', 'launchpad_task_id']);
+            $table->foreign('launchpad_application_id', 'fk_lapp_task_prog_application')
+                ->references('id')->on('launchpad_applications')->cascadeOnDelete();
+            $table->foreign('launchpad_task_id', 'fk_lapp_task_prog_task')
+                ->references('id')->on('launchpad_tasks')->cascadeOnDelete();
+            $table->unique(['launchpad_application_id', 'launchpad_task_id'], 'uniq_lapp_task_prog');
         });
     }
 

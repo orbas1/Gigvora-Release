@@ -112,25 +112,25 @@ class KeywordRegistryService
     protected function seedFromFreelance(): void
     {
         if (Schema::hasTable('project_categories')) {
-            DB::table('project_categories')->select(['id', 'category_name'])->orderBy('id')->chunkById(200, function ($categories) {
+            DB::table('project_categories')->select(['id', 'name'])->orderBy('id')->chunkById(200, function ($categories) {
                 foreach ($categories as $category) {
-                    $this->registerKeyword($category->category_name, 'project_category', (int) $category->id);
+                    $this->registerKeyword($category->name, 'project_category', (int) $category->id);
                 }
             });
         }
 
         if (Schema::hasTable('gig_categories')) {
-            DB::table('gig_categories')->select(['id', 'title'])->orderBy('id')->chunkById(200, function ($categories) {
+            DB::table('gig_categories')->select(['id', 'name'])->orderBy('id')->chunkById(200, function ($categories) {
                 foreach ($categories as $category) {
-                    $this->registerKeyword($category->title, 'gig_category', (int) $category->id);
+                    $this->registerKeyword($category->name, 'gig_category', (int) $category->id);
                 }
             });
         }
 
         if (Schema::hasTable('gig_tags')) {
-            DB::table('gig_tags')->select(['id', 'tag'])->orderBy('id')->chunkById(200, function ($tags) {
+            DB::table('gig_tags')->select(['id', 'tag_name'])->orderBy('id')->chunkById(200, function ($tags) {
                 foreach ($tags as $tag) {
-                    $this->registerKeyword($tag->tag, 'gig_tag', (int) $tag->id);
+                    $this->registerKeyword($tag->tag_name, 'gig_tag', (int) $tag->id);
                 }
             });
         }

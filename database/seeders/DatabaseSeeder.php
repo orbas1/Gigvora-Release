@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(CoreUserSeeder::class);
+        $this->call(SettingsTableSeeder::class);
+        $this->call(LanguagesTableSeeder::class);
+        $this->call(StandardUserSeeder::class);
 
         $this->callAddonSeederIfExists(
             'Gigvora-Addons/Advertisement-Addon/Advertisement_Laravel_package/database/seeders/AdvertisementSeeder.php',

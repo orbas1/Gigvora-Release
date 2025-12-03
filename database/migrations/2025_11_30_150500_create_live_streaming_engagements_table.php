@@ -17,7 +17,7 @@ return new class extends Migration
 
         Schema::create('live_streaming_engagements', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('live_streaming_id');
+            $table->integer('live_streaming_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('type', 32);
             $table->decimal('amount', 12, 2)->default(0);
@@ -45,4 +45,3 @@ return new class extends Migration
         Schema::dropIfExists('live_streaming_engagements');
     }
 };
-

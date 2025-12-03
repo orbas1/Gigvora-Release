@@ -22,7 +22,7 @@ return new class extends Migration
             }
 
             if (! Schema::hasColumn('notifications', 'title')) {
-                $table->string('title')->nullable()->after('view');
+                $table->string('title')->nullable()->after('resource_id');
             }
 
             if (! Schema::hasColumn('notifications', 'message')) {
@@ -72,4 +72,3 @@ return new class extends Migration
         });
     }
 };
-

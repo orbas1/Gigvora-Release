@@ -13,7 +13,7 @@ return new class extends Migration
                 if (! Schema::hasColumn('users', 'profile_locked_for_verification')) {
                     $table->boolean('profile_locked_for_verification')
                         ->default(false)
-                        ->after('status');
+                        ->after('remember_token');
                 }
 
                 if (! Schema::hasColumn('users', 'profile_lock_reason')) {
@@ -68,4 +68,3 @@ return new class extends Migration
         }
     }
 };
-
