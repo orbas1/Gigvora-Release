@@ -831,3 +831,13 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - Not run (not requested for this installer-only cleanup).
+
+## Snapshot – 2025-12-22 – Asset pipeline hardening & login/admin readiness
+
+### Frontend readiness
+- Added a `gigvora_asset()` helper so Blade layouts pull the versioned Mix assets when available and gracefully fall back to the raw public paths, preventing missing CSS/JS across login, admin, and the main shell.
+- Pointed the guest, app, frontend, and admin shells at the new helper to keep Gigvora token styles loaded consistently.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite)
+- `npm run build` ✅
