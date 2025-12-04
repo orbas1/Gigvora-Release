@@ -14,7 +14,6 @@ use App\Models\User;
 
 use Config;
 use DB;
-use Session;
 
 class InstallController extends Controller
 {
@@ -47,17 +46,6 @@ class InstallController extends Controller
         return view('install.step2', ['error' => $error]);
     }
 
-    public function validatePurchaseCode(Request $request) 
-    {
-        $data = $request->all();
-        $purchase_code = $data['purchase_code'] ?? 'not_required';
-        // purchase code validation has been intentionally skipped for Gigvora deployments
-        session(['purchase_code' => $purchase_code]);
-        session(['purchase_code_verified' => 1]);
-        //move to step 3
-        return redirect()->route('step3');
-    }
-
     public function api_request($code = '')
     {
         // Envato purchase code validation has been removed for Gigvora deployments
@@ -66,16 +54,17 @@ class InstallController extends Controller
 
     public function step3(Request $request) {
         $db_connection = "";
-        $data = $request->all();
 
-        $this->check_purchase_code_verification();
+        if ($request->filled('purchase_code')) {
+            session(['purchase_code' => $request->input('purchase_code')]);
+        }
 
-        if ($data) {
+        if ($request->isMethod('post') && $request->filled('hostname') && $request->filled('username') && $request->filled('dbname')) {
 
-            $hostname = $data['hostname'];
-            $username = $data['username'];
-            $password = $data['password'];
-            $dbname   = $data['dbname'];
+            $hostname = $request->input('hostname');
+            $username = $request->input('username');
+            $password = $request->input('password', '');
+            $dbname   = $request->input('dbname');
             // check db connection using the above credentials
             $db_connection = $this->check_database_connection($hostname, $username, $password, $dbname);
             if ($db_connection == 'success') {
@@ -86,17 +75,12 @@ class InstallController extends Controller
                 session(['dbname' => $dbname]);
                 return redirect()->route('step4');
             } else {
-                
+
                 return view('install.step3', ['db_connection' => $db_connection]);
-            } 
+            }
         }
 
         return view('install.step3', ['db_connection' => $db_connection]);
-    }
-
-    public function check_purchase_code_verification() {
-        // Purchase code verification is no longer required for installation
-        return;
     }
 
     public function check_database_connection($hostname, $username, $password, $dbname) {

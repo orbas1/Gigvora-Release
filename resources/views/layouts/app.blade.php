@@ -21,14 +21,14 @@
        
 
         <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <link rel="stylesheet" href="{{ gigvora_asset('css/app.css') }}">
         @if(config('advertisement.enabled'))
             <link rel="stylesheet" href="{{ mix('css/advertisement/addon.css') }}">
         @endif
         @stack('styles')
 
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
+        <script src="{{ gigvora_asset('js/app.js') }}" defer></script>
         @stack('head-scripts')
     </head>
     <body class="font-sans antialiased gv-body bg-[var(--gv-color-neutral-50)] text-[var(--gv-color-neutral-800)]">

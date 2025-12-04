@@ -679,6 +679,37 @@ if (!function_exists('get_system_logo_favicon')) {
     }
 }
 
+if (!function_exists('admin_path')) {
+    function admin_path(string $path = ''): string
+    {
+        $prefix = trim(config('app.admin_prefix', 'admin'), '/');
+
+        $prefixPath = $prefix === '' ? '' : $prefix;
+        $suffix = trim($path, '/');
+
+        $full = trim($prefixPath . '/' . $suffix, '/');
+
+        return '/' . $full;
+    }
+}
+
+if (!function_exists('gigvora_asset')) {
+    function gigvora_asset(string $path): string
+    {
+        $manifestPath = public_path('mix-manifest.json');
+
+        if (file_exists($manifestPath)) {
+            try {
+                return mix($path);
+            } catch (\Exception $e) {
+                // Fall back to the raw asset path if the manifest entry is missing
+            }
+        }
+
+        return asset($path);
+    }
+}
+
 // Global Settings
 if (!function_exists('set_config')) {
     function set_config($key = '', $value = '')

@@ -10,7 +10,7 @@
      - **Option B (Laravel migrations)**: `composer install` then `php artisan key:generate` and `php artisan migrate --seed`.
   4. Assets: `npm install` then `npm run build` (or `npm run dev` locally).
   5. Storage: `php artisan storage:link`.
-  6. Run: `php artisan serve` and log in with the seeded admin (set `GIGVORA_ADMIN_PASSWORD` before seeding).
+  6. Run: `php artisan serve` and log in with the seeded admin (email: `admin@gigvora.test`, password from `GIGVORA_ADMIN_PASSWORD`). The admin panel defaults to `/admin`; set `ADMIN_PREFIX=/secure-admin` if you want a different entry path.
 - Notes: configure media storage, AI/ads/payment API keys, and streaming credentials in `.env` before going live.
 
 ## Mobile (Flutter)

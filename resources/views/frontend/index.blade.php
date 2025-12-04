@@ -18,7 +18,7 @@
 
     <link rel="shortcut icon" href="{{ get_system_logo_favicon($system_favicon, 'favicon') }}" />
 
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ gigvora_asset('css/app.css') }}">
 
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/fontawesome/all.min.css') }}">

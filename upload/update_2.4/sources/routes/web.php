@@ -214,7 +214,6 @@ Route::controller(InstallController::class)->group(function () {
     Route::get('install/step4', 'step4')->name('step4');
     Route::get('install/step4/{confirm_import}', 'confirmImport')->name('step4.confirm_import');
     Route::get('install/install', 'confirmInstall')->name('confirm_install');
-    Route::post('install/validate', 'validatePurchaseCode')->name('install.validate');
     Route::any('install/finalizing_setup', 'finalizingSetup')->name('finalizing_setup');
     Route::get('install/success', 'success')->name('success');
 });

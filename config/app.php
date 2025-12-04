@@ -80,6 +80,8 @@ return [
 
     'url' => $app_url,
 
+    'admin_prefix' => env('ADMIN_PREFIX', 'admin'),
+
     'asset_url' => $asset_url,
 
     /*

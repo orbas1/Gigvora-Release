@@ -1,7 +1,32 @@
 # Gigvora Progress Log
 # Gigvora Progress Log
 
-Last updated: 2025-12-08
+Last updated: 2025-12-09
+
+## Snapshot – 2025-12-09 – Auth & Admin entry hardening
+
+### 1. Styling & assets
+
+- Applied Gigvora token stylesheet to the admin shell (`resources/views/backend/index.blade.php`) so `/admin` inherits the same typography, colors, focus rings, and cards as auth + app layouts.
+- Restored login illustration (`public/assets/frontend/images/login.svg`) and seeded brand assets (light/dark logo + favicon under `public/storage/logo/*` with seeded filenames) to remove missing-image warnings on auth/admin.
+- Kept the auth layout on tokenized cards/inputs and ensured the login hero image is bundled with Mix output.
+
+### 2. Admin entrypoint & installer guardrails
+
+- Added `ADMIN_PREFIX` support (default `/admin`) with a dedicated entrance controller and proxy so environments can move the admin surface (e.g., `/secure-admin`) without .env hacks while still honoring the existing admin controllers.
+- Introduced middleware to redirect legacy `/admin*` hits to the configured prefix and stop accidental install-route overrides by gating installer routes behind `ENABLE_INSTALLER` + the placeholder `db_name` connection.
+- Documented the seeded admin credentials requirement (`GIGVORA_ADMIN_PASSWORD`) and kept `/admin` available by default.
+
+### QA / Testing
+
+- `php artisan migrate:fresh --seed`
+- `npm run build`
+- Screenshots captured in Codex preview:
+  - ✔ `/login` – Gigvora tokens applied with logo/illustration visible
+  - ✔ `/` – main feed loads with token shell and seeded content
+  - ✔ `/admin` – reachable via default prefix with tokenized admin shell
+  - ✔ `/freelance` dashboards (gigs/projects) – token styling intact
+  - ✔ Profile view – hero/tabs render with Gigvora cards
 
 ## Snapshot – 2025-12-08 – Task 22 (Admin, Compliance & Security Hardening)
 
@@ -797,3 +822,22 @@ Last updated: 2025-12-01
 
 ### QA / Testing
 - `composer install --no-progress --no-interaction` ✅ (vendor bootstrap only; migrations and full builds still require DB configuration)
+
+## Snapshot – 2025-12-21 – Installer purchase check removal
+
+### Installer flow hygiene
+- Removed the legacy purchase-code validation route/controller and updated installer step 2 to link directly to database setup.
+- Pruned mirrored update packages so old installer snapshots no longer reference the removed validation endpoint.
+
+### QA / Testing
+- Not run (not requested for this installer-only cleanup).
+
+## Snapshot – 2025-12-22 – Asset pipeline hardening & login/admin readiness
+
+### Frontend readiness
+- Added a `gigvora_asset()` helper so Blade layouts pull the versioned Mix assets when available and gracefully fall back to the raw public paths, preventing missing CSS/JS across login, admin, and the main shell.
+- Pointed the guest, app, frontend, and admin shells at the new helper to keep Gigvora token styles loaded consistently.
+
+### QA / Testing
+- `php artisan migrate:fresh --seed` ✅ (sqlite)
+- `npm run build` ✅

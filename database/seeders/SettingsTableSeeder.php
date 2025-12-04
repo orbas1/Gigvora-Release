@@ -22,7 +22,7 @@ class SettingsTableSeeder extends Seeder
             ['setting_id' => 7, 'type' => 'system_footer_link', 'description' => 'https://gigvora.local', 'created_at' => $now, 'updated_at' => $now],
             ['setting_id' => 8, 'type' => 'system_dark_logo', 'description' => 'gigvora-dark.svg', 'created_at' => $now, 'updated_at' => $now],
             ['setting_id' => 9, 'type' => 'system_light_logo', 'description' => 'gigvora-light.svg', 'created_at' => $now, 'updated_at' => $now],
-            ['setting_id' => 10, 'type' => 'system_fav_icon', 'description' => 'gigvora-favicon.ico', 'created_at' => $now, 'updated_at' => $now],
+            ['setting_id' => 10, 'type' => 'system_fav_icon', 'description' => 'gigvora-favicon.svg', 'created_at' => $now, 'updated_at' => $now],
             ['setting_id' => 11, 'type' => 'system_currency', 'description' => 'USD', 'created_at' => $now, 'updated_at' => $now],
             ['setting_id' => 12, 'type' => 'system_language', 'description' => 'english', 'created_at' => $now, 'updated_at' => $now],
             ['setting_id' => 13, 'type' => 'language', 'description' => 'english', 'created_at' => $now, 'updated_at' => $now],

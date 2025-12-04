@@ -357,6 +357,9 @@ A task is “done” only when:
 - Never overwrite or revert user-authored changes you did not make; integrate with existing diffs instead of scrubbing them.
 - Skip destructive git commands (`git reset --hard`, `git checkout --`) unless the requestor gives written approval.
 
+### 2025-12-09 Auth/Admin hardening note
+- Admin entry is now routable via `ADMIN_PREFIX` (defaults to `/admin`) with middleware to redirect legacy `/admin*` paths to the configured prefix and a proxy controller so the existing admin controllers continue to work. Installer routes are gated behind `ENABLE_INSTALLER` to avoid overriding the feed login redirect. Login/admin shells load token CSS and refreshed logo/illustration assets seeded via `SettingsTableSeeder`.
+
 ## Command & Tooling Guidance
 - On the first terminal invocation, `cd` into `/Users/user/Downloads/Gigvora-Release-1` and respect the persistent shell state across subsequent commands.
 - Prefer dedicated tools (`read_file`, `rg`, `codebase_search`, `apply_patch`) over ad-hoc shell commands for file reads, searches, and edits; they respect repo ignore rules and keep diffs reviewable.
